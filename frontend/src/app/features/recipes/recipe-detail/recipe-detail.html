@@ -1,0 +1,67 @@
+@if (recipe) {
+  <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">{{ recipe.title }}</h1>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ recipe.description }}</p>
+        </div>
+        <div class="flex space-x-2">
+          <button (click)="onFork()" class="bg-orange-100 text-orange-700 px-4 py-2 rounded-md hover:bg-orange-200 text-sm font-medium">
+            Forker
+          </button>
+          @if (isOwner) {
+            <a [routerLink]="['/recipes', recipe.id, 'edit']" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 text-sm font-medium">
+              Modifier
+            </a>
+          }
+        </div>
+      </div>
+
+      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div class="flex items-center mb-6">
+          <label for="servings" class="mr-4 text-sm font-medium text-gray-700">Nombre de convives :</label>
+          <div class="flex items-center border rounded-md">
+            <button (click)="updateServings(-1)" class="px-3 py-1 hover:bg-gray-100">-</button>
+            <span class="px-4 py-1 font-bold">{{ servings }}</span>
+            <button (click)="updateServings(1)" class="px-3 py-1 hover:bg-gray-100">+</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h2 class="text-xl font-semibold mb-4 text-orange-600">Ingrédients</h2>
+            <ul class="space-y-2">
+              @for (ing of recipe.ingredients; track ing.name) {
+                <li class="flex justify-between border-b border-gray-100 pb-2">
+                  <span>{{ ing.name }}</span>
+                  <span class="font-medium">
+                    {{ (ing.quantity * servings / baseServings) | number:'1.0-2' }} {{ ing.unit }}
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-semibold mb-4 text-orange-600">Instructions</h2>
+            <ol class="space-y-4">
+              @for (step of recipe.instructions; track $index) {
+                <li class="flex">
+                  <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-orange-100 text-orange-600 text-sm font-bold mr-3">
+                    {{ $index + 1 }}
+                  </span>
+                  <p class="text-gray-700">{{ step }}</p>
+                </li>
+              }
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="text-center py-12">
+    <p class="text-gray-500">Chargement de la recette...</p>
+  </div>
+}
