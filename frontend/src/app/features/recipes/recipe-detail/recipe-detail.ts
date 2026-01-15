@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
 import { AuthService } from '../../../core/services/auth';
+import { AiService } from '../../../core/services/ai';
 import { Recipe } from '../../../core/models/recipe';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -17,6 +20,7 @@ export class RecipeDetailComponent implements OnInit {
   private router = inject(Router);
   private recipesService = inject(RecipesService);
   private authService = inject(AuthService);
+  private aiService = inject(AiService);
 
   recipe?: Recipe;
   servings = 4;
@@ -25,7 +29,6 @@ export class RecipeDetailComponent implements OnInit {
   isFavorite = false;
   userRating = 0;
   isAnalyzing = false;
-  private aiService = inject(AiService);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -106,6 +109,20 @@ export class RecipeDetailComponent implements OnInit {
           alert('Erreur lors de l\'analyse nutritionnelle');
           this.isAnalyzing = false;
         }
+      });
+    }
+  }
+
+  onPrint() {
+    const data = document.getElementById('recipe-content');
+    if (data) {
+      html2canvas(data).then(canvas => {
+        const imgWidth = 208;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        const contentDataURL = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`${this.recipe?.title || 'recette'}.pdf`);
       });
     }
   }

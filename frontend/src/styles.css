@@ -4,5 +4,54 @@
 
 /* Styles globaux supplémentaires */
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gray-50 text-gray-900 transition-colors duration-200;
+}
+
+/* Thème Sombre */
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+.dark .bg-white {
+  @apply bg-gray-800;
+}
+
+.dark .text-gray-900 {
+  @apply text-white;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-200;
+}
+
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+
+.dark .border-gray-200, .dark .border-gray-100 {
+  @apply border-gray-700;
+}
+
+/* Thème Contraste Élevé */
+.contrast body {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.contrast .bg-white, .contrast .bg-orange-50 {
+  background-color: #000000;
+  border: 2px solid #ffffff;
+}
+
+.contrast .text-orange-600, .contrast .text-orange-700, .contrast .text-orange-800 {
+  color: #ffff00;
+}
+
+.contrast .bg-orange-600 {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.contrast button, .contrast a {
+  border: 2px solid #ffffff;
 }
