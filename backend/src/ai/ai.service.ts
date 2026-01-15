@@ -26,7 +26,11 @@ export class AiService {
       response_format: { type: 'json_object' },
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content;
+    if (!content) {
+      throw new Error('Réponse vide de l\'IA');
+    }
+    return JSON.parse(content);
   }
 
   async askLia(question: string) {
