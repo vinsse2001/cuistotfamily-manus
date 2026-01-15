@@ -38,4 +38,12 @@ export class RecipesService {
   fork(id: string): Observable<Recipe> {
     return this.http.post<Recipe>(`${this.apiUrl}/${id}/fork`, {}, { headers: this.getHeaders() });
   }
+
+  toggleFavorite(id: string): Observable<{ isFavorite: boolean }> {
+    return this.http.post<{ isFavorite: boolean }>(`${this.apiUrl}/${id}/favorite`, {}, { headers: this.getHeaders() });
+  }
+
+  rate(id: string, score: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/rate`, { score }, { headers: this.getHeaders() });
+  }
 }

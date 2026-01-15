@@ -22,6 +22,8 @@ export class RecipeDetailComponent implements OnInit {
   servings = 4;
   baseServings = 4;
   isOwner = false;
+  isFavorite = false;
+  userRating = 0;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -63,6 +65,26 @@ export class RecipeDetailComponent implements OnInit {
         },
         error: (err) => {
           alert('Erreur lors du fork de la recette');
+        }
+      });
+    }
+  }
+
+  onToggleFavorite() {
+    if (this.recipe?.id) {
+      this.recipesService.toggleFavorite(this.recipe.id).subscribe({
+        next: (res) => {
+          this.isFavorite = res.isFavorite;
+        }
+      });
+    }
+  }
+
+  onRate(score: number) {
+    if (this.recipe?.id) {
+      this.recipesService.rate(this.recipe.id, score).subscribe({
+        next: () => {
+          this.userRating = score;
         }
       });
     }
