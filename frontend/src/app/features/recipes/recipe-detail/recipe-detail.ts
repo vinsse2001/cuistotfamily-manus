@@ -24,6 +24,8 @@ export class RecipeDetailComponent implements OnInit {
   isOwner = false;
   isFavorite = false;
   userRating = 0;
+  isAnalyzing = false;
+  private aiService = inject(AiService);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -85,6 +87,24 @@ export class RecipeDetailComponent implements OnInit {
       this.recipesService.rate(this.recipe.id, score).subscribe({
         next: () => {
           this.userRating = score;
+        }
+      });
+    }
+  }
+
+  onAnalyze() {
+    if (this.recipe?.id) {
+      this.isAnalyzing = true;
+      this.aiService.analyzeRecipe(this.recipe.id).subscribe({
+        next: (analysis) => {
+          if (this.recipe) {
+            this.recipe.nutritionalInfo = analysis;
+          }
+          this.isAnalyzing = false;
+        },
+        error: () => {
+          alert('Erreur lors de l\'analyse nutritionnelle');
+          this.isAnalyzing = false;
         }
       });
     }

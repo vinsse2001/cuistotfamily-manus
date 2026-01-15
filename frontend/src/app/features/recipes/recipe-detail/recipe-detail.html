@@ -48,7 +48,23 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h2 class="text-xl font-semibold mb-4 text-orange-600">Ingrédients</h2>
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold text-orange-600">Ingrédients</h2>
+              @if (!recipe.nutritionalInfo) {
+                <button (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded hover:bg-orange-200 disabled:opacity-50">
+                  {{ isAnalyzing ? 'Analyse...' : 'Analyser nutrition' }}
+                </button>
+              }
+            </div>
+            
+            @if (recipe.nutritionalInfo) {
+              <div class="bg-orange-50 p-3 rounded-md mb-4 grid grid-cols-4 gap-2 text-center text-xs">
+                <div><span class="block font-bold text-orange-800">{{ recipe.nutritionalInfo.calories }}</span> kcal</div>
+                <div><span class="block font-bold text-orange-800">{{ recipe.nutritionalInfo.proteins }}g</span> Prot.</div>
+                <div><span class="block font-bold text-orange-800">{{ recipe.nutritionalInfo.carbs }}g</span> Gluc.</div>
+                <div><span class="block font-bold text-orange-800">{{ recipe.nutritionalInfo.fat }}g</span> Lip.</div>
+              </div>
+            }
             <ul class="space-y-2">
               @for (ing of recipe.ingredients; track ing.name) {
                 <li class="flex justify-between border-b border-gray-100 pb-2">
