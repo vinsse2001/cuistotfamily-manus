@@ -3,9 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RecipesService } from './recipes.service';
 import { RecipesController } from './recipes.controller';
 import { Recipe } from './entities/recipe.entity';
+import { Favorite } from './entities/favorite.entity';
+import { Rating } from './entities/rating.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Recipe])],
+  imports: [TypeOrmModule.forFeature([Recipe, Favorite, Rating])],
   controllers: [RecipesController],
   providers: [RecipesService],
   exports: [RecipesService],

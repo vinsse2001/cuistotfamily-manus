@@ -36,4 +36,14 @@ export class RecipesController {
   fork(@Param('id') id: string, @Request() req) {
     return this.recipesService.fork(id, req.user.userId);
   }
+
+  @Post(':id/favorite')
+  toggleFavorite(@Param('id') id: string, @Request() req) {
+    return this.recipesService.toggleFavorite(id, req.user.userId);
+  }
+
+  @Post(':id/rate')
+  rate(@Param('id') id: string, @Body('score') score: number, @Request() req) {
+    return this.recipesService.rate(id, req.user.userId, score);
+  }
 }

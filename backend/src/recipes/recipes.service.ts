@@ -2,12 +2,18 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Recipe } from './entities/recipe.entity';
+import { Favorite } from './entities/favorite.entity';
+import { Rating } from './entities/rating.entity';
 
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectRepository(Recipe)
     private recipesRepository: Repository<Recipe>,
+    @InjectRepository(Favorite)
+    private favoritesRepository: Repository<Favorite>,
+    @InjectRepository(Rating)
+    private ratingsRepository: Repository<Rating>,
   ) {}
 
   async create(recipeData: Partial<Recipe>, userId: string): Promise<Recipe> {
@@ -64,5 +70,27 @@ export class RecipesService {
       visibility: 'private'
     });
     return this.recipesRepository.save(forkedRecipe);
+  }
+
+  async toggleFavorite(recipeId: string, userId: string) {
+    const favorite = await this.favoritesRepository.findOne({ where: { recipeId, userId } });
+    if (favorite) {
+      await this.favoritesRepository.remove(favorite);
+      return { isFavorite: false };
+    } else {
+      const newFavorite = this.favoritesRepository.create({ recipeId, userId });
+      await this.favoritesRepository.save(newFavorite);
+      return { isFavorite: true };
+    }
+  }
+
+  async rate(recipeId: string, userId: string, score: number) {
+    let rating = await this.ratingsRepository.findOne({ where: { recipeId, userId } });
+    if (rating) {
+      rating.score = score;
+    } else {
+      rating = this.ratingsRepository.create({ recipeId, userId, score });
+    }
+    return this.ratingsRepository.save(rating);
   }
 }
