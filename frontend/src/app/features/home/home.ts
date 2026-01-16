@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth';
 
 @Component({
   selector: 'app-home',
@@ -9,4 +10,6 @@ import { RouterLink } from '@angular/router';
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class HomeComponent {}
+export class HomeComponent {
+  public authService = inject(AuthService);
+}
