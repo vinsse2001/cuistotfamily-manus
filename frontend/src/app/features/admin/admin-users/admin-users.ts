@@ -23,28 +23,26 @@ import { NotificationService } from '../../../core/services/notification';
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-nature-100">
-            @for (user of users; track user.id) {
-              <tr class="hover:bg-nature-50 transition-colors">
-                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ user.nickname }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ user.email }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.role === 'admin' ? 'bg-saumon-100 text-saumon-700' : 'bg-nature-100 text-nature-700')">
-                    {{ user.role }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')">
-                    {{ user.isActive ? 'Actif' : 'En attente' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button (click)="toggleStatus(user)" class="text-saumon-600 hover:text-saumon-900 mr-4">
-                    {{ user.isActive ? 'Désactiver' : 'Activer' }}
-                  </button>
-                  <button (click)="deleteUser(user)" class="text-red-600 hover:text-red-900">Supprimer</button>
-                </td>
-              </tr>
-            }
+            <tr *ngFor="let user of users" class="hover:bg-nature-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ user.nickname }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ user.email }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.role === 'admin' ? 'bg-saumon-100 text-saumon-700' : 'bg-nature-100 text-nature-700')">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')">
+                  {{ user.isActive ? 'Actif' : 'En attente' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button (click)="toggleStatus(user)" class="text-saumon-600 hover:text-saumon-900 mr-4">
+                  {{ user.isActive ? 'Désactiver' : 'Activer' }}
+                </button>
+                <button (click)="deleteUser(user)" class="text-red-600 hover:text-red-900">Supprimer</button>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -65,7 +63,7 @@ export class AdminUsersComponent implements OnInit {
   }
 
   toggleStatus(user: any) {
-    this.http.patch(\`http://localhost:3000/users/\${user.id}/status\`, {}).subscribe({
+    this.http.patch(`http://localhost:3000/users/${user.id}/status`, {}).subscribe({
       next: () => {
         this.notificationService.show('Statut mis à jour', 'success');
         this.loadUsers();
@@ -75,13 +73,13 @@ export class AdminUsersComponent implements OnInit {
   }
 
   deleteUser(user: any) {
-    if (confirm(\`Supprimer l'utilisateur \${user.nickname} ?\`)) {
-      this.http.delete(\`http://localhost:3000/users/\${user.id}\`).subscribe({
+    if (confirm(`Supprimer l'utilisateur ${user.nickname} ?`)) {
+      this.http.delete(`http://localhost:3000/users/${user.id}`).subscribe({
         next: () => {
           this.notificationService.show('Utilisateur supprimé', 'success');
           this.loadUsers();
         },
-        error: (err) => this.notificationService.show(err.error.message || 'Erreur lors de la suppression', 'error')
+        error: (err) => this.notificationService.show(err.error?.message || 'Erreur lors de la suppression', 'error')
       });
     }
   }
