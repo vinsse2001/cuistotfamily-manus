@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: cuistot
-      POSTGRES_PASSWORD: cuistotpassword
+      POSTGRES_PASSWORD: cuistot
       POSTGRES_DB: cuistotfamily
     ports:
       - "5432:5432"
