@@ -1,17 +1,24 @@
 <div class="py-12">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-      Bienvenue sur <span class="text-orange-600">Cuistot Family</span>
+      Bienvenue sur <span class="text-saumon-600">Cuistot Family</span>
     </h1>
     <p class="mt-5 max-w-xl mx-auto text-xl text-gray-500">
       Le carnet de recettes collaboratif pour toute la famille.
     </p>
-    <div class="mt-8 flex justify-center space-x-4">
-      <a routerLink="/register" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700">
+    
+    <div class="mt-8 flex justify-center space-x-4" *ngIf="!(authService.currentUser$ | async)">
+      <a routerLink="/register" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-saumon-600 hover:bg-saumon-700">
         Commencer
       </a>
-      <a routerLink="/login" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-orange-700 bg-orange-100 hover:bg-orange-200">
+      <a routerLink="/login" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-saumon-700 bg-nature-100 hover:bg-nature-200">
         Se connecter
+      </a>
+    </div>
+
+    <div class="mt-8 flex justify-center space-x-4" *ngIf="authService.currentUser$ | async">
+      <a routerLink="/recipes" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-saumon-600 hover:bg-saumon-700">
+        Mes Recettes
       </a>
     </div>
   </div>

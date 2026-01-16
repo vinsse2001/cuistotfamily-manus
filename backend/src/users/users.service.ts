@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserAlias } from './entities/user-alias.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -29,19 +30,34 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find({ order: { createdAt: 'DESC' } });
+    return this.usersRepository.find({ 
+      select: ['id', 'email', 'nickname', 'role', 'isActive', 'createdAt'],
+      order: { createdAt: 'DESC' } 
+    });
+  }
+
+  async updateProfile(id: string, updateData: any): Promise<User> {
+    const user = await this.findOneById(id);
+    if (!user) throw new NotFoundException('Utilisateur non trouvé');
+
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
+    Object.assign(user, updateData);
+    return this.usersRepository.save(user);
   }
 
   async toggleStatus(id: string): Promise<User> {
     const user = await this.findOneById(id);
-    if (!user) throw new Error('Utilisateur non trouvé');
+    if (!user) throw new NotFoundException('Utilisateur non trouvé');
     user.isActive = !user.isActive;
     return this.usersRepository.save(user);
   }
 
   async remove(id: string, currentUserId: string): Promise<void> {
     if (id === currentUserId) {
-      throw new Error('Vous ne pouvez pas supprimer votre propre compte administrateur.');
+      throw new ForbiddenException('Vous ne pouvez pas supprimer votre propre compte administrateur.');
     }
     await this.usersRepository.delete(id);
   }

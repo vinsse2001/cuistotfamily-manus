@@ -4,13 +4,10 @@
       <div class="flex items-center">
         <a routerLink="/" class="flex-shrink-0 flex items-center">
           <img class="h-14 w-auto mr-3" src="logo.png" alt="Cuistot Family">
-          <!--<span class="font-bold text-2xl tracking-tight hidden sm:block">Cuistot Family</span>-->
         </a>
         <div class="hidden md:flex ml-10 space-x-6">
-          <a routerLink="/recipes" class="hover:text-nature-200 transition-colors font-medium">Mes Recettes</a>
-          @if ((authService.currentUser$ | async)?.role === 'admin') {
-            <a routerLink="/admin" class="hover:text-nature-200 transition-colors font-medium">Administration</a>
-          }
+          <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="hover:text-nature-200 transition-colors font-medium">Mes Recettes</a>
+          <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="hover:text-nature-200 transition-colors font-medium">Administration</a>
         </div>
       </div>
       <div class="flex items-center space-x-4">
@@ -25,18 +22,19 @@
             <span class="text-[10px] font-bold px-1">C</span>
           </button>
         </div>
-        @if (authService.currentUser$ | async; as user) {
-          <div class="flex flex-col items-end mr-2">
+        <div *ngIf="authService.currentUser$ | async as user" class="flex items-center">
+          <a routerLink="/profile" class="flex flex-col items-end mr-4 hover:text-nature-200 transition-colors">
             <span class="hidden sm:inline text-xs opacity-80">Bonjour,</span>
             <span class="hidden sm:inline text-sm font-bold">{{ user.nickname }}</span>
-          </div>
+          </a>
           <button (click)="logout()" class="bg-nature-700 hover:bg-nature-800 px-4 py-2 rounded-md text-sm font-bold transition-colors">
             Déconnexion
           </button>
-        } @else {
+        </div>
+        <div *ngIf="!(authService.currentUser$ | async)" class="flex items-center space-x-4">
           <a routerLink="/login" class="hover:text-nature-200 text-sm font-bold transition-colors">Connexion</a>
           <a routerLink="/register" class="bg-white text-saumon-700 hover:bg-nature-100 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm">Inscription</a>
-        }
+        </div>
       </div>
     </div>
   </div>
