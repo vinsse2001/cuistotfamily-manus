@@ -38,13 +38,14 @@ export class AuthService {
     if (!user.isActive) {
       throw new UnauthorizedException('Account pending administrator approval');
     }
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {
         id: user.id,
         email: user.email,
         nickname: user.nickname,
+        role: user.role
       },
     };
   }

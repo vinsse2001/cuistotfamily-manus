@@ -28,6 +28,24 @@ export class UsersService {
     return user || undefined;
   }
 
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find({ order: { createdAt: 'DESC' } });
+  }
+
+  async toggleStatus(id: string): Promise<User> {
+    const user = await this.findOneById(id);
+    if (!user) throw new Error('Utilisateur non trouvé');
+    user.isActive = !user.isActive;
+    return this.usersRepository.save(user);
+  }
+
+  async remove(id: string, currentUserId: string): Promise<void> {
+    if (id === currentUserId) {
+      throw new Error('Vous ne pouvez pas supprimer votre propre compte administrateur.');
+    }
+    await this.usersRepository.delete(id);
+  }
+
   async setAlias(ownerId: string, targetUserId: string, alias: string) {
     let userAlias = await this.userAliasRepository.findOne({ where: { ownerId, targetUserId } });
     if (userAlias) {

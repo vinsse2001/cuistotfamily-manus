@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
+import { NotificationService } from '../../../core/services/notification';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,7 @@ import { AuthService } from '../../../core/services/auth';
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   credentials = {
     email: '',
@@ -24,10 +26,12 @@ export class LoginComponent {
     event.preventDefault();
     this.authService.login(this.credentials).subscribe({
       next: () => {
+        this.notificationService.show('Connexion réussie !', 'success');
         this.router.navigate(['/']);
       },
       error: (err) => {
-        alert(err.error.message || 'Erreur de connexion');
+        const message = err.error?.message || 'Identifiants incorrects ou compte non validé.';
+        this.notificationService.show(message, 'error');
       }
     });
   }

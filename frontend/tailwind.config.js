@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Couleurs basées sur le logo
+        // Couleurs basées sur le logo avec contrastes améliorés
         saumon: {
           50: '#fef7f4',
           100: '#fdeee8',
@@ -15,10 +15,10 @@ module.exports = {
           300: '#f9bea4',
           400: '#f7a682',
           500: '#F5B496', // Couleur principale du logo
-          600: '#dda287',
-          700: '#b88771',
-          800: '#936c5a',
-          900: '#78584a',
+          600: '#e29474', // Plus foncé pour le contraste
+          700: '#c47a5b', // Encore plus foncé pour le texte sur fond clair
+          800: '#a66145',
+          900: '#884a31',
         },
         nature: {
           50: '#fbfcf9',
@@ -27,10 +27,10 @@ module.exports = {
           300: '#D5DFC7', // Fond vert du logo
           400: '#c0cdad',
           500: '#abbb93',
-          600: '#9aa884',
-          700: '#808c6e',
-          800: '#667058',
-          900: '#535b48',
+          600: '#8a9a72', // Plus foncé pour le contraste
+          700: '#6b7a56',
+          800: '#4d5a3b',
+          900: '#323a24',
         }
       }
     },

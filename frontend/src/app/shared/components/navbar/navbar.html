@@ -1,35 +1,41 @@
-<nav class="bg-saumon-500 text-white shadow-lg">
+<nav class="bg-saumon-600 text-white shadow-lg">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16">
+    <div class="flex justify-between h-20">
       <div class="flex items-center">
         <a routerLink="/" class="flex-shrink-0 flex items-center">
-          <img class="h-10 w-auto mr-2" src="logo.png" alt="Cuistot Family Logo">
-          <span class="font-bold text-xl tracking-tight hidden sm:block">Cuistot Family</span>
+          <img class="h-14 w-auto mr-3" src="logo.jpg" alt="Cuistot Family Logo">
+          <span class="font-bold text-2xl tracking-tight hidden sm:block">Cuistot Family</span>
         </a>
-        <div class="hidden md:flex ml-10 space-x-4">
-          <a routerLink="/recipes" class="hover:text-saumon-100 transition-colors">Mes Recettes</a>
+        <div class="hidden md:flex ml-10 space-x-6">
+          <a routerLink="/recipes" class="hover:text-nature-200 transition-colors font-medium">Mes Recettes</a>
+          @if ((authService.currentUser$ | async)?.role === 'admin') {
+            <a routerLink="/admin" class="hover:text-nature-200 transition-colors font-medium">Administration</a>
+          }
         </div>
       </div>
       <div class="flex items-center space-x-4">
-        <div class="flex items-center bg-saumon-600 rounded-md p-1">
-          <button (click)="themeService.setTheme('light')" class="p-1 rounded transition-colors" [class.bg-saumon-400]="themeService.currentTheme() === 'light'" title="Clair">
+        <div class="flex items-center bg-saumon-700 rounded-md p-1">
+          <button (click)="themeService.setTheme('light')" class="p-1.5 rounded transition-colors" [class.bg-saumon-500]="themeService.currentTheme() === 'light'" title="Clair">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" /></svg>
           </button>
-          <button (click)="themeService.setTheme('dark')" class="p-1 rounded transition-colors" [class.bg-saumon-400]="themeService.currentTheme() === 'dark'" title="Sombre">
+          <button (click)="themeService.setTheme('dark')" class="p-1.5 rounded transition-colors" [class.bg-saumon-500]="themeService.currentTheme() === 'dark'" title="Sombre">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
           </button>
-          <button (click)="themeService.setTheme('contrast')" class="p-1 rounded transition-colors" [class.bg-saumon-400]="themeService.currentTheme() === 'contrast'" title="Contraste">
+          <button (click)="themeService.setTheme('contrast')" class="p-1.5 rounded transition-colors" [class.bg-saumon-500]="themeService.currentTheme() === 'contrast'" title="Contraste">
             <span class="text-[10px] font-bold px-1">C</span>
           </button>
         </div>
         @if (authService.currentUser$ | async; as user) {
-          <span class="hidden sm:inline text-sm font-medium">Bonjour, {{ user.nickname }}</span>
-          <button (click)="logout()" class="bg-saumon-700 hover:bg-saumon-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+          <div class="flex flex-col items-end mr-2">
+            <span class="hidden sm:inline text-xs opacity-80">Bonjour,</span>
+            <span class="hidden sm:inline text-sm font-bold">{{ user.nickname }}</span>
+          </div>
+          <button (click)="logout()" class="bg-nature-700 hover:bg-nature-800 px-4 py-2 rounded-md text-sm font-bold transition-colors">
             Déconnexion
           </button>
         } @else {
-          <a routerLink="/login" class="hover:text-saumon-100 text-sm font-medium transition-colors">Connexion</a>
-          <a routerLink="/register" class="bg-white text-saumon-600 hover:bg-saumon-50 px-3 py-2 rounded-md text-sm font-medium transition-colors">Inscription</a>
+          <a routerLink="/login" class="hover:text-nature-200 text-sm font-bold transition-colors">Connexion</a>
+          <a routerLink="/register" class="bg-white text-saumon-700 hover:bg-nature-100 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm">Inscription</a>
         }
       </div>
     </div>
