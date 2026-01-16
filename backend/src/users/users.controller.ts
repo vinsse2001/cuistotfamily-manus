@@ -6,10 +6,11 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // --- ROUTES FIXES (DOIVENT ÊTRE EN PREMIER) ---
+
   @UseGuards(JwtAuthGuard)
   @Get('admin/list')
   async findAll(@Request() req) {
-    // Le payload JWT peut utiliser 'sub' ou 'userId' selon la version, on vérifie les deux
     const role = req.user.role;
     if (role !== 'admin') throw new ForbiddenException('Accès refusé');
     return this.usersService.findAll();
@@ -21,6 +22,22 @@ export class UsersController {
     const userId = req.user.sub || req.user.userId;
     return this.usersService.updateProfile(userId, updateData);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('aliases')
+  async getAliases(@Request() req) {
+    const userId = req.user.sub || req.user.userId;
+    return this.usersService.getAliases(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('alias')
+  async setAlias(@Request() req, @Body() body: { targetUserId: string; alias: string }) {
+    const userId = req.user.sub || req.user.userId;
+    return this.usersService.setAlias(userId, body.targetUserId, body.alias);
+  }
+
+  // --- ROUTES AVEC PARAMÈTRES ---
 
   @UseGuards(JwtAuthGuard)
   @Patch('admin/status/:id')
@@ -37,19 +54,5 @@ export class UsersController {
     if (role !== 'admin') throw new ForbiddenException('Accès refusé');
     const userId = req.user.sub || req.user.userId;
     return this.usersService.remove(id, userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('alias')
-  async setAlias(@Request() req, @Body() body: { targetUserId: string; alias: string }) {
-    const userId = req.user.sub || req.user.userId;
-    return this.usersService.setAlias(userId, body.targetUserId, body.alias);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('aliases')
-  async getAliases(@Request() req) {
-    const userId = req.user.sub || req.user.userId;
-    return this.usersService.getAliases(userId);
   }
 }
