@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique }
 import { User } from '../../users/entities/user.entity';
 import { Recipe } from './recipe.entity';
 
-@Entity('ratings')
+@Entity('rating')
 @Unique(['userId', 'recipeId'])
 export class Rating {
   @PrimaryGeneratedColumn('uuid')
