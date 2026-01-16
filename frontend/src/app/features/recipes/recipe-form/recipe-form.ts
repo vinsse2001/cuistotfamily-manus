@@ -28,6 +28,20 @@ export class RecipeFormComponent implements OnInit {
     visibility: 'private'
   };
 
+  units = [
+    { value: '', label: 'Choisir une unité', disabled: true },
+    { value: 'g', label: 'Grammes (g)' },
+    { value: 'kg', label: 'Kilogrammes (kg)' },
+    { value: 'ml', label: 'Millilitres (ml)' },
+    { value: 'cl', label: 'Centilitres (cl)' },
+    { value: 'l', label: 'Litres (l)' },
+    { value: 'unite', label: 'Unité(s)' },
+    { value: 'cuillere_soupe', label: 'Cuillère à soupe' },
+    { value: 'cuillere_cafe', label: 'Cuillère à café' },
+    { value: 'pincee', label: 'Pincée' },
+    { value: 'autre', label: 'Autre' }
+  ];
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -50,7 +64,6 @@ export class RecipeFormComponent implements OnInit {
   addIngredient() {
     this.recipe.ingredients.push({ name: '', quantity: 0, unit: '' });
     
-    // Focus sur le nouveau champ
     const index = this.recipe.ingredients.length - 1;
     setTimeout(() => {
       const element = document.getElementById(`ing-input-${index}`);
@@ -65,7 +78,6 @@ export class RecipeFormComponent implements OnInit {
   addInstruction() {
     this.recipe.instructions.push('');
     
-    // Focus sur le nouveau champ
     const index = this.recipe.instructions.length - 1;
     setTimeout(() => {
       const element = document.getElementById(`step-input-${index}`);
@@ -77,8 +89,23 @@ export class RecipeFormComponent implements OnInit {
     this.recipe.instructions.splice(index, 1);
   }
 
+  isFormValid(): boolean {
+    const hasTitle = !!this.recipe.title && this.recipe.title.trim().length > 0;
+    const hasIngredients = this.recipe.ingredients.length > 0 && 
+      this.recipe.ingredients.every(i => i.name.trim() !== '' && i.quantity > 0 && i.unit !== '');
+    const hasSteps = this.recipe.instructions.length > 0 && 
+      this.recipe.instructions.every(s => s.trim() !== '');
+    
+    return !!hasTitle && !!hasIngredients && !!hasSteps;
+  }
+
   onSubmit(event: Event) {
     event.preventDefault();
+    if (!this.isFormValid()) {
+      this.notificationService.show('Veuillez remplir tous les champs obligatoires', 'error');
+      return;
+    }
+
     if (this.isEdit && this.recipe.id) {
       this.recipesService.update(this.recipe.id, this.recipe).subscribe({
         next: () => {

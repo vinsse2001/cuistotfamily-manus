@@ -7,14 +7,13 @@ import { NotificationService } from '../../../core/services/notification';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2">
-      @for (toast of notificationService.toasts(); track toast.id) {
-        <div [class]="'px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 flex items-center justify-between min-w-[300px] ' + 
+    <div class="fixed bottom-4 right-4 z-[9999] flex flex-col space-y-2">
+      <div *ngFor="let toast of notificationService.toasts()" 
+        [class]="'px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 flex items-center justify-between min-w-[300px] ' + 
           (toast.type === 'success' ? 'bg-nature-600' : toast.type === 'error' ? 'bg-red-600' : 'bg-saumon-600')">
-          <span>{{ toast.message }}</span>
-          <button (click)="notificationService.remove(toast.id)" class="ml-4 font-bold">&times;</button>
-        </div>
-      }
+        <span>{{ toast.message }}</span>
+        <button (click)="notificationService.remove(toast.id)" class="ml-4 font-bold text-xl">&times;</button>
+      </div>
     </div>
   `
 })

@@ -7,7 +7,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('admin/list')
   async findAll(@Request() req) {
     if (req.user.role !== 'admin') throw new ForbiddenException('Accès refusé');
     return this.usersService.findAll();
@@ -20,14 +20,14 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id/status')
+  @Patch('admin/status/:id')
   async toggleStatus(@Param('id') id: string, @Request() req) {
     if (req.user.role !== 'admin') throw new ForbiddenException('Accès refusé');
     return this.usersService.toggleStatus(id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('admin/:id')
   async remove(@Param('id') id: string, @Request() req) {
     if (req.user.role !== 'admin') throw new ForbiddenException('Accès refusé');
     return this.usersService.remove(id, req.user.userId);

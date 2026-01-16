@@ -66,14 +66,14 @@ export class AdminUsersComponent implements OnInit {
   }
 
   private getHeaders() {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token'); // Utilisation de 'token' comme dans AuthService
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
   }
 
   loadUsers() {
-    this.http.get<any[]>('http://localhost:3000/users', { headers: this.getHeaders() }).subscribe({
+    this.http.get<any[]>('http://localhost:3000/users/admin/list', { headers: this.getHeaders() }).subscribe({
       next: (data) => this.users = data,
       error: (err) => {
         console.error('Erreur chargement utilisateurs', err);
@@ -83,7 +83,7 @@ export class AdminUsersComponent implements OnInit {
   }
 
   toggleStatus(user: any) {
-    this.http.patch(`http://localhost:3000/users/${user.id}/status`, {}, { headers: this.getHeaders() }).subscribe({
+    this.http.patch(`http://localhost:3000/users/admin/status/${user.id}`, {}, { headers: this.getHeaders() }).subscribe({
       next: () => {
         this.notificationService.show('Statut mis à jour', 'success');
         this.loadUsers();
@@ -94,7 +94,7 @@ export class AdminUsersComponent implements OnInit {
 
   deleteUser(user: any) {
     if (confirm(`Supprimer l'utilisateur ${user.nickname} ?`)) {
-      this.http.delete(`http://localhost:3000/users/${user.id}`, { headers: this.getHeaders() }).subscribe({
+      this.http.delete(`http://localhost:3000/users/admin/${user.id}`, { headers: this.getHeaders() }).subscribe({
         next: () => {
           this.notificationService.show('Utilisateur supprimé', 'success');
           this.loadUsers();
