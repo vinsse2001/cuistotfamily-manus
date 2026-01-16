@@ -1,14 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
 import { Recipe } from '../../../core/models/recipe';
 
 @Component({
   selector: 'app-recipe-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './recipe-form.html',
   styleUrl: './recipe-form.css'
 })
@@ -47,6 +47,13 @@ export class RecipeFormComponent implements OnInit {
 
   addIngredient() {
     this.recipe.ingredients.push({ name: '', quantity: 0, unit: '' });
+    
+    // Focus sur le nouveau champ
+    const index = this.recipe.ingredients.length - 1;
+    setTimeout(() => {
+      const element = document.getElementById(`ing-input-${index}`);
+      if (element) element.focus();
+    }, 0);
   }
 
   removeIngredient(index: number) {
@@ -55,6 +62,13 @@ export class RecipeFormComponent implements OnInit {
 
   addInstruction() {
     this.recipe.instructions.push('');
+    
+    // Focus sur le nouveau champ
+    const index = this.recipe.instructions.length - 1;
+    setTimeout(() => {
+      const element = document.getElementById(`step-input-${index}`);
+      if (element) element.focus();
+    }, 0);
   }
 
   removeInstruction(index: number) {

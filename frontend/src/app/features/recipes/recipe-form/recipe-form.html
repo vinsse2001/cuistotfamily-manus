@@ -1,5 +1,5 @@
 <div class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-  <div class="bg-white shadow sm:rounded-lg p-6">
+  <div class="bg-white shadow sm:rounded-lg p-6 border-t-4 border-saumon-500">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">
       {{ isEdit ? 'Modifier la recette' : 'Nouvelle Recette' }}
     </h1>
@@ -8,27 +8,47 @@
       <div>
         <label class="block text-sm font-medium text-gray-700">Titre</label>
         <input type="text" name="title" [(ngModel)]="recipe.title" required
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-saumon-500 focus:border-saumon-500 sm:text-sm">
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700">Description</label>
         <textarea name="description" [(ngModel)]="recipe.description" rows="3"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-orange-500 focus:border-orange-500 sm:text-sm"></textarea>
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-saumon-500 focus:border-saumon-500 sm:text-sm"></textarea>
       </div>
 
       <div>
         <div class="flex justify-between items-center mb-2">
           <label class="block text-sm font-medium text-gray-700">Ingrédients</label>
-          <button type="button" (click)="addIngredient()" class="text-sm text-orange-600 font-medium">+ Ajouter</button>
+          <button type="button" (click)="addIngredient()" class="text-sm text-saumon-600 font-medium flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Ajouter
+          </button>
         </div>
         <div class="space-y-2">
           @for (ing of recipe.ingredients; track $index) {
-            <div class="flex space-x-2">
-              <input type="text" [name]="'ing-name-'+$index" [(ngModel)]="ing.name" placeholder="Nom" class="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <div class="flex space-x-2 items-center">
               <input type="number" [name]="'ing-qty-'+$index" [(ngModel)]="ing.quantity" placeholder="Qté" class="w-20 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-              <input type="text" [name]="'ing-unit-'+$index" [(ngModel)]="ing.unit" placeholder="Unité" class="w-20 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-              <button type="button" (click)="removeIngredient($index)" class="text-red-500">×</button>
+              
+              <select [name]="'ing-unit-'+$index" [(ngModel)]="ing.unit" class="w-28 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+                <option value="">Unité</option>
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="cl">cl</option>
+                <option value="l">l</option>
+                <option value="c. à soupe">c. à soupe</option>
+                <option value="c. à café">c. à café</option>
+                <option value="pincée">pincée</option>
+                <option value="unité">unité</option>
+                <option value="autre">Autre...</option>
+              </select>
+
+              <input type="text" [id]="'ing-input-'+$index" [name]="'ing-name-'+$index" [(ngModel)]="ing.name" placeholder="Nom" class="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+              
+              <button type="button" (click)="removeIngredient($index)" class="text-red-500 hover:text-red-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
             </div>
           }
         </div>
@@ -37,14 +57,19 @@
       <div>
         <div class="flex justify-between items-center mb-2">
           <label class="block text-sm font-medium text-gray-700">Instructions (étapes)</label>
-          <button type="button" (click)="addInstruction()" class="text-sm text-orange-600 font-medium">+ Ajouter</button>
+          <button type="button" (click)="addInstruction()" class="text-sm text-saumon-600 font-medium flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Ajouter
+          </button>
         </div>
         <div class="space-y-2">
           @for (step of recipe.instructions; track $index) {
-            <div class="flex space-x-2">
-              <span class="mt-2 text-gray-400">{{ $index + 1 }}.</span>
-              <textarea [name]="'step-'+$index" [(ngModel)]="recipe.instructions[$index]" rows="2" class="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm"></textarea>
-              <button type="button" (click)="removeInstruction($index)" class="text-red-500">×</button>
+            <div class="flex space-x-2 items-start">
+              <span class="mt-2 text-saumon-500 font-bold">{{ $index + 1 }}.</span>
+              <textarea [id]="'step-input-'+$index" [name]="'step-'+$index" [(ngModel)]="recipe.instructions[$index]" rows="2" class="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm" placeholder="Décrivez cette étape..."></textarea>
+              <button type="button" (click)="removeInstruction($index)" class="mt-2 text-red-500 hover:text-red-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
             </div>
           }
         </div>
@@ -53,7 +78,7 @@
       <div>
         <label class="block text-sm font-medium text-gray-700">Visibilité</label>
         <select name="visibility" [(ngModel)]="recipe.visibility"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-saumon-500 focus:border-saumon-500 sm:text-sm">
           <option value="private">Privé</option>
           <option value="friends">Amis</option>
           <option value="public">Public</option>
@@ -61,10 +86,10 @@
       </div>
 
       <div class="flex justify-end space-x-3">
-        <button type="button" (click)="onCancel()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <button type="button" (click)="onCancel()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
           Annuler
         </button>
-        <button type="submit" class="bg-orange-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-orange-700">
+        <button type="submit" class="bg-saumon-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-saumon-700 transition-colors">
           Enregistrer
         </button>
       </div>

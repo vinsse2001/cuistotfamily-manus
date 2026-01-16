@@ -4,7 +4,7 @@
 
 /* Styles globaux supplémentaires */
 body {
-  @apply bg-gray-50 text-gray-900 transition-colors duration-200;
+  @apply bg-nature-50 text-gray-900 transition-colors duration-200;
 }
 
 /* Thème Sombre */
@@ -38,20 +38,20 @@ body {
   color: #ffffff;
 }
 
-.contrast .bg-white, .contrast .bg-orange-50 {
+.contrast .bg-white {
   background-color: #000000;
   border: 2px solid #ffffff;
 }
 
-.contrast .text-orange-600, .contrast .text-orange-700, .contrast .text-orange-800 {
-  color: #ffff00;
-}
-
-.contrast .bg-orange-600 {
-  background-color: #ffffff;
-  color: #000000;
-}
-
 .contrast button, .contrast a {
   border: 2px solid #ffffff;
+}
+
+/* Utilitaires pour les boutons primaires avec les nouvelles couleurs */
+.btn-primary {
+  @apply bg-saumon-500 hover:bg-saumon-600 text-white font-medium py-2 px-4 rounded-md transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-nature-300 hover:bg-nature-400 text-nature-900 font-medium py-2 px-4 rounded-md transition-colors;
 }
