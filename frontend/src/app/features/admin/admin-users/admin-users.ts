@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NotificationService } from '../../../core/services/notification';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-admin-users',
@@ -43,6 +44,11 @@ import { NotificationService } from '../../../core/services/notification';
                 <button (click)="deleteUser(user)" class="text-red-600 hover:text-red-900">Supprimer</button>
               </td>
             </tr>
+            <tr *ngIf="users.length === 0">
+              <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                Aucun utilisateur trouvé.
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -52,18 +58,32 @@ import { NotificationService } from '../../../core/services/notification';
 export class AdminUsersComponent implements OnInit {
   private http = inject(HttpClient);
   private notificationService = inject(NotificationService);
+  private authService = inject(AuthService);
   users: any[] = [];
 
   ngOnInit() {
     this.loadUsers();
   }
 
+  private getHeaders() {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
   loadUsers() {
-    this.http.get<any[]>('http://localhost:3000/users').subscribe(data => this.users = data);
+    this.http.get<any[]>('http://localhost:3000/users', { headers: this.getHeaders() }).subscribe({
+      next: (data) => this.users = data,
+      error: (err) => {
+        console.error('Erreur chargement utilisateurs', err);
+        this.notificationService.show('Erreur lors du chargement des utilisateurs', 'error');
+      }
+    });
   }
 
   toggleStatus(user: any) {
-    this.http.patch(`http://localhost:3000/users/${user.id}/status`, {}).subscribe({
+    this.http.patch(`http://localhost:3000/users/${user.id}/status`, {}, { headers: this.getHeaders() }).subscribe({
       next: () => {
         this.notificationService.show('Statut mis à jour', 'success');
         this.loadUsers();
@@ -74,7 +94,7 @@ export class AdminUsersComponent implements OnInit {
 
   deleteUser(user: any) {
     if (confirm(`Supprimer l'utilisateur ${user.nickname} ?`)) {
-      this.http.delete(`http://localhost:3000/users/${user.id}`).subscribe({
+      this.http.delete(`http://localhost:3000/users/${user.id}`, { headers: this.getHeaders() }).subscribe({
         next: () => {
           this.notificationService.show('Utilisateur supprimé', 'success');
           this.loadUsers();

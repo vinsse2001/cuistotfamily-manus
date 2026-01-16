@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
+import { NotificationService } from '../../../core/services/notification';
 
 @Component({
   selector: 'app-register',
@@ -14,6 +15,7 @@ import { AuthService } from '../../../core/services/auth';
 export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   user = {
     nickname: '',
@@ -25,11 +27,12 @@ export class RegisterComponent {
     event.preventDefault();
     this.authService.register(this.user).subscribe({
       next: () => {
-        alert('Inscription réussie ! Votre compte doit être validé par un administrateur.');
+        this.notificationService.show('Inscription réussie ! Votre compte doit être validé par un administrateur.', 'success');
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        alert(err.error.message || 'Erreur lors de l\'inscription');
+        const message = err.error?.message || "Erreur lors de l'inscription. L'email existe peut-être déjà.";
+        this.notificationService.show(message, 'error');
       }
     });
   }

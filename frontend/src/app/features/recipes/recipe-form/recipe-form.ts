@@ -1,14 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
+import { NotificationService } from '../../../core/services/notification';
 import { Recipe } from '../../../core/models/recipe';
 
 @Component({
   selector: 'app-recipe-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './recipe-form.html',
   styleUrl: './recipe-form.css'
 })
@@ -16,6 +17,7 @@ export class RecipeFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private recipesService = inject(RecipesService);
+  private notificationService = inject(NotificationService);
 
   isEdit = false;
   recipe: Recipe = {
@@ -40,7 +42,7 @@ export class RecipeFormComponent implements OnInit {
         this.recipe = data;
       },
       error: (err) => {
-        console.error('Erreur lors du chargement de la recette', err);
+        this.notificationService.show('Erreur lors du chargement de la recette', 'error');
       }
     });
   }
@@ -79,13 +81,19 @@ export class RecipeFormComponent implements OnInit {
     event.preventDefault();
     if (this.isEdit && this.recipe.id) {
       this.recipesService.update(this.recipe.id, this.recipe).subscribe({
-        next: () => this.router.navigate(['/recipes', this.recipe.id]),
-        error: (err) => alert('Erreur lors de la modification')
+        next: () => {
+          this.notificationService.show('Recette modifiée avec succès !', 'success');
+          this.router.navigate(['/recipes', this.recipe.id]);
+        },
+        error: (err) => this.notificationService.show('Erreur lors de la modification', 'error')
       });
     } else {
       this.recipesService.create(this.recipe).subscribe({
-        next: (newRecipe) => this.router.navigate(['/recipes', newRecipe.id]),
-        error: (err) => alert('Erreur lors de la création')
+        next: (newRecipe) => {
+          this.notificationService.show('Recette créée avec succès !', 'success');
+          this.router.navigate(['/recipes', newRecipe.id]);
+        },
+        error: (err) => this.notificationService.show('Erreur lors de la création', 'error')
       });
     }
   }
