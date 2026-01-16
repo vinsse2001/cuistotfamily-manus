@@ -9,39 +9,47 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('admin/list')
   async findAll(@Request() req) {
-    if (req.user.role !== 'admin') throw new ForbiddenException('Accès refusé');
+    // Le payload JWT peut utiliser 'sub' ou 'userId' selon la version, on vérifie les deux
+    const role = req.user.role;
+    if (role !== 'admin') throw new ForbiddenException('Accès refusé');
     return this.usersService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(@Request() req, @Body() updateData: any) {
-    return this.usersService.updateProfile(req.user.userId, updateData);
+    const userId = req.user.sub || req.user.userId;
+    return this.usersService.updateProfile(userId, updateData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('admin/status/:id')
   async toggleStatus(@Param('id') id: string, @Request() req) {
-    if (req.user.role !== 'admin') throw new ForbiddenException('Accès refusé');
+    const role = req.user.role;
+    if (role !== 'admin') throw new ForbiddenException('Accès refusé');
     return this.usersService.toggleStatus(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('admin/:id')
   async remove(@Param('id') id: string, @Request() req) {
-    if (req.user.role !== 'admin') throw new ForbiddenException('Accès refusé');
-    return this.usersService.remove(id, req.user.userId);
+    const role = req.user.role;
+    if (role !== 'admin') throw new ForbiddenException('Accès refusé');
+    const userId = req.user.sub || req.user.userId;
+    return this.usersService.remove(id, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('alias')
   async setAlias(@Request() req, @Body() body: { targetUserId: string; alias: string }) {
-    return this.usersService.setAlias(req.user.userId, body.targetUserId, body.alias);
+    const userId = req.user.sub || req.user.userId;
+    return this.usersService.setAlias(userId, body.targetUserId, body.alias);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('aliases')
   async getAliases(@Request() req) {
-    return this.usersService.getAliases(req.user.userId);
+    const userId = req.user.sub || req.user.userId;
+    return this.usersService.getAliases(userId);
   }
 }

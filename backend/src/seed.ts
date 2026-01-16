@@ -17,11 +17,18 @@ async function bootstrap() {
       password: hashedPassword,
       nickname: 'Administrateur',
       isActive: true,
+      isEmailVerified: true,
       role: 'admin',
     });
     console.log('Compte administrateur créé : admin@cuistotfamily.com / admin123');
   } else {
-    console.log('Le compte administrateur existe déjà.');
+    // S'assurer que l'admin existant est actif et vérifié
+    await usersService.updateProfile(existingAdmin.id, {
+      isActive: true,
+      isEmailVerified: true,
+      role: 'admin'
+    });
+    console.log('Le compte administrateur a été mis à jour (actif et vérifié).');
   }
 
   await app.close();
