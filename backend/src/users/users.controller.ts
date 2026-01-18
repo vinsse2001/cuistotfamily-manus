@@ -11,8 +11,15 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('admin/list')
   async findAll(@Request() req) {
-    const role = req.user.role;
-    if (role !== 'admin') throw new ForbiddenException('Accès refusé');
+    console.log('--- DEBUG ADMIN LIST ---');
+    console.log('User from request:', req.user);
+    const role = req.user?.role;
+    console.log('Role detected:', role);
+    
+    if (role !== 'admin') {
+      console.log('Access denied: role is not admin');
+      throw new ForbiddenException('Accès refusé : rôle insuffisant');
+    }
     return this.usersService.findAll();
   }
 
