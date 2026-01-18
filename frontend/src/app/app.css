@@ -1,0 +1,58 @@
+/* Styles globaux pour Cuistot Family */
+
+:root {
+  color-scheme: light dark;
+}
+
+/* Support du thème sombre */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: rgb(23, 23, 23);
+    color: rgb(229, 229, 229);
+  }
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Transitions fluides */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(200, 124, 88);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(180, 100, 60);
+}

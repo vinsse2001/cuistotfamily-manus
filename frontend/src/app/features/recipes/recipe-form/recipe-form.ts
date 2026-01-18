@@ -10,8 +10,7 @@ import { Recipe } from '../../../core/models/recipe';
   selector: 'app-recipe-form',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './recipe-form.html',
-  styleUrl: './recipe-form.css'
+  templateUrl: './recipe-form.html'
 })
 export class RecipeFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -23,24 +22,11 @@ export class RecipeFormComponent implements OnInit {
   recipe: Recipe = {
     title: '',
     description: '',
-    ingredients: [{ name: '', quantity: 0, unit: '' }],
+    ingredients: [{ name: '', quantity: 1, unit: '' }],
     instructions: [''],
-    visibility: 'private'
+    visibility: 'private',
+    photoUrl: ''
   };
-
-  units = [
-    { value: '', label: 'Choisir une unité', disabled: true },
-    { value: 'g', label: 'Grammes (g)' },
-    { value: 'kg', label: 'Kilogrammes (kg)' },
-    { value: 'ml', label: 'Millilitres (ml)' },
-    { value: 'cl', label: 'Centilitres (cl)' },
-    { value: 'l', label: 'Litres (l)' },
-    { value: 'unite', label: 'Unité(s)' },
-    { value: 'cuillere_soupe', label: 'Cuillère à soupe' },
-    { value: 'cuillere_cafe', label: 'Cuillère à café' },
-    { value: 'pincee', label: 'Pincée' },
-    { value: 'autre', label: 'Autre' }
-  ];
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -57,12 +43,13 @@ export class RecipeFormComponent implements OnInit {
       },
       error: (err) => {
         this.notificationService.show('Erreur lors du chargement de la recette', 'error');
+        this.router.navigate(['/recipes']);
       }
     });
   }
 
   addIngredient() {
-    this.recipe.ingredients.push({ name: '', quantity: 0, unit: '' });
+    this.recipe.ingredients.push({ name: '', quantity: 1, unit: '' });
     
     const index = this.recipe.ingredients.length - 1;
     setTimeout(() => {
@@ -72,7 +59,9 @@ export class RecipeFormComponent implements OnInit {
   }
 
   removeIngredient(index: number) {
-    this.recipe.ingredients.splice(index, 1);
+    if (this.recipe.ingredients.length > 1) {
+      this.recipe.ingredients.splice(index, 1);
+    }
   }
 
   addInstruction() {
@@ -86,7 +75,9 @@ export class RecipeFormComponent implements OnInit {
   }
 
   removeInstruction(index: number) {
-    this.recipe.instructions.splice(index, 1);
+    if (this.recipe.instructions.length > 1) {
+      this.recipe.instructions.splice(index, 1);
+    }
   }
 
   isFormValid(): boolean {
