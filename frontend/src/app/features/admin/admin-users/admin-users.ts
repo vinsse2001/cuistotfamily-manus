@@ -33,7 +33,7 @@ import { NotificationService } from '../../../core/services/notification';
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.isActive ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300')">
-                  {{ user.isActive ? 'Actif' : 'En attente' }}
+                  {{ user.isActive ? 'Actif' : 'Inactif' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
@@ -79,8 +79,14 @@ export class AdminUsersComponent implements OnInit {
 
   toggleStatus(user: any) {
     this.usersService.toggleUserStatus(user.id).subscribe({
-      next: () => {
+      next: (updatedUser) => {
         this.notificationService.show('Statut mis à jour', 'success');
+        // Mise à jour locale immédiate pour un feedback instantané
+        const index = this.users.findIndex(u => u.id === user.id);
+        if (index !== -1) {
+          this.users[index].isActive = updatedUser.isActive;
+        }
+        // Rechargement complet pour être sûr de la cohérence
         this.loadUsers();
       },
       error: (err) => {
@@ -94,6 +100,9 @@ export class AdminUsersComponent implements OnInit {
       this.usersService.deleteUser(user.id).subscribe({
         next: () => {
           this.notificationService.show('Utilisateur supprimé', 'success');
+          // Mise à jour locale immédiate
+          this.users = this.users.filter(u => u.id !== user.id);
+          // Rechargement complet
           this.loadUsers();
         },
         error: (err) => {

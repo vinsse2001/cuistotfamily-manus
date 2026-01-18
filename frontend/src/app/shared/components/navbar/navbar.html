@@ -6,8 +6,8 @@
           <img class="h-14 w-auto mr-3" src="logo.png" alt="Cuistot Family">
         </a>
         <div class="hidden md:flex ml-10 space-x-6">
-          <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="hover:text-nature-200 transition-colors font-medium">Mes Recettes</a>
-          <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="hover:text-nature-200 transition-colors font-medium">Administration</a>
+          <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-100 transition-colors font-bold">Mes Recettes</a>
+          <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="text-white hover:text-nature-100 transition-colors font-bold">Administration</a>
         </div>
       </div>
       <div class="flex items-center space-x-4">
@@ -23,16 +23,16 @@
           </button>
         </div>
         <div *ngIf="authService.currentUser$ | async as user" class="flex items-center">
-          <a routerLink="/profile" class="flex flex-col items-end mr-4 hover:text-nature-200 transition-colors">
-            <span class="hidden sm:inline text-xs opacity-80">Bonjour,</span>
+          <a routerLink="/profile" class="flex flex-col items-end mr-4 text-white hover:text-nature-100 transition-colors">
+            <span class="hidden sm:inline text-xs opacity-90">Bonjour,</span>
             <span class="hidden sm:inline text-sm font-bold">{{ user.nickname }}</span>
           </a>
-          <button (click)="logout()" class="bg-nature-700 hover:bg-nature-800 px-4 py-2 rounded-md text-sm font-bold transition-colors">
+          <button (click)="logout()" class="bg-nature-700 hover:bg-nature-800 px-4 py-2 rounded-md text-sm font-bold transition-colors text-white">
             Déconnexion
           </button>
         </div>
         <div *ngIf="!(authService.currentUser$ | async)" class="flex items-center space-x-4">
-          <a routerLink="/login" class="hover:text-nature-200 text-sm font-bold transition-colors">Connexion</a>
+          <a routerLink="/login" class="text-white hover:text-nature-100 text-sm font-bold transition-colors">Connexion</a>
           <a routerLink="/register" class="bg-white text-saumon-700 hover:bg-nature-100 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm">Inscription</a>
         </div>
       </div>
