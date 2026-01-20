@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   private apiUrl = 'http://localhost:3000/auth';
   
   private currentUserSubject = new BehaviorSubject<any>(null);
@@ -37,6 +39,8 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
+    // Redirection vers l'accueil après déconnexion
+    this.router.navigate(['/']);
   }
 
   isLoggedIn(): boolean {

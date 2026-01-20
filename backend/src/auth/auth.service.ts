@@ -17,36 +17,20 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(pass, 10);
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
+    
+    // On simplifie : pas de code de vérification par email pour l'instant
+    // On met isEmailVerified à true par défaut pour ne dépendre que de isActive (admin)
     const user = await this.usersService.create({
       email,
       password: hashedPassword,
       nickname,
-      verificationCode,
-      isEmailVerified: false,
+      isEmailVerified: true, 
       isActive: false,
+      role: 'user'
     });
 
-    // Simulation d'envoi d'email dans les logs
-    console.log(`[EMAIL SIMULATION] Code de vérification pour ${user.email} : ${verificationCode}`);
-    
     const { password, ...result } = user;
     return result;
-  }
-
-  async verifyEmail(email: string, code: string) {
-    const user = await this.usersService.findOneByEmail(email);
-    if (!user || user.verificationCode !== code) {
-      throw new UnauthorizedException('Code de vérification incorrect');
-    }
-
-    await this.usersService.updateProfile(user.id, { 
-      isEmailVerified: true, 
-      verificationCode: null 
-    });
-
-    return { message: 'Email vérifié avec succès. En attente de validation par un administrateur.' };
   }
 
   async login(email: string, pass: string) {
@@ -60,10 +44,7 @@ export class AuthService {
       throw new UnauthorizedException('Identifiants incorrects');
     }
 
-    if (!user.isEmailVerified) {
-      throw new UnauthorizedException('Veuillez vérifier votre email avant de vous connecter');
-    }
-
+    // Seul le contrôle admin (isActive) est conservé pour la validation
     if (!user.isActive) {
       throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur');
     }

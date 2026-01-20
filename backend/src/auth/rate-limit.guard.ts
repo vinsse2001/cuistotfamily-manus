@@ -9,7 +9,7 @@ interface RateLimitEntry {
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   private attempts: Map<string, RateLimitEntry> = new Map();
-  private readonly maxAttempts = 5;
+  private readonly maxAttempts = 20; // Augmenté à 20 pour plus de souplesse en dev
   private readonly windowMs = 15 * 60 * 1000; // 15 minutes
 
   canActivate(context: ExecutionContext): boolean {
@@ -34,8 +34,9 @@ export class RateLimitGuard implements CanActivate {
 
     entry.count++;
     if (entry.count > this.maxAttempts) {
+      const minutesLeft = Math.ceil((entry.resetTime - now) / 1000 / 60);
       throw new BadRequestException(
-        `Trop de tentatives. Veuillez réessayer dans ${Math.ceil((entry.resetTime - now) / 1000 / 60)} minutes.`
+        `Trop de tentatives. Veuillez réessayer dans ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.`
       );
     }
 
