@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UsersService } from '../../../core/services/users';
 import { NotificationService } from '../../../core/services/notification';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-admin-users',
@@ -37,17 +38,24 @@ import { NotificationService } from '../../../core/services/notification';
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
-                <button (click)="toggleStatus(user)" class="text-saumon-600 dark:text-saumon-400 hover:text-saumon-900 dark:hover:text-saumon-300 transition-colors">
+                <button 
+                  *ngIf="user.id !== currentUserId"
+                  (click)="toggleStatus(user)" 
+                  class="text-saumon-600 dark:text-saumon-400 hover:text-saumon-900 dark:hover:text-saumon-300 transition-colors font-bold">
                   {{ user.isActive ? 'Désactiver' : 'Activer' }}
                 </button>
-                <button (click)="deleteUser(user)" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors">
+                <button 
+                  *ngIf="user.id !== currentUserId"
+                  (click)="deleteUser(user)" 
+                  class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors font-bold">
                   Supprimer
                 </button>
+                <span *ngIf="user.id === currentUserId" class="text-nature-400 italic text-xs">C'est vous</span>
               </td>
             </tr>
             <tr *ngIf="users.length === 0">
               <td colspan="5" class="px-6 py-10 text-center text-nature-500 dark:text-nature-400">
-                Aucun utilisateur trouvé.
+                Chargement des utilisateurs...
               </td>
             </tr>
           </tbody>
@@ -59,37 +67,59 @@ import { NotificationService } from '../../../core/services/notification';
 export class AdminUsersComponent implements OnInit {
   private usersService = inject(UsersService);
   private notificationService = inject(NotificationService);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
+  
   users: any[] = [];
+  currentUserId: string = '';
 
   ngOnInit() {
+    console.log('AdminUsersComponent: Initializing...');
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.currentUserId = user.id || user.userId;
+        console.log('AdminUsersComponent: Current User ID set to', this.currentUserId);
+      }
+    });
     this.loadUsers();
   }
 
   loadUsers() {
+    console.log('AdminUsersComponent: Loading users...');
     this.usersService.getAllUsers().subscribe({
       next: (data) => {
-        this.users = data;
+        console.log('AdminUsersComponent: Users loaded successfully', data);
+        this.users = [...data]; // Créer une nouvelle référence pour forcer la détection
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erreur chargement utilisateurs', err);
+        console.error('AdminUsersComponent: Error loading users', err);
         this.notificationService.show('Erreur lors du chargement des utilisateurs', 'error');
       }
     });
   }
 
   toggleStatus(user: any) {
+    console.log('AdminUsersComponent: Toggling status for user', user.id, 'Current state:', user.isActive);
     this.usersService.toggleUserStatus(user.id).subscribe({
       next: (updatedUser) => {
-        this.notificationService.show('Statut mis à jour', 'success');
-        // Mise à jour locale immédiate pour un feedback instantané
+        console.log('AdminUsersComponent: Status updated on server', updatedUser);
+        this.notificationService.show(`Utilisateur ${updatedUser.isActive ? 'activé' : 'désactivé'}`, 'success');
+        
+        // Mise à jour locale immédiate
         const index = this.users.findIndex(u => u.id === user.id);
         if (index !== -1) {
-          this.users[index].isActive = updatedUser.isActive;
+          this.users[index] = { ...this.users[index], isActive: updatedUser.isActive };
+          this.users = [...this.users]; // Nouvelle référence
+          console.log('AdminUsersComponent: Local state updated');
         }
-        // Rechargement complet pour être sûr de la cohérence
-        this.loadUsers();
+        
+        this.cdr.detectChanges();
+        // Rechargement de sécurité
+        setTimeout(() => this.loadUsers(), 500);
       },
       error: (err) => {
+        console.error('AdminUsersComponent: Error toggling status', err);
         this.notificationService.show(err.error?.message || 'Erreur lors de la mise à jour', 'error');
       }
     });
@@ -97,15 +127,17 @@ export class AdminUsersComponent implements OnInit {
 
   deleteUser(user: any) {
     if (confirm(`Supprimer l'utilisateur ${user.nickname} ?`)) {
+      console.log('AdminUsersComponent: Deleting user', user.id);
       this.usersService.deleteUser(user.id).subscribe({
         next: () => {
+          console.log('AdminUsersComponent: User deleted on server');
           this.notificationService.show('Utilisateur supprimé', 'success');
-          // Mise à jour locale immédiate
           this.users = this.users.filter(u => u.id !== user.id);
-          // Rechargement complet
+          this.cdr.detectChanges();
           this.loadUsers();
         },
         error: (err) => {
+          console.error('AdminUsersComponent: Error deleting user', err);
           this.notificationService.show(err.error?.message || 'Erreur lors de la suppression', 'error');
         }
       });

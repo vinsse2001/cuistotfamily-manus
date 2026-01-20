@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Request, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -6,18 +6,11 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // --- ROUTES FIXES (DOIVENT ÊTRE EN PREMIER) ---
-
   @UseGuards(JwtAuthGuard)
   @Get('admin/list')
   async findAll(@Request() req) {
-    console.log('--- DEBUG ADMIN LIST ---');
-    console.log('User from request:', req.user);
     const role = req.user?.role;
-    console.log('Role detected:', role);
-    
     if (role !== 'admin') {
-      console.log('Access denied: role is not admin');
       throw new ForbiddenException('Accès refusé : rôle insuffisant');
     }
     return this.usersService.findAll();
@@ -26,40 +19,59 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(@Request() req, @Body() updateData: any) {
-    const userId = req.user.sub || req.user.userId;
-    return this.usersService.updateProfile(userId, updateData);
+    return this.usersService.update(req.user.userId, updateData);
   }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('aliases')
-  async getAliases(@Request() req) {
-    const userId = req.user.sub || req.user.userId;
-    return this.usersService.getAliases(userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('alias')
-  async setAlias(@Request() req, @Body() body: { targetUserId: string; alias: string }) {
-    const userId = req.user.sub || req.user.userId;
-    return this.usersService.setAlias(userId, body.targetUserId, body.alias);
-  }
-
-  // --- ROUTES AVEC PARAMÈTRES ---
 
   @UseGuards(JwtAuthGuard)
   @Patch('admin/status/:id')
-  async toggleStatus(@Param('id') id: string, @Request() req) {
-    const role = req.user.role;
-    if (role !== 'admin') throw new ForbiddenException('Accès refusé');
+  async toggleStatus(@Request() req, @Param('id') id: string) {
+    if (req.user?.role !== 'admin') {
+      throw new ForbiddenException('Action non autorisée');
+    }
+    
+    // Sécurité : Empêcher de se désactiver soi-même
+    if (req.user.userId === id) {
+      throw new ForbiddenException('Vous ne pouvez pas désactiver votre propre compte administrateur');
+    }
+
     return this.usersService.toggleStatus(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('admin/:id')
-  async remove(@Param('id') id: string, @Request() req) {
-    const role = req.user.role;
-    if (role !== 'admin') throw new ForbiddenException('Accès refusé');
-    const userId = req.user.sub || req.user.userId;
-    return this.usersService.remove(id, userId);
+  async remove(@Request() req, @Param('id') id: string) {
+    if (req.user?.role !== 'admin') {
+      throw new ForbiddenException('Action non autorisée');
+    }
+
+    // Sécurité : Empêcher de se supprimer soi-même
+    if (req.user.userId === id) {
+      throw new ForbiddenException('Vous ne pouvez pas supprimer votre propre compte administrateur');
+    }
+
+    return this.usersService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('aliases')
+  async getAliases(@Request() req) {
+    return this.usersService.getAliases(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('alias')
+  async setAlias(@Request() req, @Body() data: { targetUserId: string, alias: string }) {
+    return this.usersService.setAlias(req.user.userId, data.targetUserId, data.alias);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const user = await this.usersService.findOne(id);
+    if (!user) throw new NotFoundException('Utilisateur non trouvé');
+    return user;
   }
 }
+
+// Note: Ajout de l'import Post manquant si nécessaire
+import { Post } from '@nestjs/common';
