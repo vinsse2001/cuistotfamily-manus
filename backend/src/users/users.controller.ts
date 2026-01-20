@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Request, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Request, ForbiddenException, NotFoundException, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -19,7 +19,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(@Request() req, @Body() updateData: any) {
-    return this.usersService.update(req.user.userId, updateData);
+    return this.usersService.updateProfile(req.user.userId, updateData);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,11 +45,8 @@ export class UsersController {
     }
 
     // Sécurité : Empêcher de se supprimer soi-même
-    if (req.user.userId === id) {
-      throw new ForbiddenException('Vous ne pouvez pas supprimer votre propre compte administrateur');
-    }
-
-    return this.usersService.remove(id);
+    // Note: UsersService.remove vérifie aussi cela, mais on le fait ici pour la cohérence
+    return this.usersService.remove(id, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -67,11 +64,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const user = await this.usersService.findOne(id);
+    const user = await this.usersService.findOneById(id);
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
     return user;
   }
 }
-
-// Note: Ajout de l'import Post manquant si nécessaire
-import { Post } from '@nestjs/common';
