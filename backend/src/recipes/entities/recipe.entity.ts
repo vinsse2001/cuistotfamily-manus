@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-@Entity('recipe')
+@Entity('recipes') // Renommé aussi en recipes pour cohérence
 export class Recipe {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -27,14 +27,14 @@ export class Recipe {
   @Column({ default: 'private' })
   visibility: 'private' | 'friends' | 'public';
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId' })
   owner: User;
 
   @Column()
   ownerId: string;
 
-  @ManyToOne(() => Recipe, { nullable: true })
+  @ManyToOne(() => Recipe, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'forkedFromId' })
   forkedFrom: Recipe;
 
