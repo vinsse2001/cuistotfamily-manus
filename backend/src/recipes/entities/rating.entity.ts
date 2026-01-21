@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique }
 import { User } from '../../users/entities/user.entity';
 import { Recipe } from './recipe.entity';
 
-@Entity('rating')
+@Entity('ratings')
 @Unique(['userId', 'recipeId'])
 export class Rating {
   @PrimaryGeneratedColumn('uuid')
@@ -11,14 +11,14 @@ export class Rating {
   @Column({ type: 'int' })
   score: number; // 1 à 5
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column()
   userId: string;
 
-  @ManyToOne(() => Recipe)
+  @ManyToOne(() => Recipe, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'recipeId' })
   recipe: Recipe;
 
