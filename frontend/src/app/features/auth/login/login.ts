@@ -22,6 +22,8 @@ export class LoginComponent {
     password: ''
   };
 
+  showPassword = false;
+
   onSubmit(event: Event) {
     event.preventDefault();
     this.authService.login(this.credentials).subscribe({
