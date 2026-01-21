@@ -7,13 +7,13 @@
     <form (submit)="onSubmit($event)" class="space-y-6">
       <div>
         <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Titre <span class="text-saumon-500">*</span></label>
-        <input type="text" name="title" [(ngModel)]="recipe.title" required
+        <input type="text" name="title" [(ngModel)]="recipeData.title" required
           class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 focus:border-saumon-500 outline-none transition-all">
       </div>
 
       <div>
         <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Description (facultatif)</label>
-        <textarea name="description" [(ngModel)]="recipe.description" rows="3"
+        <textarea name="description" [(ngModel)]="recipeData.description" rows="3"
           class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 focus:border-saumon-500 outline-none transition-all"></textarea>
       </div>
 
@@ -26,8 +26,8 @@
           </button>
         </div>
         <div class="space-y-3">
-          <div *ngFor="let ing of recipe.ingredients; let i = index" class="flex flex-wrap sm:flex-nowrap gap-2 items-center bg-nature-50 dark:bg-nature-700/50 p-2 rounded-lg">
-            <input type="text" [id]="'ing-input-'+i" [name]="'ing-name-'+i" [(ngModel)]="ing.name" placeholder="Nom (ex: Farine)" 
+          <div *ngFor="let ing of recipeData.ingredients; let i = index" class="flex flex-wrap sm:flex-nowrap gap-2 items-center bg-nature-50 dark:bg-nature-700/50 p-2 rounded-lg">
+            <input type="text" [name]="'ing-name-'+i" [(ngModel)]="ing.name" placeholder="Nom (ex: Farine)" 
               class="flex-1 min-w-[150px] px-3 py-2 rounded border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
             
             <div class="flex space-x-2 w-full sm:w-auto">
@@ -66,9 +66,9 @@
           </button>
         </div>
         <div class="space-y-3">
-          <div *ngFor="let step of recipe.instructions; let i = index" class="flex space-x-3 items-start bg-nature-50 dark:bg-nature-700/50 p-3 rounded-lg">
+          <div *ngFor="let step of recipeData.instructions; let i = index" class="flex space-x-3 items-start bg-nature-50 dark:bg-nature-700/50 p-3 rounded-lg">
             <span class="mt-2 text-saumon-600 dark:text-saumon-400 font-black text-lg">{{ i + 1 }}.</span>
-            <textarea [id]="'step-input-'+i" [name]="'step-'+i" [(ngModel)]="recipe.instructions[i]" rows="2" 
+            <textarea [name]="'step-'+i" [(ngModel)]="step.text" rows="2" 
               class="flex-1 px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all" 
               placeholder="Décrivez cette étape..."></textarea>
             <button type="button" (click)="removeInstruction(i)" class="mt-2 text-red-500 hover:text-red-700 p-1">
@@ -81,7 +81,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Visibilité</label>
-          <select name="visibility" [(ngModel)]="recipe.visibility"
+          <select name="visibility" [(ngModel)]="recipeData.visibility"
             class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
             <option value="private">Privé (Moi uniquement)</option>
             <option value="friends">Amis (Mon cercle)</option>
@@ -90,7 +90,7 @@
         </div>
         <div>
           <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Photo URL (facultatif)</label>
-          <input type="text" name="photoUrl" [(ngModel)]="recipe.photoUrl" placeholder="https://..."
+          <input type="text" name="photoUrl" [(ngModel)]="recipeData.photoUrl" placeholder="https://..."
             class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
         </div>
       </div>
@@ -101,7 +101,7 @@
           Annuler
         </button>
         <button type="submit"
-          class="px-8 py-2 rounded-lg font-bold text-white shadow-md transition-all transform hover:scale-105 bg-saumon-600 hover:bg-saumon-700">
+          class="px-8 py-2 rounded-lg font-bold text-white shadow-md transition-all transform hover:scale-105 bg-saumon-600 hover:bg-saumon-700 dark:bg-saumon-600 dark:hover:bg-saumon-500">
           Enregistrer la recette
         </button>
       </div>

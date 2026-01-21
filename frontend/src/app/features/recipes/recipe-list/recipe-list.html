@@ -1,15 +1,29 @@
 <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-  <div class="flex justify-between items-center mb-8">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400">Mes Recettes</h1>
-    <a routerLink="/recipes/new" 
-      class="bg-saumon-600 hover:bg-saumon-700 dark:bg-saumon-500 dark:hover:bg-saumon-400 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all transform hover:scale-105 active:scale-95 border border-transparent dark:border-saumon-400">
-      Nouvelle Recette
-    </a>
+    
+    <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4 items-center">
+      <!-- Barre de recherche -->
+      <div class="relative w-full sm:w-64">
+        <input type="text" [(ngModel)]="searchQuery" (input)="filterRecipes()" 
+          placeholder="Rechercher une recette..."
+          class="w-full pl-10 pr-4 py-2 rounded-lg border border-nature-200 dark:border-nature-700 dark:bg-nature-800 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      <a routerLink="/recipes/new" 
+        class="w-full sm:w-auto bg-saumon-600 hover:bg-saumon-700 dark:bg-saumon-600 dark:hover:bg-saumon-500 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all transform hover:scale-105 active:scale-95 text-center">
+        Nouvelle Recette
+      </a>
+    </div>
   </div>
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    <div *ngFor="let recipe of recipes" 
-      class="bg-white dark:bg-nature-800 overflow-hidden shadow-md rounded-xl border border-nature-100 dark:border-nature-700 hover:shadow-xl transition-all group">
+    <div *ngFor="let recipe of filteredRecipes" 
+      (click)="goToDetail(recipe.id)"
+      class="bg-white dark:bg-nature-800 overflow-hidden shadow-md rounded-xl border border-nature-100 dark:border-nature-700 hover:shadow-xl transition-all group cursor-pointer transform hover:-translate-y-1">
       <div class="p-6">
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-xl font-bold text-nature-900 dark:text-white truncate group-hover:text-saumon-600 dark:group-hover:text-saumon-400 transition-colors">
@@ -24,24 +38,29 @@
         </div>
         <p class="text-sm text-nature-600 dark:text-nature-400 line-clamp-2 mb-6 h-10">{{ recipe.description || 'Aucune description' }}</p>
         <div class="flex justify-between items-center pt-4 border-t border-nature-50 dark:border-nature-700">
-          <a [routerLink]="['/recipes', recipe.id]" class="text-saumon-600 dark:text-saumon-400 hover:text-saumon-700 dark:hover:text-saumon-300 font-bold text-sm flex items-center">
+          <span class="text-saumon-600 dark:text-saumon-400 font-bold text-sm flex items-center group-hover:translate-x-1 transition-transform">
             Voir la recette
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-          </a>
+          </span>
           <span class="text-xs text-nature-400 dark:text-nature-500">{{ recipe.createdAt | date:'dd/MM/yyyy' }}</span>
         </div>
       </div>
     </div>
     
     <!-- Empty State -->
-    <div *ngIf="recipes.length === 0" class="col-span-full text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
+    <div *ngIf="filteredRecipes.length === 0" class="col-span-full text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
       <div class="mx-auto w-16 h-16 bg-nature-100 dark:bg-nature-700 rounded-full flex items-center justify-center mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
       </div>
-      <p class="text-nature-600 dark:text-nature-400 font-medium">Vous n'avez pas encore de recettes.</p>
-      <a routerLink="/recipes/new" class="mt-4 inline-block text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
+      <p class="text-nature-600 dark:text-nature-400 font-medium">
+        {{ searchQuery ? 'Aucune recette ne correspond à votre recherche.' : "Vous n'avez pas encore de recettes." }}
+      </p>
+      <a *ngIf="!searchQuery" routerLink="/recipes/new" class="mt-4 inline-block text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
         Créez votre première recette !
       </a>
+      <button *ngIf="searchQuery" (click)="searchQuery = ''; filterRecipes()" class="mt-4 text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
+        Effacer la recherche
+      </button>
     </div>
   </div>
 </div>

@@ -19,19 +19,24 @@ export class RecipeFormComponent implements OnInit {
   private notificationService = inject(NotificationService);
 
   isEdit = false;
-  recipe: Recipe = {
+  
+  // Utilisation d'objets pour les instructions pour stabiliser le focus Angular
+  recipeData = {
     title: '',
     description: '',
     ingredients: [{ name: '', quantity: 1, unit: '' }],
-    instructions: [''],
-    visibility: 'private',
+    instructions: [{ text: '' }],
+    visibility: 'private' as 'private' | 'friends' | 'public',
     photoUrl: ''
   };
+
+  recipeId?: string;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdit = true;
+      this.recipeId = id;
       this.loadRecipe(id);
     }
   }
@@ -39,7 +44,14 @@ export class RecipeFormComponent implements OnInit {
   loadRecipe(id: string) {
     this.recipesService.getOne(id).subscribe({
       next: (data) => {
-        this.recipe = data;
+        this.recipeData = {
+          title: data.title,
+          description: data.description || '',
+          ingredients: data.ingredients.length > 0 ? [...data.ingredients] : [{ name: '', quantity: 1, unit: '' }],
+          instructions: data.instructions.map(text => ({ text })),
+          visibility: data.visibility,
+          photoUrl: data.photoUrl || ''
+        };
       },
       error: (err) => {
         this.notificationService.show('Erreur lors du chargement de la recette', 'error');
@@ -49,36 +61,36 @@ export class RecipeFormComponent implements OnInit {
   }
 
   addIngredient() {
-    this.recipe.ingredients.push({ name: '', quantity: 1, unit: '' });
+    this.recipeData.ingredients.push({ name: '', quantity: 1, unit: '' });
   }
 
   removeIngredient(index: number) {
-    if (this.recipe.ingredients.length > 1) {
-      this.recipe.ingredients.splice(index, 1);
+    if (this.recipeData.ingredients.length > 1) {
+      this.recipeData.ingredients.splice(index, 1);
     }
   }
 
   addInstruction() {
-    this.recipe.instructions.push('');
+    this.recipeData.instructions.push({ text: '' });
   }
 
   removeInstruction(index: number) {
-    if (this.recipe.instructions.length > 1) {
-      this.recipe.instructions.splice(index, 1);
+    if (this.recipeData.instructions.length > 1) {
+      this.recipeData.instructions.splice(index, 1);
     }
   }
 
   validateForm(): { valid: boolean, message: string } {
-    if (!this.recipe.title || this.recipe.title.trim().length === 0) {
+    if (!this.recipeData.title || this.recipeData.title.trim().length === 0) {
       return { valid: false, message: 'Le titre de la recette est obligatoire.' };
     }
     
-    const validIngredients = this.recipe.ingredients.filter(i => i.name && i.name.trim() !== '');
+    const validIngredients = this.recipeData.ingredients.filter(i => i.name && i.name.trim() !== '');
     if (validIngredients.length === 0) {
       return { valid: false, message: 'Veuillez ajouter au moins un ingrédient avec un nom.' };
     }
     
-    const validSteps = this.recipe.instructions.filter(s => s && s.trim() !== '');
+    const validSteps = this.recipeData.instructions.filter(s => s.text && s.text.trim() !== '');
     if (validSteps.length === 0) {
       return { valid: false, message: 'Veuillez ajouter au moins une étape de préparation.' };
     }
@@ -95,22 +107,25 @@ export class RecipeFormComponent implements OnInit {
       return;
     }
 
-    const cleanedRecipe = {
-      ...this.recipe,
-      ingredients: this.recipe.ingredients.filter(i => i.name && i.name.trim() !== ''),
-      instructions: this.recipe.instructions.filter(s => s && s.trim() !== '')
+    const finalRecipe: Recipe = {
+      title: this.recipeData.title,
+      description: this.recipeData.description,
+      ingredients: this.recipeData.ingredients.filter(i => i.name && i.name.trim() !== ''),
+      instructions: this.recipeData.instructions.filter(s => s.text && s.text.trim() !== '').map(s => s.text),
+      visibility: this.recipeData.visibility,
+      photoUrl: this.recipeData.photoUrl
     };
 
-    if (this.isEdit && this.recipe.id) {
-      this.recipesService.update(this.recipe.id, cleanedRecipe).subscribe({
+    if (this.isEdit && this.recipeId) {
+      this.recipesService.update(this.recipeId, finalRecipe).subscribe({
         next: () => {
           this.notificationService.show('Recette modifiée avec succès !', 'success');
-          this.router.navigate(['/recipes', this.recipe.id]);
+          this.router.navigate(['/recipes', this.recipeId]);
         },
         error: (err) => this.notificationService.show('Erreur lors de la modification', 'error')
       });
     } else {
-      this.recipesService.create(cleanedRecipe).subscribe({
+      this.recipesService.create(finalRecipe).subscribe({
         next: (newRecipe) => {
           this.notificationService.show('Recette créée avec succès !', 'success');
           this.router.navigate(['/recipes', newRecipe.id]);
