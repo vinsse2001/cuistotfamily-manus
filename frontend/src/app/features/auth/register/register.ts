@@ -24,14 +24,29 @@ export class RegisterComponent {
     password: ''
   };
 
+  showPassword = false;
   showVerification = false;
   verificationCode = '';
+
+  validatePassword(pass: string): boolean {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(pass);
+    const hasLowerCase = /[a-z]/.test(pass);
+    const hasNumbers = /\d/.test(pass);
+    const hasNonalphas = /\W/.test(pass);
+    return pass.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasNonalphas;
+  }
 
   onSubmit(event: Event) {
     event.preventDefault();
     
     if (!this.user.nickname.trim() || !this.user.email.trim() || !this.user.password.trim()) {
       this.notificationService.show('Veuillez remplir tous les champs', 'error');
+      return;
+    }
+
+    if (!this.validatePassword(this.user.password)) {
+      this.notificationService.show('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.', 'error');
       return;
     }
 
