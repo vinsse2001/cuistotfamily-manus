@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
@@ -21,6 +21,7 @@ export class RecipeDetailComponent implements OnInit {
   private recipesService = inject(RecipesService);
   private authService = inject(AuthService);
   private aiService = inject(AiService);
+  private cdr = inject(ChangeDetectorRef);
 
   recipe?: Recipe;
   servings = 4;
@@ -31,10 +32,12 @@ export class RecipeDetailComponent implements OnInit {
   isAnalyzing = false;
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadRecipe(id);
-    }
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.loadRecipe(id);
+      }
+    });
   }
 
   loadRecipe(id: string) {
@@ -42,6 +45,8 @@ export class RecipeDetailComponent implements OnInit {
       next: (data) => {
         this.recipe = data;
         this.checkOwnership();
+        // Forcer la détection de changement pour éviter NG0100
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur lors du chargement de la recette', err);
@@ -53,6 +58,7 @@ export class RecipeDetailComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       if (user && this.recipe) {
         this.isOwner = user.id === this.recipe.ownerId;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -80,6 +86,7 @@ export class RecipeDetailComponent implements OnInit {
       this.recipesService.toggleFavorite(this.recipe.id).subscribe({
         next: (res) => {
           this.isFavorite = res.isFavorite;
+          this.cdr.detectChanges();
         }
       });
     }
@@ -90,6 +97,7 @@ export class RecipeDetailComponent implements OnInit {
       this.recipesService.rate(this.recipe.id, score).subscribe({
         next: () => {
           this.userRating = score;
+          this.cdr.detectChanges();
         }
       });
     }
@@ -104,10 +112,12 @@ export class RecipeDetailComponent implements OnInit {
             this.recipe.nutritionalInfo = analysis;
           }
           this.isAnalyzing = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           alert('Erreur lors de l\'analyse nutritionnelle');
           this.isAnalyzing = false;
+          this.cdr.detectChanges();
         }
       });
     }

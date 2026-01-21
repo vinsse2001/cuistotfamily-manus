@@ -1,38 +1,37 @@
-<nav class="bg-saumon-600 text-white shadow-lg">
+<nav class="bg-saumon-600 dark:bg-saumon-700 text-white shadow-lg transition-colors">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-20">
       <div class="flex items-center">
         <a routerLink="/" class="flex-shrink-0 flex items-center">
-          <img class="h-14 w-auto mr-3" src="logo.png" alt="Cuistot Family">
+          <img class="h-14 w-auto" src="logo.png" alt="Cuistot Family">
+          <!-- Texte retiré car déjà présent dans le logo -->
         </a>
         <div class="hidden md:flex ml-10 space-x-6">
-          <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-100 transition-colors font-bold">Mes Recettes</a>
-          <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="text-white hover:text-nature-100 transition-colors font-bold">Administration</a>
+          <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Mes Recettes</a>
+          <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="text-white hover:text-nature-200 transition-colors font-bold">Administration</a>
         </div>
       </div>
       <div class="flex items-center space-x-4">
-        <div class="flex items-center bg-saumon-700 rounded-md p-1">
+        <div class="flex items-center bg-saumon-700 dark:bg-saumon-800 rounded-md p-1">
           <button (click)="themeService.setTheme('light')" class="p-1.5 rounded transition-colors" [class.bg-saumon-500]="themeService.currentTheme() === 'light'" title="Clair">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" /></svg>
           </button>
           <button (click)="themeService.setTheme('dark')" class="p-1.5 rounded transition-colors" [class.bg-saumon-500]="themeService.currentTheme() === 'dark'" title="Sombre">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
           </button>
-          <button (click)="themeService.setTheme('contrast')" class="p-1.5 rounded transition-colors" [class.bg-saumon-500]="themeService.currentTheme() === 'contrast'" title="Contraste">
-            <span class="text-[10px] font-bold px-1">C</span>
-          </button>
         </div>
+
         <div *ngIf="authService.currentUser$ | async as user" class="flex items-center">
-          <a routerLink="/profile" class="flex flex-col items-end mr-4 text-white hover:text-nature-100 transition-colors">
+          <a routerLink="/profile" class="flex flex-col items-end mr-4 text-white hover:text-nature-200 transition-colors">
             <span class="hidden sm:inline text-xs opacity-90">Bonjour,</span>
             <span class="hidden sm:inline text-sm font-bold">{{ user.nickname }}</span>
           </a>
-          <button (click)="logout()" class="bg-nature-700 hover:bg-nature-800 px-4 py-2 rounded-md text-sm font-bold transition-colors text-white">
+          <button (click)="logout()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md text-sm font-bold transition-all border border-white/20">
             Déconnexion
           </button>
         </div>
         <div *ngIf="!(authService.currentUser$ | async)" class="flex items-center space-x-4">
-          <a routerLink="/login" class="text-white hover:text-nature-100 text-sm font-bold transition-colors">Connexion</a>
+          <a routerLink="/login" class="text-white hover:text-nature-200 text-sm font-bold transition-colors">Connexion</a>
           <a routerLink="/register" class="bg-white text-saumon-700 hover:bg-nature-100 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm">Inscription</a>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
@@ -13,6 +13,8 @@ import { Recipe } from '../../../core/models/recipe';
 })
 export class RecipeListComponent implements OnInit {
   private recipesService = inject(RecipesService);
+  private cdr = inject(ChangeDetectorRef);
+  
   recipes: Recipe[] = [];
 
   ngOnInit() {
@@ -22,7 +24,8 @@ export class RecipeListComponent implements OnInit {
   loadRecipes() {
     this.recipesService.getAll().subscribe({
       next: (data) => {
-        this.recipes = data;
+        this.recipes = [...data];
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur lors du chargement des recettes', err);

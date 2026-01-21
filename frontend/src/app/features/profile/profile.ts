@@ -29,16 +29,22 @@ import { NotificationService } from '../../core/services/notification';
 
           <div class="pt-4 border-t border-nature-100 dark:border-nature-700">
             <h2 class="text-lg font-bold text-nature-800 dark:text-nature-200 mb-4">Changer le mot de passe</h2>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Nouveau mot de passe</label>
-                <input type="password" name="newPassword" [(ngModel)]="passwords.new"
-                  class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 focus:border-saumon-500 outline-none transition-all">
-              </div>
-              <div>
-                <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Confirmer le mot de passe</label>
-                <input type="password" name="confirmPassword" [(ngModel)]="passwords.confirm"
-                  class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 focus:border-saumon-500 outline-none transition-all">
+            <div class="relative">
+              <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Nouveau mot de passe</label>
+              <p class="text-[10px] text-nature-500 mb-2">8 car. min, 1 Maj, 1 min, 1 chiffre, 1 spécial</p>
+              <div class="relative">
+                <input [type]="showPassword ? 'text' : 'password'" name="newPassword" [(ngModel)]="newPassword"
+                  class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 focus:border-saumon-500 outline-none transition-all pr-10">
+                <button type="button" (click)="showPassword = !showPassword" 
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-nature-400 hover:text-saumon-500 transition-colors">
+                  <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -64,10 +70,8 @@ export class ProfileComponent implements OnInit {
     email: ''
   };
 
-  passwords = {
-    new: '',
-    confirm: ''
-  };
+  newPassword = '';
+  showPassword = false;
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(u => {
@@ -78,29 +82,37 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  validatePassword(pass: string): boolean {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(pass);
+    const hasLowerCase = /[a-z]/.test(pass);
+    const hasNumbers = /\d/.test(pass);
+    const hasNonalphas = /\W/.test(pass);
+    return pass.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasNonalphas;
+  }
+
   updateProfile(event: Event) {
     event.preventDefault();
     
-    if (this.passwords.new && this.passwords.new !== this.passwords.confirm) {
-      this.notificationService.show('Les mots de passe ne correspondent pas', 'error');
-      return;
-    }
-
     const updateData: any = { ...this.user };
-    if (this.passwords.new) {
-      updateData.password = this.passwords.new;
+    if (this.newPassword) {
+      if (!this.validatePassword(this.newPassword)) {
+        this.notificationService.show('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.', 'error');
+        return;
+      }
+      updateData.password = this.newPassword;
     }
 
     this.usersService.updateProfile(updateData).subscribe({
       next: (updatedUser: any) => {
         this.notificationService.show('Profil mis à jour avec succès', 'success');
-        this.passwords = { new: '', confirm: '' };
-        // Mettre à jour le contexte utilisateur dans AuthService
+        this.newPassword = '';
         this.authService['currentUserSubject'].next(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
       },
       error: (err) => {
-        this.notificationService.show(err.error?.message || 'Erreur lors de la mise à jour', 'error');
+        const message = err.status === 409 ? 'Cet email est déjà utilisé par un autre compte' : (err.error?.message || 'Erreur lors de la mise à jour');
+        this.notificationService.show(message, 'error');
       }
     });
   }

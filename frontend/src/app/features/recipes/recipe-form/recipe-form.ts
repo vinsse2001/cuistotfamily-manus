@@ -50,12 +50,6 @@ export class RecipeFormComponent implements OnInit {
 
   addIngredient() {
     this.recipe.ingredients.push({ name: '', quantity: 1, unit: '' });
-    
-    const index = this.recipe.ingredients.length - 1;
-    setTimeout(() => {
-      const element = document.getElementById(`ing-input-${index}`);
-      if (element) element.focus();
-    }, 0);
   }
 
   removeIngredient(index: number) {
@@ -66,12 +60,6 @@ export class RecipeFormComponent implements OnInit {
 
   addInstruction() {
     this.recipe.instructions.push('');
-    
-    const index = this.recipe.instructions.length - 1;
-    setTimeout(() => {
-      const element = document.getElementById(`step-input-${index}`);
-      if (element) element.focus();
-    }, 0);
   }
 
   removeInstruction(index: number) {
@@ -80,25 +68,41 @@ export class RecipeFormComponent implements OnInit {
     }
   }
 
-  isFormValid(): boolean {
-    const hasTitle = !!this.recipe.title && this.recipe.title.trim().length > 0;
-    const hasIngredients = this.recipe.ingredients.length > 0 && 
-      this.recipe.ingredients.every(i => i.name.trim() !== '' && i.quantity > 0 && i.unit !== '');
-    const hasSteps = this.recipe.instructions.length > 0 && 
-      this.recipe.instructions.every(s => s.trim() !== '');
+  validateForm(): { valid: boolean, message: string } {
+    if (!this.recipe.title || this.recipe.title.trim().length === 0) {
+      return { valid: false, message: 'Le titre de la recette est obligatoire.' };
+    }
     
-    return !!hasTitle && !!hasIngredients && !!hasSteps;
+    const validIngredients = this.recipe.ingredients.filter(i => i.name && i.name.trim() !== '');
+    if (validIngredients.length === 0) {
+      return { valid: false, message: 'Veuillez ajouter au moins un ingrédient avec un nom.' };
+    }
+    
+    const validSteps = this.recipe.instructions.filter(s => s && s.trim() !== '');
+    if (validSteps.length === 0) {
+      return { valid: false, message: 'Veuillez ajouter au moins une étape de préparation.' };
+    }
+    
+    return { valid: true, message: '' };
   }
 
   onSubmit(event: Event) {
     event.preventDefault();
-    if (!this.isFormValid()) {
-      this.notificationService.show('Veuillez remplir tous les champs obligatoires', 'error');
+    const validation = this.validateForm();
+    
+    if (!validation.valid) {
+      this.notificationService.show(validation.message, 'error');
       return;
     }
 
+    const cleanedRecipe = {
+      ...this.recipe,
+      ingredients: this.recipe.ingredients.filter(i => i.name && i.name.trim() !== ''),
+      instructions: this.recipe.instructions.filter(s => s && s.trim() !== '')
+    };
+
     if (this.isEdit && this.recipe.id) {
-      this.recipesService.update(this.recipe.id, this.recipe).subscribe({
+      this.recipesService.update(this.recipe.id, cleanedRecipe).subscribe({
         next: () => {
           this.notificationService.show('Recette modifiée avec succès !', 'success');
           this.router.navigate(['/recipes', this.recipe.id]);
@@ -106,7 +110,7 @@ export class RecipeFormComponent implements OnInit {
         error: (err) => this.notificationService.show('Erreur lors de la modification', 'error')
       });
     } else {
-      this.recipesService.create(this.recipe).subscribe({
+      this.recipesService.create(cleanedRecipe).subscribe({
         next: (newRecipe) => {
           this.notificationService.show('Recette créée avec succès !', 'success');
           this.router.navigate(['/recipes', newRecipe.id]);

@@ -6,7 +6,7 @@
 
     <form (submit)="onSubmit($event)" class="space-y-6">
       <div>
-        <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Titre</label>
+        <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Titre <span class="text-saumon-500">*</span></label>
         <input type="text" name="title" [(ngModel)]="recipe.title" required
           class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 focus:border-saumon-500 outline-none transition-all">
       </div>
@@ -19,7 +19,7 @@
 
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label class="block text-sm font-bold text-nature-800 dark:text-nature-200">Ingrédients</label>
+          <label class="block text-sm font-bold text-nature-800 dark:text-nature-200">Ingrédients <span class="text-saumon-500">*</span></label>
           <button type="button" (click)="addIngredient()" class="text-sm text-saumon-600 dark:text-saumon-400 font-bold flex items-center hover:text-saumon-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
             Ajouter un ingrédient
@@ -27,11 +27,9 @@
         </div>
         <div class="space-y-3">
           <div *ngFor="let ing of recipe.ingredients; let i = index" class="flex flex-wrap sm:flex-nowrap gap-2 items-center bg-nature-50 dark:bg-nature-700/50 p-2 rounded-lg">
-            <!-- Nom de l'ingrédient à gauche -->
             <input type="text" [id]="'ing-input-'+i" [name]="'ing-name-'+i" [(ngModel)]="ing.name" placeholder="Nom (ex: Farine)" 
               class="flex-1 min-w-[150px] px-3 py-2 rounded border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
             
-            <!-- Quantité et Unité à droite -->
             <div class="flex space-x-2 w-full sm:w-auto">
               <input type="number" [name]="'ing-qty-'+i" [(ngModel)]="ing.quantity" placeholder="Qté" 
                 class="w-20 px-3 py-2 rounded border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
@@ -61,7 +59,7 @@
 
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label class="block text-sm font-bold text-nature-800 dark:text-nature-200">Instructions (étapes)</label>
+          <label class="block text-sm font-bold text-nature-800 dark:text-nature-200">Instructions (étapes) <span class="text-saumon-500">*</span></label>
           <button type="button" (click)="addInstruction()" class="text-sm text-saumon-600 dark:text-saumon-400 font-bold flex items-center hover:text-saumon-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
             Ajouter une étape
@@ -102,9 +100,8 @@
           class="px-6 py-2 rounded-lg font-bold text-nature-600 dark:text-nature-400 hover:bg-nature-100 dark:hover:bg-nature-700 transition-all">
           Annuler
         </button>
-        <button type="submit" [disabled]="!isFormValid()"
-          class="px-8 py-2 rounded-lg font-bold text-white shadow-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          [ngClass]="isFormValid() ? 'bg-saumon-600 hover:bg-saumon-700' : 'bg-gray-400'">
+        <button type="submit"
+          class="px-8 py-2 rounded-lg font-bold text-white shadow-md transition-all transform hover:scale-105 bg-saumon-600 hover:bg-saumon-700">
           Enregistrer la recette
         </button>
       </div>
