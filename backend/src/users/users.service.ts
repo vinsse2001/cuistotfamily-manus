@@ -31,7 +31,7 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({ 
-      select: ['id', 'email', 'nickname', 'role', 'isActive', 'createdAt'],
+      select: ['id', 'email', 'nickname', 'role', 'isActive', 'isEmailVerified', 'createdAt'],
       order: { createdAt: 'DESC' } 
     });
   }
@@ -51,7 +51,15 @@ export class UsersService {
   async toggleStatus(id: string): Promise<User> {
     const user = await this.findOneById(id);
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
+    
     user.isActive = !user.isActive;
+    
+    // Si l'admin active le compte manuellement, on considère l'email comme vérifié
+    if (user.isActive && !user.isEmailVerified) {
+      user.isEmailVerified = true;
+      user.verificationCode = null;
+    }
+    
     return this.usersRepository.save(user);
   }
 
