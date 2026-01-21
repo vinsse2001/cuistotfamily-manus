@@ -57,7 +57,8 @@ export class UsersService {
     // Si l'admin active le compte manuellement, on considère l'email comme vérifié
     if (user.isActive && !user.isEmailVerified) {
       user.isEmailVerified = true;
-      user.verificationCode = null;
+      // On utilise une assertion de type ou on accepte que le champ soit nullable
+      (user as any).verificationCode = null;
     }
     
     return this.usersRepository.save(user);
