@@ -7,7 +7,6 @@ import { RecipeDetailComponent } from './features/recipes/recipe-detail/recipe-d
 import { RecipeFormComponent } from './features/recipes/recipe-form/recipe-form';
 import { ProfileComponent } from './features/profile/profile';
 import { ContactComponent } from './features/contact/contact';
-import { TestNotificationsComponent } from './features/test-notifications/test-notifications';
 import { authGuard, adminGuard } from './core/guards/auth';
 
 export const routes: Routes = [
@@ -15,7 +14,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'test-notifications', component: TestNotificationsComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'recipes', component: RecipeListComponent, canActivate: [authGuard] },
   { path: 'recipes/new', component: RecipeFormComponent, canActivate: [authGuard] },
