@@ -101,6 +101,14 @@ export class RecipeFormComponent implements OnInit {
     return { valid: true, message: '' };
   }
 
+  onCancel() {
+    if (this.isEdit && this.recipeId) {
+      this.router.navigate(['/recipes', this.recipeId]);
+    } else {
+      this.router.navigate(['/recipes']);
+    }
+  }
+
   onSubmit(event: Event) {
     event.preventDefault();
     const validation = this.validateForm();
