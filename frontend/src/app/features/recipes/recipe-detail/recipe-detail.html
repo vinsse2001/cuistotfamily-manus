@@ -1,68 +1,69 @@
-<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8" *ngIf="recipe">
-  <div id="recipe-content" class="bg-white shadow sm:rounded-lg overflow-hidden">
+<div class="min-h-screen bg-nature-50 dark:bg-nature-900 py-8 transition-colors">
+  <div id="recipe-content" class="max-w-4xl mx-auto bg-white dark:bg-nature-800 shadow sm:rounded-lg overflow-hidden">
     <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">{{ recipe.title }}</h1>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ recipe.description }}</p>
+        <h1 class="text-3xl font-bold text-nature-900 dark:text-white">{{ recipe.title }}</h1>
+        <p class="mt-1 max-w-2xl text-sm text-nature-600 dark:text-nature-400">{{ recipe.description }}</p>
       </div>
-      <div class="flex space-x-2">
-        <button (click)="onToggleFavorite()" class="p-2 rounded-full hover:bg-gray-100" [title]="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'">
-          <svg xmlns="http://www.w3.org/2000/svg" [class]="isFavorite ? 'h-6 w-6 text-saumon-500 fill-current' : 'h-6 w-6 text-gray-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex flex-wrap gap-2 justify-end">
+        <button (click)="onToggleFavorite()" class="p-2 rounded-full hover:bg-nature-100 dark:hover:bg-nature-700 transition-colors" [title]="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'">
+          <svg xmlns="http://www.w3.org/2000/svg" [class]="isFavorite ? 'h-6 w-6 text-saumon-500 fill-current' : 'h-6 w-6 text-nature-400 dark:text-nature-500'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
           </svg>
         </button>
-        <button (click)="onPrint()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 text-sm font-medium flex items-center">
+        <button (click)="onPrint()" class="bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-200 px-4 py-2 rounded-md hover:bg-nature-200 dark:hover:bg-nature-600 text-sm font-medium transition-colors">
           PDF
         </button>
-        <button (click)="onFork()" class="bg-saumon-100 text-saumon-700 px-4 py-2 rounded-md hover:bg-saumon-200 text-sm font-medium">
-          Forker
+        <button (click)="onAdapt()" [title]="isOwner ? 'Modifier cette recette' : 'Adapter cette recette à votre goût'" class="bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-4 py-2 rounded-md hover:bg-saumon-200 dark:hover:bg-saumon-800 text-sm font-medium transition-colors">
+          {{ isOwner ? 'Modifier' : 'Adapter' }}
         </button>
-        <a *ngIf="isOwner" [routerLink]="['/recipes', recipe.id, 'edit']" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 text-sm font-medium">
-          Modifier
-        </a>
+        <button *ngIf="isOwner" (click)="onDelete()" class="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-4 py-2 rounded-md hover:bg-red-200 dark:hover:bg-red-800 text-sm font-medium transition-colors">
+          Supprimer
+        </button>
       </div>
     </div>
 
-    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+    <div class="border-t border-nature-200 dark:border-nature-700 px-4 py-5 sm:px-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
         <div class="flex items-center">
-          <label for="servings" class="mr-4 text-sm font-medium text-gray-700">Nombre de convives :</label>
-          <div class="flex items-center border rounded-md">
-            <button (click)="updateServings(-1)" class="px-3 py-1 hover:bg-gray-100">-</button>
-            <span class="px-4 py-1 font-bold">{{ servings }}</span>
-            <button (click)="updateServings(1)" class="px-3 py-1 hover:bg-gray-100">+</button>
+          <label for="servings" class="mr-4 text-sm font-medium text-nature-700 dark:text-nature-300">Nombre de convives :</label>
+          <div class="flex items-center border border-nature-300 dark:border-nature-600 rounded-md">
+            <button (click)="updateServings(-1)" class="px-3 py-1 hover:bg-nature-100 dark:hover:bg-nature-700 transition-colors">-</button>
+            <span class="px-4 py-1 font-bold text-nature-900 dark:text-white">{{ servings }}</span>
+            <button (click)="updateServings(1)" class="px-3 py-1 hover:bg-nature-100 dark:hover:bg-nature-700 transition-colors">+</button>
           </div>
         </div>
         
         <div class="flex items-center space-x-1">
-          <span class="text-sm font-medium text-gray-700 mr-2">Ma note :</span>
-          <button *ngFor="let star of [1,2,3,4,5]" (click)="onRate(star)" class="focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" [class]="star <= userRating ? 'h-6 w-6 text-saumon-500 fill-current' : 'h-6 w-6 text-gray-300'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <span class="text-sm font-medium text-nature-700 dark:text-nature-300 mr-2">Ma note :</span>
+          <button *ngFor="let star of [1,2,3,4,5]" (click)="onRate(star)" class="focus:outline-none transition-transform hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" [class]="star <= userRating ? 'h-6 w-6 text-saumon-500 fill-current' : 'h-6 w-6 text-nature-300 dark:text-nature-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
           </button>
+          <span *ngIf="recipe.ratingCount" class="text-xs text-nature-600 dark:text-nature-400 ml-2">({{ recipe.averageRating }}/5 - {{ recipe.ratingCount }} avis)</span>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-saumon-600">Ingrédients</h2>
-            <button *ngIf="!recipe.nutritionalInfo" (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-xs bg-saumon-100 text-saumon-700 px-2 py-1 rounded hover:bg-saumon-200 disabled:opacity-50">
+            <h2 class="text-xl font-semibold text-saumon-600 dark:text-saumon-400">Ingrédients</h2>
+            <button *ngIf="!recipe.nutritionalInfo" (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-xs bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-2 py-1 rounded hover:bg-saumon-200 dark:hover:bg-saumon-800 disabled:opacity-50 transition-colors">
               {{ isAnalyzing ? 'Analyse...' : 'Analyser nutrition' }}
             </button>
           </div>
           
-          <div *ngIf="recipe.nutritionalInfo" class="bg-saumon-50 p-3 rounded-md mb-4 grid grid-cols-4 gap-2 text-center text-xs">
-            <div><span class="block font-bold text-saumon-800">{{ recipe.nutritionalInfo.calories }}</span> kcal</div>
-            <div><span class="block font-bold text-saumon-800">{{ recipe.nutritionalInfo.proteins }}g</span> Prot.</div>
-            <div><span class="block font-bold text-saumon-800">{{ recipe.nutritionalInfo.carbs }}g</span> Gluc.</div>
-            <div><span class="block font-bold text-saumon-800">{{ recipe.nutritionalInfo.fat }}g</span> Lip.</div>
+          <div *ngIf="recipe.nutritionalInfo" class="bg-saumon-50 dark:bg-saumon-900/20 p-3 rounded-md mb-4 grid grid-cols-4 gap-2 text-center text-xs">
+            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.calories }}</span> kcal</div>
+            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.proteins }}g</span> Prot.</div>
+            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.carbs }}g</span> Gluc.</div>
+            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.fat }}g</span> Lip.</div>
           </div>
           <ul class="space-y-2">
-            <li *ngFor="let ing of recipe.ingredients" class="flex justify-between border-b border-gray-100 pb-2">
-              <span>{{ ing.name }}</span>
-              <span class="font-medium">
+            <li *ngFor="let ing of recipe.ingredients" class="flex justify-between border-b border-nature-200 dark:border-nature-700 pb-2">
+              <span class="text-nature-900 dark:text-nature-100">{{ ing.name }}</span>
+              <span class="font-medium text-nature-700 dark:text-nature-300">
                 {{ (ing.quantity * servings / baseServings) | number:'1.0-2' }} {{ ing.unit }}
               </span>
             </li>
@@ -70,13 +71,13 @@
         </div>
 
         <div>
-          <h2 class="text-xl font-semibold mb-4 text-saumon-600">Instructions</h2>
+          <h2 class="text-xl font-semibold mb-4 text-saumon-600 dark:text-saumon-400">Instructions</h2>
           <ol class="space-y-4">
             <li *ngFor="let step of recipe.instructions; let i = index" class="flex">
-              <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-saumon-100 text-saumon-600 text-sm font-bold mr-3">
+              <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-saumon-100 dark:bg-saumon-900 text-saumon-600 dark:text-saumon-300 text-sm font-bold mr-3">
                 {{ i + 1 }}
               </span>
-              <p class="text-gray-700">{{ step }}</p>
+              <p class="text-nature-700 dark:text-nature-300">{{ step }}</p>
             </li>
           </ol>
         </div>
@@ -85,5 +86,5 @@
   </div>
 </div>
 <div *ngIf="!recipe" class="text-center py-12">
-  <p class="text-gray-500">Chargement de la recette...</p>
+  <p class="text-nature-500 dark:text-nature-400">Chargement de la recette...</p>
 </div>

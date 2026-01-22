@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
 import { AuthService } from '../../../core/services/auth';
 import { AiService } from '../../../core/services/ai';
+import { NotificationService } from '../../../core/services/notification';
 import { Recipe } from '../../../core/models/recipe';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -21,6 +22,7 @@ export class RecipeDetailComponent implements OnInit {
   private recipesService = inject(RecipesService);
   private authService = inject(AuthService);
   private aiService = inject(AiService);
+  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
 
   recipe?: Recipe;
@@ -67,15 +69,35 @@ export class RecipeDetailComponent implements OnInit {
     this.servings = Math.max(1, this.servings + delta);
   }
 
-  onFork() {
+  onAdapt() {
     if (this.recipe?.id) {
-      this.recipesService.fork(this.recipe.id).subscribe({
-        next: (newRecipe) => {
-          alert('Recette forkée avec succès !');
-          this.router.navigate(['/recipes', newRecipe.id]);
+      if (this.isOwner) {
+        // Si propriétaire, aller à la modification
+        this.router.navigate(['/recipes', this.recipe.id, 'edit']);
+      } else {
+        // Sinon, faire un fork
+        this.recipesService.fork(this.recipe.id).subscribe({
+          next: (newRecipe) => {
+            this.notificationService.show('Recette adaptée avec succès !', 'success');
+            this.router.navigate(['/recipes', newRecipe.id, 'edit']);
+          },
+          error: (err) => {
+            this.notificationService.show('Erreur lors de l\'adaptation de la recette', 'error');
+          }
+        });
+      }
+    }
+  }
+
+  onDelete() {
+    if (this.recipe?.id && confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')) {
+      this.recipesService.delete(this.recipe.id).subscribe({
+        next: () => {
+          this.notificationService.show('Recette supprimée avec succès', 'success');
+          this.router.navigate(['/recipes']);
         },
         error: (err) => {
-          alert('Erreur lors du fork de la recette');
+          this.notificationService.show('Erreur lors de la suppression de la recette', 'error');
         }
       });
     }
@@ -95,8 +117,12 @@ export class RecipeDetailComponent implements OnInit {
   onRate(score: number) {
     if (this.recipe?.id) {
       this.recipesService.rate(this.recipe.id, score).subscribe({
-        next: () => {
+        next: (res) => {
           this.userRating = score;
+          if (this.recipe) {
+            this.recipe.averageRating = res.averageRating;
+            this.recipe.ratingCount = res.ratingCount;
+          }
           this.cdr.detectChanges();
         }
       });
@@ -115,7 +141,7 @@ export class RecipeDetailComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: () => {
-          alert('Erreur lors de l\'analyse nutritionnelle');
+          this.notificationService.show('Erreur lors de l\'analyse nutritionnelle', 'error');
           this.isAnalyzing = false;
           this.cdr.detectChanges();
         }
