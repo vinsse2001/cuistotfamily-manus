@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
 import { AuthService } from '../../../core/services/auth';
 import { AiService } from '../../../core/services/ai';
@@ -12,7 +12,7 @@ import html2canvas from 'html2canvas';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css'
 })

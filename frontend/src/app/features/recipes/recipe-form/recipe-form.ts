@@ -20,7 +20,6 @@ export class RecipeFormComponent implements OnInit {
 
   isEdit = false;
   
-  // Utilisation d'objets pour les instructions pour stabiliser le focus Angular
   recipeData = {
     title: '',
     description: '',
@@ -47,9 +46,13 @@ export class RecipeFormComponent implements OnInit {
         this.recipeData = {
           title: data.title,
           description: data.description || '',
-          ingredients: data.ingredients.length > 0 ? [...data.ingredients] : [{ name: '', quantity: 1, unit: '' }],
-          instructions: data.instructions.map(text => ({ text })),
-          visibility: data.visibility,
+          ingredients: (data.ingredients && data.ingredients.length > 0) 
+            ? [...data.ingredients] 
+            : [{ name: '', quantity: 1, unit: '' }],
+          instructions: (data.instructions && data.instructions.length > 0)
+            ? data.instructions.map(text => ({ text }))
+            : [{ text: '' }],
+          visibility: data.visibility || 'private',
           photoUrl: data.photoUrl || ''
         };
       },
@@ -119,23 +122,23 @@ export class RecipeFormComponent implements OnInit {
     if (this.isEdit && this.recipeId) {
       this.recipesService.update(this.recipeId, finalRecipe).subscribe({
         next: () => {
-          this.notificationService.show('Recette modifiée avec succès !', 'success');
+          this.notificationService.show('Recette mise à jour !', 'success');
           this.router.navigate(['/recipes', this.recipeId]);
         },
-        error: (err) => this.notificationService.show('Erreur lors de la modification', 'error')
+        error: () => {
+          this.notificationService.show('Erreur lors de la mise à jour', 'error');
+        }
       });
     } else {
       this.recipesService.create(finalRecipe).subscribe({
-        next: (newRecipe) => {
-          this.notificationService.show('Recette créée avec succès !', 'success');
-          this.router.navigate(['/recipes', newRecipe.id]);
+        next: (res) => {
+          this.notificationService.show('Recette créée !', 'success');
+          this.router.navigate(['/recipes', res.id]);
         },
-        error: (err) => this.notificationService.show('Erreur lors de la création', 'error')
+        error: () => {
+          this.notificationService.show('Erreur lors de la création', 'error');
+        }
       });
     }
-  }
-
-  onCancel() {
-    this.router.navigate(['/recipes']);
   }
 }
