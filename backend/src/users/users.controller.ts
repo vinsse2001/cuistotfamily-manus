@@ -38,6 +38,21 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Patch('admin/role/:id')
+  async updateRole(@Request() req, @Param('id') id: string, @Body() data: { role: string }) {
+    if (req.user?.role !== 'admin') {
+      throw new ForbiddenException('Action non autorisée');
+    }
+
+    // Sécurité : Empêcher de se retirer les droits admin
+    if (req.user.userId === id && data.role !== 'admin') {
+      throw new ForbiddenException('Vous ne pouvez pas vous retirer les droits administrateur');
+    }
+
+    return this.usersService.updateRole(id, data.role);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete('admin/:id')
   async remove(@Request() req, @Param('id') id: string) {
     if (req.user?.role !== 'admin') {

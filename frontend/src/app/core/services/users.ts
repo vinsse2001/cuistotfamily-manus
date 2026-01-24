@@ -24,6 +24,11 @@ export class UsersService {
     return this.http.patch(`${this.apiUrl}/admin/status/${userId}`, {}, { headers: this.getHeaders() });
   }
 
+  // Admin: Mettre à jour le rôle d'un utilisateur
+  updateUserRole(userId: string, role: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/admin/role/${userId}`, { role }, { headers: this.getHeaders() });
+  }
+
   // Admin: Supprimer un utilisateur
   deleteUser(userId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/admin/${userId}`, { headers: this.getHeaders() });

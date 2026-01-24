@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/services/auth';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400 mb-8">Administration des Utilisateurs</h1>
       
       <div class="bg-white dark:bg-nature-800 shadow-md rounded-lg overflow-hidden border border-nature-200 dark:border-nature-700 transition-colors">
@@ -18,6 +18,7 @@ import { AuthService } from '../../../core/services/auth';
             <tr>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Utilisateur</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Email Validé</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Rôle</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Statut</th>
               <th class="px-6 py-3 text-right text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Actions</th>
@@ -26,9 +27,22 @@ import { AuthService } from '../../../core/services/auth';
           <tbody class="bg-white dark:bg-nature-800 divide-y divide-nature-100 dark:divide-nature-700">
             <tr *ngFor="let user of users" class="hover:bg-nature-50 dark:hover:bg-nature-700 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap font-medium text-nature-900 dark:text-nature-100">{{ user.nickname }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-nature-600 dark:text-nature-400">{{ user.email }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-nature-600 dark:text-nature-400 text-sm">{{ user.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.role === 'admin' ? 'bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300')">
+                <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.isEmailVerified ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300')">
+                  {{ user.isEmailVerified ? 'Oui' : 'Non' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <select 
+                  *ngIf="user.id !== currentUserId"
+                  [(ngModel)]="user.role" 
+                  (change)="updateRole(user)"
+                  class="px-2 py-1 text-xs font-bold rounded border border-nature-300 dark:border-nature-600 bg-white dark:bg-nature-700 text-nature-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-saumon-500">
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <span *ngIf="user.id === currentUserId" [class]="'px-2 py-1 text-xs font-bold rounded-full ' + (user.role === 'admin' ? 'bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300')">
                   {{ user.role }}
                 </span>
               </td>
@@ -54,7 +68,7 @@ import { AuthService } from '../../../core/services/auth';
               </td>
             </tr>
             <tr *ngIf="users.length === 0">
-              <td colspan="5" class="px-6 py-10 text-center text-nature-500 dark:text-nature-400">
+              <td colspan="6" class="px-6 py-10 text-center text-nature-500 dark:text-nature-400">
                 Chargement des utilisateurs...
               </td>
             </tr>
@@ -89,7 +103,7 @@ export class AdminUsersComponent implements OnInit {
     this.usersService.getAllUsers().subscribe({
       next: (data) => {
         console.log('AdminUsersComponent: Users loaded successfully', data);
-        this.users = [...data]; // Créer une nouvelle référence pour forcer la détection
+        this.users = [...data];
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -106,21 +120,35 @@ export class AdminUsersComponent implements OnInit {
         console.log('AdminUsersComponent: Status updated on server', updatedUser);
         this.notificationService.show(`Utilisateur ${updatedUser.isActive ? 'activé' : 'désactivé'}`, 'success');
         
-        // Mise à jour locale immédiate
         const index = this.users.findIndex(u => u.id === user.id);
         if (index !== -1) {
           this.users[index] = { ...this.users[index], isActive: updatedUser.isActive };
-          this.users = [...this.users]; // Nouvelle référence
+          this.users = [...this.users];
           console.log('AdminUsersComponent: Local state updated');
         }
         
         this.cdr.detectChanges();
-        // Rechargement de sécurité
         setTimeout(() => this.loadUsers(), 500);
       },
       error: (err) => {
         console.error('AdminUsersComponent: Error toggling status', err);
         this.notificationService.show(err.error?.message || 'Erreur lors de la mise à jour', 'error');
+      }
+    });
+  }
+
+  updateRole(user: any) {
+    console.log('AdminUsersComponent: Updating role for user', user.id, 'to', user.role);
+    this.usersService.updateUserRole(user.id, user.role).subscribe({
+      next: (updatedUser) => {
+        console.log('AdminUsersComponent: Role updated on server', updatedUser);
+        this.notificationService.show(`Rôle mis à jour en ${user.role}`, 'success');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('AdminUsersComponent: Error updating role', err);
+        this.notificationService.show(err.error?.message || 'Erreur lors de la mise à jour du rôle', 'error');
+        this.loadUsers(); // Recharger pour annuler le changement local
       }
     });
   }

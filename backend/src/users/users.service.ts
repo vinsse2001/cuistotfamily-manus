@@ -87,6 +87,18 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async updateRole(id: string, role: string): Promise<User> {
+    const user = await this.findOneById(id);
+    if (!user) throw new NotFoundException('Utilisateur non trouvé');
+    
+    if (role !== 'user' && role !== 'admin') {
+      throw new BadRequestException('Le rôle doit être "user" ou "admin"');
+    }
+    
+    user.role = role;
+    return this.usersRepository.save(user);
+  }
+
   async remove(id: string, currentUserId: string): Promise<void> {
     if (id === currentUserId) {
       throw new ForbiddenException('Vous ne pouvez pas supprimer votre propre compte administrateur.');
