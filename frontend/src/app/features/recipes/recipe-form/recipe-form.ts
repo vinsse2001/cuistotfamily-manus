@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RecipesService } from '../../../core/services/recipes';
 import { NotificationService } from '../../../core/services/notification';
 import { Recipe } from '../../../core/models/recipe';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-recipe-form',
@@ -17,6 +18,8 @@ export class RecipeFormComponent implements OnInit {
   private router = inject(Router);
   private recipesService = inject(RecipesService);
   private notificationService = inject(NotificationService);
+  private cdr = inject(ChangeDetectorRef);
+  private http = inject(HttpClient);
 
   isEdit = false;
   
@@ -32,35 +35,88 @@ export class RecipeFormComponent implements OnInit {
   recipeId?: string;
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.isEdit = true;
-      this.recipeId = id;
-      this.loadRecipe(id);
-    }
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.isEdit = true;
+        this.recipeId = id;
+        this.loadRecipe(id);
+      } else {
+        this.isEdit = false;
+        this.recipeId = undefined;
+        this.resetForm();
+      }
+    });
+  }
+
+  resetForm() {
+    this.recipeData = {
+      title: '',
+      description: '',
+      ingredients: [{ name: '', quantity: 1, unit: '' }],
+      instructions: [{ text: '' }],
+      visibility: 'private',
+      photoUrl: ''
+    };
   }
 
   loadRecipe(id: string) {
     this.recipesService.getOne(id).subscribe({
       next: (data) => {
+        console.log('Données reçues pour modification:', data);
+        
+        let mappedInstructions = [{ text: '' }];
+        if (data.instructions && Array.isArray(data.instructions) && data.instructions.length > 0) {
+          mappedInstructions = data.instructions.map(text => ({ text: String(text) }));
+        }
+
         this.recipeData = {
-          title: data.title,
+          title: data.title || '',
           description: data.description || '',
-          ingredients: (data.ingredients && data.ingredients.length > 0) 
-            ? [...data.ingredients] 
+          ingredients: (data.ingredients && Array.isArray(data.ingredients) && data.ingredients.length > 0) 
+            ? data.ingredients.map(i => ({ ...i })) 
             : [{ name: '', quantity: 1, unit: '' }],
-          instructions: (data.instructions && data.instructions.length > 0)
-            ? data.instructions.map(text => ({ text }))
-            : [{ text: '' }],
+          instructions: mappedInstructions,
           visibility: data.visibility || 'private',
           photoUrl: data.photoUrl || ''
         };
+        
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.notificationService.show('Erreur lors du chargement de la recette', 'error');
         this.router.navigate(['/recipes']);
       }
     });
+  }
+
+  getFullUrl(url: string): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `http://localhost:3000${url}`;
+  }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const token = localStorage.getItem('token');
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+      this.http.post<any>('http://localhost:3000/recipes/upload', formData, { headers }).subscribe({
+        next: (res) => {
+          this.recipeData.photoUrl = res.url;
+          this.notificationService.show('Image uploadée avec succès', 'success');
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Erreur upload:', err);
+          this.notificationService.show('Erreur lors de l\'upload de l\'image', 'error');
+        }
+      });
+    }
   }
 
   addIngredient() {

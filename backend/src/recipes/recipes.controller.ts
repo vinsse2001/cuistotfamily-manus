@@ -1,6 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { RecipesService } from './recipes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import * as sharp from 'sharp';
+import { existsSync, mkdirSync, unlinkSync } from 'fs';
 
 @Controller('recipes')
 @UseGuards(JwtAuthGuard)
@@ -45,5 +50,56 @@ export class RecipesController {
   @Post(':id/rate')
   rate(@Param('id') id: string, @Body('score') score: number, @Request() req) {
     return this.recipesService.rate(id, req.user.userId, score);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('image', {
+    storage: diskStorage({
+      destination: './uploads/temp',
+      filename: (req, file, cb) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        cb(null, `${randomName}${extname(file.originalname)}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+        return cb(new BadRequestException('Seules les images sont autorisées'), false);
+      }
+      cb(null, true);
+    },
+  }))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier envoyé');
+    }
+
+    const uploadDir = './uploads/recipes';
+    if (!existsSync(uploadDir)) {
+      mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const fileName = `recipe-${Date.now()}.webp`;
+    const filePath = join(uploadDir, fileName);
+
+    try {
+      // Redimensionnement automatique à 800px max et conversion en WebP
+      await sharp(file.path)
+        .resize(800, 800, {
+          fit: 'inside',
+          withoutEnlargement: true
+        })
+        .toFormat('webp')
+        .toFile(filePath);
+
+      // Supprimer le fichier temporaire
+      unlinkSync(file.path);
+
+      return {
+        url: `/uploads/recipes/${fileName}`
+      };
+    } catch (error) {
+      console.error('Erreur traitement image:', error);
+      throw new BadRequestException('Erreur lors du traitement de l\'image');
+    }
   }
 }
