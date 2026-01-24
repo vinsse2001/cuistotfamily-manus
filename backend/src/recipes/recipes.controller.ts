@@ -4,7 +4,7 @@ import { RecipesService } from './recipes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
 
 @Controller('recipes')
