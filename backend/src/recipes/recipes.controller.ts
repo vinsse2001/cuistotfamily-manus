@@ -68,7 +68,7 @@ export class RecipesController {
       cb(null, true);
     },
   }))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: any) { // Utilisation de any pour éviter les erreurs de type Multer si les types ne sont pas installés
     if (!file) {
       throw new BadRequestException('Aucun fichier envoyé');
     }
@@ -92,7 +92,9 @@ export class RecipesController {
         .toFile(filePath);
 
       // Supprimer le fichier temporaire
-      unlinkSync(file.path);
+      if (existsSync(file.path)) {
+        unlinkSync(file.path);
+      }
 
       return {
         url: `/uploads/recipes/${fileName}`
