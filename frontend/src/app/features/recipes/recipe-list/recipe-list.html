@@ -26,7 +26,7 @@
       class="bg-white dark:bg-nature-800 overflow-hidden shadow-md rounded-xl border border-nature-100 dark:border-nature-700 hover:shadow-xl transition-all group cursor-pointer transform hover:-translate-y-1">
       <div class="p-6">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-xl font-bold text-nature-900 dark:text-white truncate group-hover:text-saumon-600 dark:group-hover:text-saumon-400 transition-colors">
+          <h3 class="text-xl font-bold text-nature-900 dark:text-white group-hover:text-saumon-600 dark:group-hover:text-saumon-400 transition-colors line-clamp-2">
             {{ recipe.title }}
           </h3>
           <span [class]="'px-2 py-1 text-xs font-bold rounded-full ' + 
@@ -36,7 +36,8 @@
             {{ recipe.visibility === 'public' ? 'Public' : recipe.visibility === 'friends' ? 'Amis' : 'Privé' }}
           </span>
         </div>
-        <p class="text-sm text-nature-600 dark:text-nature-400 line-clamp-2 mb-6 h-10">{{ recipe.description || 'Aucune description' }}</p>
+        <p *ngIf="recipe.description" class="text-sm text-nature-600 dark:text-nature-400 line-clamp-2 mb-6 h-10">{{ recipe.description }}</p>
+        <div *ngIf="!recipe.description" class="mb-6 h-10"></div>
         <div class="flex justify-between items-center pt-4 border-t border-nature-50 dark:border-nature-700">
           <span class="text-saumon-600 dark:text-saumon-400 font-bold text-sm flex items-center group-hover:translate-x-1 transition-transform">
             Voir la recette
