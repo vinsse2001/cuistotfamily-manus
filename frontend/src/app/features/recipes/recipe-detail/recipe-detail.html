@@ -1,9 +1,23 @@
 <div class="min-h-screen bg-nature-50 dark:bg-nature-900 py-8 transition-colors">
   <div *ngIf="recipe" id="recipe-content" class="max-w-4xl mx-auto bg-white dark:bg-nature-800 shadow sm:rounded-lg overflow-hidden">
-    <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
-      <div>
+    
+    <!-- Image de couverture de la recette -->
+    <div *ngIf="recipe.photoUrl" class="w-full h-64 sm:h-96 overflow-hidden relative">
+      <img [src]="getFullUrl(recipe.photoUrl)" class="w-full h-full object-cover" [alt]="recipe.title">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+        <div class="p-6">
+          <h1 class="text-3xl sm:text-4xl font-bold text-white drop-shadow-md">{{ recipe.title }}</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-start" [class.pt-8]="!recipe.photoUrl">
+      <div *ngIf="!recipe.photoUrl">
         <h1 class="text-3xl font-bold text-nature-900 dark:text-white">{{ recipe.title }}</h1>
         <p class="mt-1 max-w-2xl text-sm text-nature-600 dark:text-nature-400">{{ recipe.description }}</p>
+      </div>
+      <div *ngIf="recipe.photoUrl">
+        <p class="max-w-2xl text-sm text-nature-600 dark:text-nature-400">{{ recipe.description }}</p>
       </div>
       <div class="flex flex-wrap gap-2 justify-end">
         <button (click)="onToggleFavorite()" class="p-2 rounded-full hover:bg-nature-100 dark:hover:bg-nature-700 transition-colors" [title]="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'">

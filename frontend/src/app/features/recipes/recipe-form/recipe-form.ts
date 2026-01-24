@@ -22,6 +22,7 @@ export class RecipeFormComponent implements OnInit {
   private http = inject(HttpClient);
 
   isEdit = false;
+  isUploading = false;
   
   recipeData = {
     title: '',
@@ -63,8 +64,6 @@ export class RecipeFormComponent implements OnInit {
   loadRecipe(id: string) {
     this.recipesService.getOne(id).subscribe({
       next: (data) => {
-        console.log('Données reçues pour modification:', data);
-        
         let mappedInstructions = [{ text: '' }];
         if (data.instructions && Array.isArray(data.instructions) && data.instructions.length > 0) {
           mappedInstructions = data.instructions.map(text => ({ text: String(text) }));
@@ -99,6 +98,7 @@ export class RecipeFormComponent implements OnInit {
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
+      this.isUploading = true;
       const formData = new FormData();
       formData.append('image', file);
 
@@ -108,10 +108,12 @@ export class RecipeFormComponent implements OnInit {
       this.http.post<any>('http://localhost:3000/recipes/upload', formData, { headers }).subscribe({
         next: (res) => {
           this.recipeData.photoUrl = res.url;
+          this.isUploading = false;
           this.notificationService.show('Image uploadée avec succès', 'success');
           this.cdr.detectChanges();
         },
         error: (err) => {
+          this.isUploading = false;
           console.error('Erreur upload:', err);
           this.notificationService.show('Erreur lors de l\'upload de l\'image', 'error');
         }
@@ -139,24 +141,6 @@ export class RecipeFormComponent implements OnInit {
     }
   }
 
-  validateForm(): { valid: boolean, message: string } {
-    if (!this.recipeData.title || this.recipeData.title.trim().length === 0) {
-      return { valid: false, message: 'Le titre de la recette est obligatoire.' };
-    }
-    
-    const validIngredients = this.recipeData.ingredients.filter(i => i.name && i.name.trim() !== '');
-    if (validIngredients.length === 0) {
-      return { valid: false, message: 'Veuillez ajouter au moins un ingrédient avec un nom.' };
-    }
-    
-    const validSteps = this.recipeData.instructions.filter(s => s.text && s.text.trim() !== '');
-    if (validSteps.length === 0) {
-      return { valid: false, message: 'Veuillez ajouter au moins une étape de préparation.' };
-    }
-    
-    return { valid: true, message: '' };
-  }
-
   onCancel() {
     if (this.isEdit && this.recipeId) {
       this.router.navigate(['/recipes', this.recipeId]);
@@ -167,18 +151,43 @@ export class RecipeFormComponent implements OnInit {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    const validation = this.validateForm();
     
-    if (!validation.valid) {
-      this.notificationService.show(validation.message, 'error');
+    // Nettoyage des données (Trim)
+    const cleanTitle = this.recipeData.title.trim();
+    const cleanDescription = this.recipeData.description.trim();
+    
+    const cleanIngredients = this.recipeData.ingredients
+      .filter(i => i.name && i.name.trim() !== '')
+      .map(i => ({
+        name: i.name.trim(),
+        quantity: i.quantity,
+        unit: i.unit.trim()
+      }));
+
+    const cleanInstructions = this.recipeData.instructions
+      .filter(i => i.text && i.text.trim() !== '')
+      .map(i => i.text.trim());
+
+    if (!cleanTitle) {
+      this.notificationService.show('Le titre de la recette est obligatoire.', 'error');
+      return;
+    }
+
+    if (cleanIngredients.length === 0) {
+      this.notificationService.show('Veuillez ajouter au moins un ingrédient avec un nom.', 'error');
+      return;
+    }
+
+    if (cleanInstructions.length === 0) {
+      this.notificationService.show('Veuillez ajouter au moins une étape de préparation.', 'error');
       return;
     }
 
     const finalRecipe: Recipe = {
-      title: this.recipeData.title,
-      description: this.recipeData.description,
-      ingredients: this.recipeData.ingredients.filter(i => i.name && i.name.trim() !== ''),
-      instructions: this.recipeData.instructions.filter(s => s.text && s.text.trim() !== '').map(s => s.text),
+      title: cleanTitle,
+      description: cleanDescription,
+      ingredients: cleanIngredients,
+      instructions: cleanInstructions,
       visibility: this.recipeData.visibility,
       photoUrl: this.recipeData.photoUrl
     };
