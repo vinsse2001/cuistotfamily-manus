@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UsersService } from '../../../core/services/users';
@@ -7,7 +8,7 @@ import { AuthService } from '../../../core/services/auth';
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400 mb-8">Administration des Utilisateurs</h1>
