@@ -43,9 +43,9 @@ export class RecipeDetailComponent implements OnInit {
         // Vérifier si l'utilisateur est propriétaire (comparaison avec l'ID utilisateur stocké)
         const userId = localStorage.getItem('userId');
         this.isOwner = userId === data.ownerId;
-        // Simulation des favoris et notes pour l'instant
-        this.isFavorite = false; 
-        this.userRating = 0;
+        // Charger la note personnelle et le statut de favori depuis les données de la recette
+        this.userRating = data.userRating || 0;
+        this.isFavorite = data.isFavorite || false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
@@ -146,6 +146,7 @@ export class RecipeDetailComponent implements OnInit {
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 20;
     const contentWidth = pageWidth - (margin * 2);
+    const hasPhoto = !!this.recipe.photoUrl;
 
     // Titre centré
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
@@ -165,10 +166,11 @@ export class RecipeDetailComponent implements OnInit {
       y += (descLines.length * 5) + 10;
     }
 
+    // Si pas de photo, utiliser toute la largeur pour les ingrédients
+    const colWidth = hasPhoto ? (contentWidth / 2) - 5 : contentWidth;
     const startY = y;
-    const colWidth = (contentWidth / 2) - 5;
 
-    // Colonne de gauche : Ingrédients
+    // Ingrédients
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -189,23 +191,26 @@ export class RecipeDetailComponent implements OnInit {
 
     const ingredientsEndY = y;
 
-    // Colonne de droite : Image (si présente)
-    if (this.recipe.photoUrl) {
+    // Image (si présente et à droite)
+    let maxImageHeight = 0;
+    if (hasPhoto && this.recipe.photoUrl) {
       try {
         const imgUrl = this.getFullUrl(this.recipe.photoUrl);
         const img = await this.loadImage(imgUrl);
         const imgWidth = colWidth;
         const imgHeight = (img.height * imgWidth) / img.width;
-        doc.addImage(img, 'WEBP', margin + colWidth + 10, startY, imgWidth, Math.min(imgHeight, 80));
+        const limitedImgHeight = Math.min(imgHeight, 60); // Limiter la hauteur à 60mm
+        doc.addImage(img, 'WEBP', margin + colWidth + 10, startY, imgWidth, limitedImgHeight);
+        maxImageHeight = limitedImgHeight;
       } catch (e) {
         console.error('Erreur chargement image PDF', e);
       }
     }
 
-    // On se place après le bloc le plus long (ingrédients ou image)
-    y = Math.max(ingredientsEndY, startY + 85) + 15;
+    // Placer les étapes immédiatement après les ingrédients ou l'image
+    y = Math.max(ingredientsEndY, startY + maxImageHeight) + 10;
 
-    // Étapes en dessous
+    // Étapes
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');

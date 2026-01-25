@@ -20,6 +20,7 @@ export class RecipeListComponent implements OnInit {
   recipes: Recipe[] = [];
   filteredRecipes: Recipe[] = [];
   searchQuery: string = '';
+  activeFilter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' = 'all';
 
   ngOnInit() {
     this.loadRecipes();
@@ -38,12 +39,34 @@ export class RecipeListComponent implements OnInit {
     });
   }
 
+  toggleFilter(filter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public') {
+    this.activeFilter = filter;
+    this.filterRecipes();
+  }
+
   filterRecipes() {
+    let filtered = [...this.recipes];
+
+    // Filtre par type de visibilité ou propriété
+    if (this.activeFilter === 'mine') {
+      const userId = localStorage.getItem('userId');
+      filtered = filtered.filter(r => r.ownerId === userId);
+    } else if (this.activeFilter === 'favorites') {
+      filtered = filtered.filter(r => r.isFavorite);
+    } else if (this.activeFilter === 'private') {
+      filtered = filtered.filter(r => r.visibility === 'private');
+    } else if (this.activeFilter === 'friends') {
+      filtered = filtered.filter(r => r.visibility === 'friends');
+    } else if (this.activeFilter === 'public') {
+      filtered = filtered.filter(r => r.visibility === 'public');
+    }
+
+    // Filtre par recherche textuelle
     if (!this.searchQuery.trim()) {
-      this.filteredRecipes = [...this.recipes];
+      this.filteredRecipes = filtered;
     } else {
       const query = this.searchQuery.toLowerCase().trim();
-      this.filteredRecipes = this.recipes.filter(r => 
+      this.filteredRecipes = filtered.filter(r => 
         r.title.toLowerCase().includes(query) || 
         (r.description && r.description.toLowerCase().includes(query))
       );

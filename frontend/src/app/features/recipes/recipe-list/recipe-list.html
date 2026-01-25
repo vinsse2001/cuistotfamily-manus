@@ -20,6 +20,34 @@
     </div>
   </div>
 
+  <!-- Filtres -->
+  <div class="mb-6 flex flex-wrap gap-2">
+    <button (click)="toggleFilter('all')" 
+      [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeFilter === 'all' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+      Toutes
+    </button>
+    <button (click)="toggleFilter('mine')" 
+      [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeFilter === 'mine' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+      Mes recettes
+    </button>
+    <button (click)="toggleFilter('favorites')" 
+      [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeFilter === 'favorites' ? 'bg-yellow-500 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+      ⭐ Favoris
+    </button>
+    <button (click)="toggleFilter('private')" 
+      [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeFilter === 'private' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+      Privé
+    </button>
+    <button (click)="toggleFilter('friends')" 
+      [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeFilter === 'friends' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+      Amis
+    </button>
+    <button (click)="toggleFilter('public')" 
+      [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeFilter === 'public' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+      Public
+    </button>
+  </div>
+
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
     <div *ngFor="let recipe of filteredRecipes" 
       (click)="goToDetail(recipe.id)"
@@ -56,13 +84,22 @@
         <div *ngIf="!recipe.description" class="mb-4 h-10"></div>
 
         <div class="flex justify-between items-center pt-4 border-t border-nature-50 dark:border-nature-700">
-          <div class="flex items-center">
-            <div class="flex text-saumon-500 mr-2">
-              <svg *ngFor="let star of [1,2,3,4,5]" class="h-4 w-4" [class.fill-current]="(recipe.averageRating || 0) >= star" [class.text-nature-300]="(recipe.averageRating || 0) < star" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          <div class="flex items-center gap-3">
+            <!-- Ma note personnelle -->
+            <div *ngIf="recipe.userRating" class="flex items-center">
+              <div class="flex text-saumon-500">
+                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              </div>
+              <span class="text-xs text-saumon-600 dark:text-saumon-400 ml-1 font-medium">{{ recipe.userRating }}</span>
+            </div>
+            <!-- Favori -->
+            <div *ngIf="recipe.isFavorite" class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500 fill-current" viewBox="0 0 24 24">
+                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
             </div>
-            <span class="text-xs text-nature-500">{{ recipe.ratingCount || 0 }} avis</span>
           </div>
           <span class="text-xs text-nature-400 dark:text-nature-500">{{ recipe.createdAt | date:'dd/MM/yyyy' }}</span>
         </div>

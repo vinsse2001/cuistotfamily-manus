@@ -18,4 +18,6 @@ export interface Recipe {
   createdAt?: Date;
   averageRating?: number;
   ratingCount?: number;
+  userRating?: number;
+  isFavorite?: boolean;
 }
