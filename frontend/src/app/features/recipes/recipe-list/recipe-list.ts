@@ -26,6 +26,17 @@ export class RecipeListComponent implements OnInit {
     this.loadRecipes();
   }
 
+  getCurrentUserId(): string | null {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return null;
+    try {
+      const user = JSON.parse(userStr);
+      return user.id || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   loadRecipes() {
     this.recipesService.getAll().subscribe({
       next: (data) => {
@@ -46,13 +57,12 @@ export class RecipeListComponent implements OnInit {
 
   filterRecipes() {
     let filtered = [...this.recipes];
+    const currentUserId = this.getCurrentUserId();
 
-    // Filtre par type de visibilité ou propriété
     if (this.activeFilter === 'mine') {
-      const userId = localStorage.getItem('userId');
-      filtered = filtered.filter(r => r.ownerId === userId);
+      filtered = filtered.filter(r => !!currentUserId && (r.ownerId === currentUserId || (r as any).userId === currentUserId));
     } else if (this.activeFilter === 'favorites') {
-      filtered = filtered.filter(r => r.isFavorite);
+      filtered = filtered.filter(r => r.isFavorite === true);
     } else if (this.activeFilter === 'private') {
       filtered = filtered.filter(r => r.visibility === 'private');
     } else if (this.activeFilter === 'friends') {
@@ -61,7 +71,6 @@ export class RecipeListComponent implements OnInit {
       filtered = filtered.filter(r => r.visibility === 'public');
     }
 
-    // Filtre par recherche textuelle
     if (!this.searchQuery.trim()) {
       this.filteredRecipes = filtered;
     } else {

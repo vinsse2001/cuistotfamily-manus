@@ -34,14 +34,28 @@ export class RecipeDetailComponent implements OnInit {
     }
   }
 
+  getCurrentUserId(): string | null {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return null;
+    try {
+      const user = JSON.parse(userStr);
+      return user.id || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   loadRecipe(id: string) {
     this.recipesService.getOne(id).subscribe({
       next: (data: Recipe) => {
         this.recipe = data;
         this.servings = 4;
         this.baseServings = 4;
-        const userId = localStorage.getItem('userId');
-        this.isOwner = userId === data.ownerId;
+        
+        const currentUserId = this.getCurrentUserId();
+        // On vérifie ownerId ou userId selon ce que le backend renvoie
+        this.isOwner = !!currentUserId && (currentUserId === data.ownerId || currentUserId === (data as any).userId);
+        
         this.userRating = data.userRating || 0;
         this.isFavorite = data.isFavorite || false;
         this.cdr.detectChanges();
@@ -63,8 +77,8 @@ export class RecipeDetailComponent implements OnInit {
     if (!this.recipe?.id) return;
     this.recipesService.toggleFavorite(this.recipe.id).subscribe({
       next: (res: any) => {
-        // Utiliser la réponse du serveur pour être sûr de l'état
         this.isFavorite = res.isFavorite;
+        if (this.recipe) this.recipe.isFavorite = res.isFavorite;
         this.notificationService.show(this.isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris', 'success');
         this.cdr.detectChanges();
       }
@@ -79,6 +93,7 @@ export class RecipeDetailComponent implements OnInit {
         if (this.recipe) {
           this.recipe.averageRating = res.averageRating;
           this.recipe.ratingCount = res.ratingCount;
+          this.recipe.userRating = score;
         }
         this.notificationService.show('Merci pour votre note !', 'success');
         this.cdr.detectChanges();
@@ -88,11 +103,9 @@ export class RecipeDetailComponent implements OnInit {
 
   onAdapt() {
     if (!this.recipe?.id) return;
-    // Si propriétaire, on édite directement l'originale
     if (this.isOwner) {
       this.router.navigate(['/recipes', this.recipe.id, 'edit']);
     } else {
-      // Sinon on crée un fork
       this.recipesService.fork(this.recipe.id).subscribe({
         next: (newRecipe: Recipe) => {
           this.notificationService.show('Recette adaptée à votre carnet !', 'success');
@@ -140,8 +153,8 @@ export class RecipeDetailComponent implements OnInit {
     if (!this.recipe) return;
 
     const doc = new jsPDF();
-    const saumonColor = [255, 120, 100]; // #FF7864
-    const natureColor = [45, 55, 72]; // #2D3748
+    const saumonColor = [255, 120, 100];
+    const natureColor = [45, 55, 72];
     
     let y = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -149,7 +162,6 @@ export class RecipeDetailComponent implements OnInit {
     const contentWidth = pageWidth - (margin * 2);
     const hasPhoto = !!this.recipe.photoUrl;
 
-    // Titre centré
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
@@ -157,7 +169,6 @@ export class RecipeDetailComponent implements OnInit {
     doc.text(titleLines, pageWidth / 2, y, { align: 'center' });
     y += (titleLines.length * 10) + 5;
 
-    // Description en italique
     if (this.recipe.description) {
       doc.setTextColor(natureColor[0], natureColor[1], natureColor[2]);
       doc.setFontSize(10);
@@ -170,7 +181,6 @@ export class RecipeDetailComponent implements OnInit {
     const startY = y;
     const colWidth = hasPhoto ? (contentWidth / 2) - 5 : contentWidth;
 
-    // Ingrédients
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -191,7 +201,6 @@ export class RecipeDetailComponent implements OnInit {
 
     const ingredientsEndY = y;
 
-    // Image (si présente et à droite)
     let maxImageHeight = 0;
     if (hasPhoto && this.recipe.photoUrl) {
       try {
@@ -207,7 +216,6 @@ export class RecipeDetailComponent implements OnInit {
       }
     }
 
-    // Étapes
     y = Math.max(ingredientsEndY, startY + maxImageHeight) + 10;
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
     doc.setFontSize(14);
