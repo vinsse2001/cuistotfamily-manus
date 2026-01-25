@@ -35,19 +35,21 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   loadRecipe(id: string) {
-    this.recipesService.getById(id).subscribe({
-      next: (data) => {
+    this.recipesService.getOne(id).subscribe({
+      next: (data: Recipe) => {
         this.recipe = data;
-        this.servings = data.servings || 4;
-        this.baseServings = data.servings || 4;
-        this.isOwner = this.recipesService.isOwner(data);
+        this.servings = 4;
+        this.baseServings = 4;
+        // Vérifier si l'utilisateur est propriétaire (comparaison avec l'ID utilisateur stocké)
+        const userId = localStorage.getItem('userId');
+        this.isOwner = userId === data.ownerId;
         // Simulation des favoris et notes pour l'instant
         this.isFavorite = false; 
         this.userRating = 0;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        this.notificationService.error('Erreur lors du chargement de la recette');
+      error: (err: any) => {
+        this.notificationService.show('Erreur lors du chargement de la recette', 'error');
         this.router.navigate(['/recipes']);
       }
     });
@@ -64,7 +66,7 @@ export class RecipeDetailComponent implements OnInit {
     this.recipesService.toggleFavorite(this.recipe.id).subscribe({
       next: () => {
         this.isFavorite = !this.isFavorite;
-        this.notificationService.success(this.isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris');
+        this.notificationService.show(this.isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris', 'success');
       }
     });
   }
@@ -72,13 +74,13 @@ export class RecipeDetailComponent implements OnInit {
   onRate(score: number) {
     if (!this.recipe?.id) return;
     this.recipesService.rate(this.recipe.id, score).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.userRating = score;
         if (this.recipe) {
           this.recipe.averageRating = res.averageRating;
           this.recipe.ratingCount = res.ratingCount;
         }
-        this.notificationService.success('Merci pour votre note !');
+        this.notificationService.show('Merci pour votre note !', 'success');
         this.cdr.detectChanges();
       }
     });
@@ -90,8 +92,8 @@ export class RecipeDetailComponent implements OnInit {
       this.router.navigate(['/recipes', this.recipe.id, 'edit']);
     } else {
       this.recipesService.fork(this.recipe.id).subscribe({
-        next: (newRecipe) => {
-          this.notificationService.success('Recette adaptée à votre carnet !');
+        next: (newRecipe: Recipe) => {
+          this.notificationService.show('Recette adaptée à votre carnet !', 'success');
           this.router.navigate(['/recipes', newRecipe.id, 'edit']);
         }
       });
@@ -102,7 +104,7 @@ export class RecipeDetailComponent implements OnInit {
     if (!this.recipe?.id || !confirm('Voulez-vous vraiment supprimer cette recette ?')) return;
     this.recipesService.delete(this.recipe.id).subscribe({
       next: () => {
-        this.notificationService.success('Recette supprimée');
+        this.notificationService.show('Recette supprimée', 'success');
         this.router.navigate(['/recipes']);
       }
     });
@@ -122,7 +124,7 @@ export class RecipeDetailComponent implements OnInit {
         };
       }
       this.isAnalyzing = false;
-      this.notificationService.success('Analyse nutritionnelle terminée');
+      this.notificationService.show('Analyse nutritionnelle terminée', 'success');
       this.cdr.detectChanges();
     }, 1500);
   }
