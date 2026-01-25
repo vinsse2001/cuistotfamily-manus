@@ -28,8 +28,8 @@
         <button (click)="onPrint()" class="bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-200 px-4 py-2 rounded-md hover:bg-nature-200 dark:hover:bg-nature-600 text-sm font-medium transition-colors">
           PDF
         </button>
-        <button (click)="onAdapt()" [title]="isOwner ? 'Modifier cette recette' : 'Adapter cette recette à votre goût'" class="bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-4 py-2 rounded-md hover:bg-saumon-200 dark:hover:bg-saumon-800 text-sm font-medium transition-colors">
-          {{ isOwner ? 'Modifier' : 'Adapter' }}
+        <button (click)="onAdapt()" [title]="isOwner ? 'Modifier cette recette' : 'Adapter cette recette à votre goût (crée une copie)'" class="bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-4 py-2 rounded-md hover:bg-saumon-200 dark:hover:bg-saumon-800 text-sm font-medium transition-colors">
+          Modifier
         </button>
         <button *ngIf="isOwner" (click)="onDelete()" class="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-4 py-2 rounded-md hover:bg-red-200 dark:hover:bg-red-800 text-sm font-medium transition-colors">
           Supprimer
