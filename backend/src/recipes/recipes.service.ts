@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Recipe } from './entities/recipe.entity';
 import { Favorite } from './entities/favorite.entity';
 import { Rating } from './entities/rating.entity';
@@ -24,17 +24,53 @@ export class RecipesService {
     return this.recipesRepository.save(recipe);
   }
 
-  async findAll(userId: string): Promise<Recipe[]> {
-    return this.recipesRepository.find({
+  async findAll(userId: string): Promise<any[]> {
+    const recipes = await this.recipesRepository.find({
       where: [
         { ownerId: userId },
         { visibility: 'public' }
       ],
       order: { createdAt: 'DESC' }
     });
+
+    if (recipes.length === 0) return [];
+
+    const recipeIds = recipes.map(r => r.id);
+
+    // Récupérer tous les favoris de l'utilisateur pour ces recettes
+    const userFavorites = await this.favoritesRepository.find({
+      where: { userId, recipeId: In(recipeIds) }
+    });
+    const favoriteSet = new Set(userFavorites.map(f => f.recipeId));
+
+    // Récupérer toutes les notes de l'utilisateur pour ces recettes
+    const userRatings = await this.ratingsRepository.find({
+      where: { userId, recipeId: In(recipeIds) }
+    });
+    const ratingMap = new Map(userRatings.map(r => [r.recipeId, r.score]));
+
+    // Récupérer toutes les notes moyennes
+    const allRatings = await this.ratingsRepository.find({
+      where: { recipeId: In(recipeIds) }
+    });
+
+    return recipes.map(recipe => {
+      const recipeRatings = allRatings.filter(r => r.recipeId === recipe.id);
+      const averageRating = recipeRatings.length > 0 
+        ? recipeRatings.reduce((sum, r) => sum + r.score, 0) / recipeRatings.length 
+        : 0;
+
+      return {
+        ...recipe,
+        isFavorite: favoriteSet.has(recipe.id),
+        userRating: ratingMap.get(recipe.id) || 0,
+        averageRating: Math.round(averageRating * 10) / 10,
+        ratingCount: recipeRatings.length
+      };
+    });
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOne(id: string, userId?: string): Promise<any> {
     const recipe = await this.recipesRepository.findOne({ where: { id } });
     if (!recipe) {
       throw new NotFoundException(`Recipe with ID ${id} not found`);
@@ -46,8 +82,21 @@ export class RecipesService {
       ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length 
       : 0;
 
+    let isFavorite = false;
+    let userRating = 0;
+
+    if (userId) {
+      const favorite = await this.favoritesRepository.findOne({ where: { recipeId: id, userId } });
+      isFavorite = !!favorite;
+
+      const rating = await this.ratingsRepository.findOne({ where: { recipeId: id, userId } });
+      userRating = rating ? rating.score : 0;
+    }
+
     return {
       ...recipe,
+      isFavorite,
+      userRating,
       averageRating: Math.round(averageRating * 10) / 10,
       ratingCount: ratings.length
     };
@@ -105,7 +154,6 @@ export class RecipesService {
   }
 
   async rate(recipeId: string, userId: string, score: number) {
-    // Valider le score
     if (score < 1 || score > 5) {
       throw new Error('Score must be between 1 and 5');
     }
@@ -118,7 +166,6 @@ export class RecipesService {
     }
     await this.ratingsRepository.save(rating);
 
-    // Retourner la note moyenne mise à jour
     const allRatings = await this.ratingsRepository.find({ where: { recipeId } });
     const averageRating = allRatings.length > 0 
       ? allRatings.reduce((sum, r) => sum + r.score, 0) / allRatings.length 

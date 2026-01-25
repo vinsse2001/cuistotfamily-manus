@@ -23,8 +23,8 @@ export class RecipesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recipesService.findOne(id);
+  findOne(@Param('id') id: string, @Request() req) {
+    return this.recipesService.findOne(id, req.user.userId);
   }
 
   @Patch(':id')
