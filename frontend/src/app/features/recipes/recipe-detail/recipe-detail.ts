@@ -40,10 +40,8 @@ export class RecipeDetailComponent implements OnInit {
         this.recipe = data;
         this.servings = 4;
         this.baseServings = 4;
-        // Vérifier si l'utilisateur est propriétaire (comparaison avec l'ID utilisateur stocké)
         const userId = localStorage.getItem('userId');
         this.isOwner = userId === data.ownerId;
-        // Charger la note personnelle et le statut de favori depuis les données de la recette
         this.userRating = data.userRating || 0;
         this.isFavorite = data.isFavorite || false;
         this.cdr.detectChanges();
@@ -64,9 +62,11 @@ export class RecipeDetailComponent implements OnInit {
   onToggleFavorite() {
     if (!this.recipe?.id) return;
     this.recipesService.toggleFavorite(this.recipe.id).subscribe({
-      next: () => {
-        this.isFavorite = !this.isFavorite;
+      next: (res: any) => {
+        // Utiliser la réponse du serveur pour être sûr de l'état
+        this.isFavorite = res.isFavorite;
         this.notificationService.show(this.isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris', 'success');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -88,9 +88,11 @@ export class RecipeDetailComponent implements OnInit {
 
   onAdapt() {
     if (!this.recipe?.id) return;
+    // Si propriétaire, on édite directement l'originale
     if (this.isOwner) {
       this.router.navigate(['/recipes', this.recipe.id, 'edit']);
     } else {
+      // Sinon on crée un fork
       this.recipesService.fork(this.recipe.id).subscribe({
         next: (newRecipe: Recipe) => {
           this.notificationService.show('Recette adaptée à votre carnet !', 'success');
@@ -113,7 +115,6 @@ export class RecipeDetailComponent implements OnInit {
   onAnalyze() {
     if (!this.recipe) return;
     this.isAnalyzing = true;
-    // Simulation d'analyse nutritionnelle
     setTimeout(() => {
       if (this.recipe) {
         this.recipe.nutritionalInfo = {
@@ -166,9 +167,8 @@ export class RecipeDetailComponent implements OnInit {
       y += (descLines.length * 5) + 10;
     }
 
-    // Si pas de photo, utiliser toute la largeur pour les ingrédients
-    const colWidth = hasPhoto ? (contentWidth / 2) - 5 : contentWidth;
     const startY = y;
+    const colWidth = hasPhoto ? (contentWidth / 2) - 5 : contentWidth;
 
     // Ingrédients
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
@@ -199,7 +199,7 @@ export class RecipeDetailComponent implements OnInit {
         const img = await this.loadImage(imgUrl);
         const imgWidth = colWidth;
         const imgHeight = (img.height * imgWidth) / img.width;
-        const limitedImgHeight = Math.min(imgHeight, 60); // Limiter la hauteur à 60mm
+        const limitedImgHeight = Math.min(imgHeight, 60);
         doc.addImage(img, 'WEBP', margin + colWidth + 10, startY, imgWidth, limitedImgHeight);
         maxImageHeight = limitedImgHeight;
       } catch (e) {
@@ -207,10 +207,8 @@ export class RecipeDetailComponent implements OnInit {
       }
     }
 
-    // Placer les étapes immédiatement après les ingrédients ou l'image
-    y = Math.max(ingredientsEndY, startY + maxImageHeight) + 10;
-
     // Étapes
+    y = Math.max(ingredientsEndY, startY + maxImageHeight) + 10;
     doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -225,7 +223,6 @@ export class RecipeDetailComponent implements OnInit {
       const stepText = `${i + 1}. ${step}`;
       const lines = doc.splitTextToSize(stepText, contentWidth);
       
-      // Vérifier si on doit changer de page
       if (y + (lines.length * 5) > 280) {
         doc.addPage();
         y = 20;
