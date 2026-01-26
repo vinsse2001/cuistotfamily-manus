@@ -149,24 +149,30 @@ export class RecipeFormComponent implements OnInit {
     }
   }
 
+  private capitalize(s: string): string {
+    if (!s) return '';
+    const trimmed = s.trim();
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+
   onSubmit(event: Event) {
     event.preventDefault();
     
-    // Nettoyage des données (Trim)
-    const cleanTitle = this.recipeData.title.trim();
-    const cleanDescription = this.recipeData.description.trim();
+    // Nettoyage des données (Trim + Capitalize)
+    const cleanTitle = this.capitalize(this.recipeData.title);
+    const cleanDescription = this.capitalize(this.recipeData.description);
     
     const cleanIngredients = this.recipeData.ingredients
       .filter(i => i.name && i.name.trim() !== '')
       .map(i => ({
-        name: i.name.trim(),
+        name: this.capitalize(i.name),
         quantity: i.quantity,
         unit: i.unit.trim()
       }));
 
     const cleanInstructions = this.recipeData.instructions
       .filter(i => i.text && i.text.trim() !== '')
-      .map(i => i.text.trim());
+      .map(i => this.capitalize(i.text));
 
     if (!cleanTitle) {
       this.notificationService.show('Le titre de la recette est obligatoire.', 'error');
