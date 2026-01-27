@@ -272,9 +272,22 @@ export class RecipeDetailComponent implements OnInit {
         
         console.log('[NUTRITION] Resultat complet recu :', result);
         this.recipe.nutritionalInfo = result;
+        
+        // Sauvegarder les infos nutritionnelles en base de donnees
+        if (this.recipe.id) {
+          this.recipesService.update(this.recipe.id, { nutritionalInfo: result }).subscribe({
+            next: () => {
+              console.log('[NUTRITION] Infos nutritionnelles sauvegardees en base de donnees');
+              this.notificationService.show('Analyse nutritionnelle sauvegardee', 'success');
+            },
+            error: (err) => {
+              console.error('[NUTRITION] Erreur lors de la sauvegarde:', err);
+              this.notificationService.show('Erreur lors de la sauvegarde', 'error');
+            }
+          });
+        }
       }
       this.isAnalyzing = false;
-      this.notificationService.show('Analyse nutritionnelle terminee avec succes', 'success');
       this.cdr.detectChanges();
     }, 1500);
   }
