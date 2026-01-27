@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400">Mes Recettes</h1>
     
@@ -83,7 +83,35 @@
     </div>
   </div>
 
-  <div [ngClass]="displayMode === 'grid' ? 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-2'">
+  <!-- Pagination Haut -->
+  <div *ngIf="totalPages > 1" class="mb-6 w-full flex flex-wrap gap-4 items-center justify-between">
+    <div class="flex gap-1 items-center">
+      <button (click)="previousPage()" [disabled]="currentPage === 1"
+        [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === 1 ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        ← Précédent
+      </button>
+      
+      <div class="flex gap-1">
+        <button *ngFor="let page of [].constructor(totalPages); let i = index" 
+          (click)="goToPage(i + 1)"
+          [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === i + 1 ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+          {{ i + 1 }}
+        </button>
+      </div>
+      
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+        [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === totalPages ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        Suivant →
+      </button>
+    </div>
+    
+    <div class="text-sm text-nature-600 dark:text-nature-400">
+      Page {{ currentPage }} sur {{ totalPages }} ({{ filteredRecipes.length }} recettes)
+    </div>
+  </div>
+
+  <!-- Mode Grille -->
+  <div *ngIf="displayMode === 'grid'" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
     <div *ngFor="let recipe of paginatedRecipes" 
       (click)="goToDetail(recipe.id)"
       class="bg-white dark:bg-nature-800 overflow-hidden shadow-md rounded-xl border border-nature-100 dark:border-nature-700 hover:shadow-xl transition-all group cursor-pointer transform hover:-translate-y-1">
@@ -156,12 +184,10 @@
         </div>
       </div>
     </div>
-    
-    
-
+  </div>
 
   <!-- Mode Liste Tableau -->
-  <div *ngIf="displayMode === 'list'" class="w-full overflow-x-auto">
+  <div *ngIf="displayMode === 'list'" class="w-full overflow-x-auto mb-8">
     <table class="w-full border-collapse">
       <thead>
         <tr class="bg-saumon-50 dark:bg-saumon-900/20 border-b-2 border-saumon-200 dark:border-saumon-700">
@@ -220,47 +246,46 @@
     </table>
   </div>
 
-  </div>
-
-    <!-- Pagination -->
-    <div *ngIf="totalPages > 1" class="mt-8 flex flex-wrap gap-4 items-center justify-between">
-      <div class="flex gap-1 items-center">
-        <button (click)="previousPage()" [disabled]="currentPage === 1"
-          [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === 1 ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-          ← Précédent
-        </button>
-        
-        <div class="flex gap-1">
-          <button *ngFor="let page of [].constructor(totalPages); let i = index" 
-            (click)="goToPage(i + 1)"
-            [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === i + 1 ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            {{ i + 1 }}
-          </button>
-        </div>
-        
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-          [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === totalPages ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-          Suivant →
+  <!-- Pagination Bas -->
+  <div *ngIf="totalPages > 1" class="w-full flex flex-wrap gap-4 items-center justify-between">
+    <div class="flex gap-1 items-center">
+      <button (click)="previousPage()" [disabled]="currentPage === 1"
+        [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === 1 ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        ← Précédent
+      </button>
+      
+      <div class="flex gap-1">
+        <button *ngFor="let page of [].constructor(totalPages); let i = index" 
+          (click)="goToPage(i + 1)"
+          [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === i + 1 ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+          {{ i + 1 }}
         </button>
       </div>
       
-      <div class="text-sm text-nature-600 dark:text-nature-400">
-        Page {{ currentPage }} sur {{ totalPages }} ({{ filteredRecipes.length }} recettes)
-      </div>
-    </div>
-    <!-- Empty State -->
-    <div *ngIf="paginatedRecipes.length === 0 && filteredRecipes.length === 0" class="col-span-full text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
-      <div class="mx-auto w-16 h-16 bg-nature-100 dark:bg-nature-700 rounded-full flex items-center justify-center mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-      </div>
-      <p class="text-nature-600 dark:text-nature-400 font-medium">
-        {{ searchQuery ? 'Aucune recette ne correspond à votre recherche.' : "Vous n'avez pas encore de recettes." }}
-      </p>
-      <a *ngIf="!searchQuery" routerLink="/recipes/new" class="mt-4 inline-block text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
-        Créez votre première recette !
-      </a>
-      <button *ngIf="searchQuery" (click)="searchQuery = ''; filterRecipes()" class="mt-4 text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
-        Effacer la recherche
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+        [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === totalPages ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        Suivant →
       </button>
     </div>
+    
+    <div class="text-sm text-nature-600 dark:text-nature-400">
+      Page {{ currentPage }} sur {{ totalPages }} ({{ filteredRecipes.length }} recettes)
+    </div>
   </div>
+
+  <!-- Empty State -->
+  <div *ngIf="paginatedRecipes.length === 0 && filteredRecipes.length === 0" class="text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
+    <div class="mx-auto w-16 h-16 bg-nature-100 dark:bg-nature-700 rounded-full flex items-center justify-center mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+    </div>
+    <p class="text-nature-600 dark:text-nature-400 font-medium">
+      {{ searchQuery ? 'Aucune recette ne correspond à votre recherche.' : "Vous n'avez pas encore de recettes." }}
+    </p>
+    <a *ngIf="!searchQuery" routerLink="/recipes/new" class="mt-4 inline-block text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
+      Créez votre première recette !
+    </a>
+    <button *ngIf="searchQuery" (click)="searchQuery = ''; filterRecipes()" class="mt-4 text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
+      Effacer la recherche
+    </button>
+  </div>
+</div>
