@@ -80,6 +80,18 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
+          <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Catégorie</label>
+          <select name="category" [(ngModel)]="recipeData.category"
+            class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
+            <option value="Entrée">Entrée</option>
+            <option value="Plat">Plat</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Cocktail">Cocktail</option>
+            <option value="Soupe">Soupe</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div>
           <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Visibilité</label>
           <select name="visibility" [(ngModel)]="recipeData.visibility"
             class="w-full px-4 py-2 rounded-lg border border-nature-300 dark:border-nature-600 dark:bg-nature-700 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">

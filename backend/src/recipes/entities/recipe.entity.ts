@@ -24,6 +24,9 @@ export class Recipe {
   @Column({ type: 'jsonb', nullable: true })
   nutritionalInfo: any;
 
+  @Column({ default: 'Autre' })
+  category: 'Entrée' | 'Plat' | 'Dessert' | 'Cocktail' | 'Soupe' | 'Autre';
+
   @Column({ default: 'private' })
   visibility: 'private' | 'friends' | 'public';
 

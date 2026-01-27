@@ -30,6 +30,7 @@ export class RecipeFormComponent implements OnInit {
     ingredients: [{ name: '', quantity: 1, unit: '' }],
     instructions: [{ text: '' }],
     visibility: 'private' as 'private' | 'friends' | 'public',
+    category: 'Autre' as 'Entrée' | 'Plat' | 'Dessert' | 'Cocktail' | 'Soupe' | 'Autre',
     photoUrl: ''
   };
 
@@ -57,6 +58,7 @@ export class RecipeFormComponent implements OnInit {
       ingredients: [{ name: '', quantity: 1, unit: '' }],
       instructions: [{ text: '' }],
       visibility: 'private',
+      category: 'Autre',
       photoUrl: ''
     };
   }
@@ -77,6 +79,7 @@ export class RecipeFormComponent implements OnInit {
             : [{ name: '', quantity: 1, unit: '' }],
           instructions: mappedInstructions,
           visibility: data.visibility || 'private',
+          category: data.category || 'Autre',
           photoUrl: data.photoUrl || ''
         };
         
@@ -195,6 +198,7 @@ export class RecipeFormComponent implements OnInit {
       ingredients: cleanIngredients,
       instructions: cleanInstructions,
       visibility: this.recipeData.visibility,
+      category: this.recipeData.category,
       photoUrl: this.recipeData.photoUrl
     };
 

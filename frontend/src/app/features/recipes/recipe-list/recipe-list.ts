@@ -21,6 +21,8 @@ export class RecipeListComponent implements OnInit {
   filteredRecipes: Recipe[] = [];
   searchQuery: string = '';
   activeFilter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' = 'all';
+  activeCategory: string = 'all';
+  categories = ['Entree', 'Plat', 'Dessert', 'Cocktail', 'Soupe', 'Autre'];
 
   ngOnInit() {
     this.loadRecipes();
@@ -55,6 +57,11 @@ export class RecipeListComponent implements OnInit {
     this.filterRecipes();
   }
 
+  toggleCategory(category: string) {
+    this.activeCategory = this.activeCategory === category ? 'all' : category;
+    this.filterRecipes();
+  }
+
   filterRecipes() {
     let filtered = [...this.recipes];
     const currentUserId = this.getCurrentUserId();
@@ -71,14 +78,21 @@ export class RecipeListComponent implements OnInit {
       filtered = filtered.filter(r => r.visibility === 'public');
     }
 
+    // Filtre par categorie
+    if (this.activeCategory !== 'all') {
+      filtered = filtered.filter(r => r.category === this.activeCategory);
+    }
+
     if (!this.searchQuery.trim()) {
       this.filteredRecipes = filtered;
     } else {
       const query = this.searchQuery.toLowerCase().trim();
-      this.filteredRecipes = filtered.filter(r => 
-        r.title.toLowerCase().includes(query) || 
-        (r.description && r.description.toLowerCase().includes(query))
-      );
+      this.filteredRecipes = filtered.filter(r => {
+        const titleMatch = r.title.toLowerCase().includes(query);
+        const descMatch = r.description && r.description.toLowerCase().includes(query);
+        const ingredientsMatch = r.ingredients && r.ingredients.some(i => i.name.toLowerCase().includes(query));
+        return titleMatch || descMatch || ingredientsMatch;
+      });
     }
     this.cdr.detectChanges();
   }

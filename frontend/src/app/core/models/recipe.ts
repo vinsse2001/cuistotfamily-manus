@@ -13,6 +13,7 @@ export interface Recipe {
   instructions?: string[];
   nutritionalInfo?: any;
   visibility: 'private' | 'friends' | 'public';
+  category?: 'Entrée' | 'Plat' | 'Dessert' | 'Cocktail' | 'Soupe' | 'Autre';
   ownerId?: string;
   forkedFromId?: string;
   createdAt?: Date;
