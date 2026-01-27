@@ -91,11 +91,49 @@
             </button>
           </div>
           
-          <div *ngIf="recipe.nutritionalInfo" class="bg-saumon-50 dark:bg-saumon-900/20 p-3 rounded-md mb-4 grid grid-cols-4 gap-2 text-center text-xs">
-            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.calories }}</span> kcal</div>
-            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.proteins }}g</span> Prot.</div>
-            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.carbs }}g</span> Gluc.</div>
-            <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.fat }}g</span> Lip.</div>
+          <div *ngIf="recipe.nutritionalInfo" class="bg-saumon-50 dark:bg-saumon-900/20 p-4 rounded-md mb-4">
+            <!-- Macronutriments -->
+            <div class="grid grid-cols-4 gap-2 text-center text-xs mb-4">
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.calories }}</span> kcal</div>
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.protein }}g</span> Prot.</div>
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.carbs }}g</span> Gluc.</div>
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.fat }}g</span> Lip.</div>
+            </div>
+            
+            <!-- Autres macronutriments -->
+            <div class="grid grid-cols-3 gap-2 text-center text-xs mb-4 border-t border-saumon-200 dark:border-saumon-700 pt-3">
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.fiber }}g</span> Fibres</div>
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.sugar }}g</span> Sucre</div>
+              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.sodium }}mg</span> Sodium</div>
+            </div>
+            
+            <!-- Vitamines -->
+            <div *ngIf="recipe.nutritionalInfo.vitamins" class="mb-3 border-t border-saumon-200 dark:border-saumon-700 pt-3">
+              <p class="text-xs font-bold text-saumon-700 dark:text-saumon-300 mb-2">Vitamines :</p>
+              <div class="grid grid-cols-4 gap-1 text-xs">
+                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminA"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminA }}</span> Vit. A (µg)</div>
+                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminC"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminC }}</span> Vit. C (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminD"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminD }}</span> Vit. D (µg)</div>
+                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminE"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminE }}</span> Vit. E (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminK"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminK }}</span> Vit. K (µg)</div>
+                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminB12"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminB12 }}</span> Vit. B12 (µg)</div>
+                <div *ngIf="recipe.nutritionalInfo.vitamins.folate"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.folate }}</span> Folate (µg)</div>
+              </div>
+            </div>
+            
+            <!-- Minéraux -->
+            <div *ngIf="recipe.nutritionalInfo.minerals" class="border-t border-saumon-200 dark:border-saumon-700 pt-3">
+              <p class="text-xs font-bold text-saumon-700 dark:text-saumon-300 mb-2">Minéraux :</p>
+              <div class="grid grid-cols-4 gap-1 text-xs">
+                <div *ngIf="recipe.nutritionalInfo.minerals.calcium"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.calcium }}</span> Calcium (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.minerals.iron"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.iron }}</span> Fer (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.minerals.magnesium"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.magnesium }}</span> Mag. (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.minerals.phosphorus"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.phosphorus }}</span> Phos. (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.minerals.potassium"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.potassium }}</span> Pot. (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.minerals.zinc"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.zinc }}</span> Zinc (mg)</div>
+                <div *ngIf="recipe.nutritionalInfo.minerals.copper"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.copper }}</span> Cuivre (mg)</div>
+              </div>
+            </div>
           </div>
           <ul class="space-y-2">
             <li *ngFor="let ing of recipe.ingredients" class="flex justify-between border-b border-nature-200 dark:border-nature-700 pb-2">

@@ -59,6 +59,9 @@ export class RecipeDetailComponent implements OnInit {
         this.userRating = data.userRating || 0;
         this.isFavorite = data.isFavorite || false;
         this.cdr.detectChanges();
+        
+        // Scroll vers le haut pour afficher le bandeau de navigation
+        window.scrollTo(0, 0);
       },
       error: (err: any) => {
         this.notificationService.show('Erreur lors du chargement de la recette', 'error');
@@ -128,14 +131,50 @@ export class RecipeDetailComponent implements OnInit {
   onAnalyze() {
     if (!this.recipe) return;
     this.isAnalyzing = true;
+    
+    // Construire le prompt pour l'analyse nutritionnelle
+    const ingredientsList = this.recipe.ingredients
+      .map(ing => `${ing.quantity} ${ing.unit} de ${ing.name}`)
+      .join(', ');
+    
+    const prompt = 'Analysez les valeurs nutritionnelles pour cette recette avec ingrédients: ' + ingredientsList;
+    
+    console.log('[NUTRITION] Prompt envoyé :', prompt);
+    console.log('[NUTRITION] Ingredients analysés :', ingredientsList);
+    
+    // Simulation d'appel API avec résultats enrichis
     setTimeout(() => {
       if (this.recipe) {
-        this.recipe.nutritionalInfo = {
+        const result = {
           calories: Math.floor(Math.random() * 500) + 200,
-          proteins: Math.floor(Math.random() * 20) + 5,
+          protein: Math.floor(Math.random() * 20) + 5,
           carbs: Math.floor(Math.random() * 50) + 10,
-          fat: Math.floor(Math.random() * 30) + 5
+          fat: Math.floor(Math.random() * 30) + 5,
+          fiber: Math.floor(Math.random() * 8) + 2,
+          sugar: Math.floor(Math.random() * 10) + 2,
+          sodium: Math.floor(Math.random() * 500) + 100,
+          vitamins: {
+            vitaminA: Math.floor(Math.random() * 800) + 100,
+            vitaminC: Math.floor(Math.random() * 60) + 10,
+            vitaminD: Math.floor(Math.random() * 20) + 2,
+            vitaminE: Math.floor(Math.random() * 15) + 2,
+            vitaminK: Math.floor(Math.random() * 100) + 20,
+            vitaminB12: Math.floor(Math.random() * 3) + 0.5,
+            folate: Math.floor(Math.random() * 200) + 50
+          },
+          minerals: {
+            calcium: Math.floor(Math.random() * 400) + 100,
+            iron: Math.floor(Math.random() * 8) + 2,
+            magnesium: Math.floor(Math.random() * 200) + 50,
+            phosphorus: Math.floor(Math.random() * 300) + 100,
+            potassium: Math.floor(Math.random() * 500) + 200,
+            zinc: Math.floor(Math.random() * 8) + 2,
+            copper: Math.floor(Math.random() * 1) + 0.2
+          }
         };
+        
+        console.log('[NUTRITION] Resultat recu :', result);
+        this.recipe.nutritionalInfo = result;
       }
       this.isAnalyzing = false;
       this.notificationService.show('Analyse nutritionnelle terminée', 'success');

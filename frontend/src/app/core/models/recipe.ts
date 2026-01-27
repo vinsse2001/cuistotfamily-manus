@@ -4,6 +4,34 @@ export interface Ingredient {
   unit: string;
 }
 
+export interface NutritionalInfo {
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  fiber?: number;
+  sugar?: number;
+  sodium?: number;
+  vitamins?: {
+    vitaminA?: number;
+    vitaminC?: number;
+    vitaminD?: number;
+    vitaminE?: number;
+    vitaminK?: number;
+    vitaminB12?: number;
+    folate?: number;
+  };
+  minerals?: {
+    calcium?: number;
+    iron?: number;
+    magnesium?: number;
+    phosphorus?: number;
+    potassium?: number;
+    zinc?: number;
+    copper?: number;
+  };
+}
+
 export interface Recipe {
   id?: string;
   title: string;
@@ -11,7 +39,7 @@ export interface Recipe {
   photoUrl?: string;
   ingredients: Ingredient[];
   instructions?: string[];
-  nutritionalInfo?: any;
+  nutritionalInfo?: NutritionalInfo;
   visibility: 'private' | 'friends' | 'public';
   category?: 'Entrée' | 'Plat' | 'Dessert' | 'Cocktail' | 'Soupe' | 'Autre';
   ownerId?: string;
