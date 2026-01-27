@@ -207,6 +207,7 @@ export class RecipeFormComponent implements OnInit {
         next: () => {
           this.notificationService.show('Recette mise à jour !', 'success');
           this.router.navigate(['/recipes', this.recipeId]);
+          window.scrollTo(0, 0);
         },
         error: () => {
           this.notificationService.show('Erreur lors de la mise à jour', 'error');
@@ -217,6 +218,7 @@ export class RecipeFormComponent implements OnInit {
         next: (res) => {
           this.notificationService.show('Recette créée !', 'success');
           this.router.navigate(['/recipes', res.id]);
+          window.scrollTo(0, 0);
         },
         error: () => {
           this.notificationService.show('Erreur lors de la création', 'error');
