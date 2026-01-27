@@ -108,57 +108,59 @@
         </div>
       </div>
 
-      <!-- Tableau Nutritionnel Compact en Fin de Recette -->
-      <div *ngIf="recipe.nutritionalInfo" class="mt-8 pt-6 border-t border-nature-200 dark:border-nature-700">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-saumon-600 dark:text-saumon-400">Informations Nutritionnelles</h2>
-          <button *ngIf="recipe.nutritionalInfo" (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-xs bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-2 py-1 rounded hover:bg-saumon-200 dark:hover:bg-saumon-800 disabled:opacity-50 transition-colors">
-            {{ isAnalyzing ? 'Analyse...' : 'Mettre à jour' }}
+            <!-- Tableau Nutritionnel Ultra-Compact en Fin de Recette -->
+      <div *ngIf="recipe.nutritionalInfo" class="mt-8 pt-4 border-t border-nature-200 dark:border-nature-700">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-lg font-semibold text-saumon-600 dark:text-saumon-400">Bilan Nutritionnel (CIQUAL)</h2>
+          <button (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-[10px] bg-saumon-50 dark:bg-saumon-900/30 text-saumon-600 dark:text-saumon-400 px-2 py-0.5 rounded border border-saumon-200 dark:border-saumon-800 hover:bg-saumon-100 transition-colors">
+            {{ isAnalyzing ? 'Analyse...' : 'Actualiser' }}
           </button>
         </div>
         
-        <div class="w-full overflow-x-auto">
-          <table class="w-full text-xs border-collapse">
-            <thead>
-              <tr class="bg-saumon-50 dark:bg-saumon-900/20 border-b border-saumon-200 dark:border-saumon-700">
-                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Nutriment</th>
-                <th class="px-3 py-2 text-center font-bold text-saumon-700 dark:text-saumon-300">Pour 100g</th>
-                <th class="px-3 py-2 text-center font-bold text-saumon-700 dark:text-saumon-300">Par part</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-nature-100 dark:border-nature-700 bg-nature-50 dark:bg-nature-900/10">
-                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Calories</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.calories }}</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.calories }}</strong></td>
-              </tr>
-              <tr class="border-b border-nature-100 dark:border-nature-700">
-                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Prot. (g)</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.protein }}</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.protein }}</strong></td>
-              </tr>
-              <tr class="border-b border-nature-100 dark:border-nature-700 bg-nature-50 dark:bg-nature-900/10">
-                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Gluc. (g)</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.carbs }}</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.carbs }}</strong></td>
-              </tr>
-              <tr class="border-b border-nature-100 dark:border-nature-700">
-                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Lip. (g)</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.fat }}</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.fat }}</strong></td>
-              </tr>
-              <tr class="border-b border-nature-100 dark:border-nature-700 bg-nature-50 dark:bg-nature-900/10">
-                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Fibres (g)</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.fiber }}</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.fiber }}</strong></td>
-              </tr>
-              <tr class="border-b border-nature-100 dark:border-nature-700">
-                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Sodium (mg)</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.sodium }}</td>
-                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.sodium }}</strong></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-[11px]">
+          <!-- Macronutriments -->
+          <div class="bg-nature-50 dark:bg-nature-900/20 p-2 rounded border border-nature-100 dark:border-nature-800">
+            <div class="font-bold text-saumon-600 dark:text-saumon-400 border-b border-saumon-100 dark:border-saumon-900 mb-1 pb-0.5 flex justify-between">
+              <span>Macronutriments</span>
+              <span class="text-[9px] font-normal text-nature-500">/100g | Part</span>
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between"><span>Calories</span><span class="font-mono">{{ getNutritionPer100g()?.calories }} | <strong class="text-nature-900 dark:text-white">{{ getNutritionPerServing()?.calories }}</strong></span></div>
+              <div class="flex justify-between"><span>Protéines (g)</span><span class="font-mono">{{ getNutritionPer100g()?.protein }} | <strong class="text-nature-900 dark:text-white">{{ getNutritionPerServing()?.protein }}</strong></span></div>
+              <div class="flex justify-between"><span>Glucides (g)</span><span class="font-mono">{{ getNutritionPer100g()?.carbs }} | <strong class="text-nature-900 dark:text-white">{{ getNutritionPerServing()?.carbs }}</strong></span></div>
+              <div class="flex justify-between"><span>Lipides (g)</span><span class="font-mono">{{ getNutritionPer100g()?.fat }} | <strong class="text-nature-900 dark:text-white">{{ getNutritionPerServing()?.fat }}</strong></span></div>
+              <div class="flex justify-between"><span>Fibres (g)</span><span class="font-mono">{{ getNutritionPer100g()?.fiber }} | <strong class="text-nature-900 dark:text-white">{{ getNutritionPerServing()?.fiber }}</strong></span></div>
+              <div class="flex justify-between"><span>Sodium (mg)</span><span class="font-mono">{{ getNutritionPer100g()?.sodium }} | <strong class="text-nature-900 dark:text-white">{{ getNutritionPerServing()?.sodium }}</strong></span></div>
+            </div>
+          </div>
+
+          <!-- Vitamines -->
+          <div class="bg-nature-50 dark:bg-nature-900/20 p-2 rounded border border-nature-100 dark:border-nature-800">
+            <div class="font-bold text-saumon-600 dark:text-saumon-400 border-b border-saumon-100 dark:border-saumon-900 mb-1 pb-0.5">Vitamines (/part)</div>
+            <div class="grid grid-cols-2 gap-x-2 gap-y-0.5">
+              <div class="flex justify-between"><span>Vit. A</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.vitaminA }}µg</span></div>
+              <div class="flex justify-between"><span>Vit. C</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.vitaminC }}mg</span></div>
+              <div class="flex justify-between"><span>Vit. D</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.vitaminD }}µg</span></div>
+              <div class="flex justify-between"><span>Vit. E</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.vitaminE }}mg</span></div>
+              <div class="flex justify-between"><span>Vit. K</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.vitaminK }}µg</span></div>
+              <div class="flex justify-between"><span>B12</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.vitaminB12 }}µg</span></div>
+              <div class="flex justify-between"><span>Folate</span><span class="font-semibold">{{ getNutritionPerServing()?.vitamins?.folate }}µg</span></div>
+            </div>
+          </div>
+
+          <!-- Minéraux -->
+          <div class="bg-nature-50 dark:bg-nature-900/20 p-2 rounded border border-nature-100 dark:border-nature-800">
+            <div class="font-bold text-saumon-600 dark:text-saumon-400 border-b border-saumon-100 dark:border-saumon-900 mb-1 pb-0.5">Minéraux (/part)</div>
+            <div class="grid grid-cols-2 gap-x-2 gap-y-0.5">
+              <div class="flex justify-between"><span>Calcium</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.calcium }}mg</span></div>
+              <div class="flex justify-between"><span>Fer</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.iron }}mg</span></div>
+              <div class="flex justify-between"><span>Mag.</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.magnesium }}mg</span></div>
+              <div class="flex justify-between"><span>Phos.</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.phosphorus }}mg</span></div>
+              <div class="flex justify-between"><span>Potas.</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.potassium }}mg</span></div>
+              <div class="flex justify-between"><span>Zinc</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.zinc }}mg</span></div>
+              <div class="flex justify-between"><span>Cuivre</span><span class="font-semibold">{{ getNutritionPerServing()?.minerals?.copper }}mg</span></div>
+            </div>
+          </div>
         </div>
       </div>
       

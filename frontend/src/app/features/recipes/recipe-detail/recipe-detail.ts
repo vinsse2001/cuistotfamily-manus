@@ -376,57 +376,88 @@ export class RecipeDetailComponent implements OnInit {
       y += (lines.length * 5) + 3;
     });
 
-    // Ajouter le tableau nutritionnel si disponible
+        // Ajouter le tableau nutritionnel ultra-compact si disponible
     if (this.recipe.nutritionalInfo) {
-      if (y + 50 > 280) {
+      if (y + 40 > 280) {
         doc.addPage();
         y = 20;
       }
       
-      y += 8;
+      y += 5;
       doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text('Informations Nutritionnelles', margin, y);
-      y += 8;
+      doc.text('Bilan Nutritionnel (CIQUAL)', margin, y);
+      y += 5;
 
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(saumonColor[0], saumonColor[1], saumonColor[2]);
-      
-      const colWidth1 = 60;
-      const colWidth2 = 40;
-      
-      doc.text('Nutriment', margin, y + 3);
-      doc.text('Pour 100g', margin + colWidth1, y + 3);
-      doc.text('Par part', margin + colWidth1 + colWidth2, y + 3);
-      y += 6;
-      
-      doc.setDrawColor(saumonColor[0], saumonColor[1], saumonColor[2]);
-      doc.line(margin, y, margin + contentWidth, y);
-      y += 3;
-      
       const nutrition100g = this.getNutritionPer100g();
       const nutritionPerServing = this.getNutritionPerServing();
       
-      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
       doc.setTextColor(natureColor[0], natureColor[1], natureColor[2]);
       
-      const rows = [
-        { label: 'Calories', val100g: nutrition100g?.calories || 0, valServing: nutritionPerServing?.calories || 0 },
-        { label: 'Prot. (g)', val100g: nutrition100g?.protein || 0, valServing: nutritionPerServing?.protein || 0 },
-        { label: 'Gluc. (g)', val100g: nutrition100g?.carbs || 0, valServing: nutritionPerServing?.carbs || 0 },
-        { label: 'Lip. (g)', val100g: nutrition100g?.fat || 0, valServing: nutritionPerServing?.fat || 0 },
-        { label: 'Fibres (g)', val100g: nutrition100g?.fiber || 0, valServing: nutritionPerServing?.fiber || 0 },
-        { label: 'Sodium (mg)', val100g: nutrition100g?.sodium || 0, valServing: nutritionPerServing?.sodium || 0 }
+      // Colonne 1: Macronutriments
+      let yMacro = y;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Macronutriments (/100g | /part)', margin, yMacro);
+      yMacro += 4;
+      doc.setFont('helvetica', 'normal');
+      const macros = [
+        { l: 'Calories', v1: nutrition100g?.calories, v2: nutritionPerServing?.calories },
+        { l: 'Protéines (g)', v1: nutrition100g?.protein, v2: nutritionPerServing?.protein },
+        { l: 'Glucides (g)', v1: nutrition100g?.carbs, v2: nutritionPerServing?.carbs },
+        { l: 'Lipides (g)', v1: nutrition100g?.fat, v2: nutritionPerServing?.fat },
+        { l: 'Fibres (g)', v1: nutrition100g?.fiber, v2: nutritionPerServing?.fiber },
+        { l: 'Sodium (mg)', v1: nutrition100g?.sodium, v2: nutritionPerServing?.sodium }
       ];
-      
-      rows.forEach(row => {
-        doc.text(row.label, margin, y);
-        doc.text(String(row.val100g), margin + colWidth1, y);
-        doc.text(String(row.valServing), margin + colWidth1 + colWidth2, y);
-        y += 4;
+      macros.forEach(m => {
+        doc.text(`${m.l}: ${m.v1 || 0} | ${m.v2 || 0}`, margin, yMacro);
+        yMacro += 3.5;
       });
+
+      // Colonne 2: Vitamines
+      let yVit = y;
+      const col2X = margin + 65;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Vitamines (/part)', col2X, yVit);
+      yVit += 4;
+      doc.setFont('helvetica', 'normal');
+      const vits = [
+        { l: 'Vit. A', v: nutritionPerServing?.vitamins?.vitaminA, u: 'µg' },
+        { l: 'Vit. C', v: nutritionPerServing?.vitamins?.vitaminC, u: 'mg' },
+        { l: 'Vit. D', v: nutritionPerServing?.vitamins?.vitaminD, u: 'µg' },
+        { l: 'Vit. E', v: nutritionPerServing?.vitamins?.vitaminE, u: 'mg' },
+        { l: 'Vit. K', v: nutritionPerServing?.vitamins?.vitaminK, u: 'µg' },
+        { l: 'B12', v: nutritionPerServing?.vitamins?.vitaminB12, u: 'µg' },
+        { l: 'Folate', v: nutritionPerServing?.vitamins?.folate, u: 'µg' }
+      ];
+      vits.forEach(v => {
+        doc.text(`${v.l}: ${v.v || 0}${v.u}`, col2X, yVit);
+        yVit += 3.5;
+      });
+
+      // Colonne 3: Minéraux
+      let yMin = y;
+      const col3X = margin + 120;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Minéraux (/part)', col3X, yMin);
+      yMin += 4;
+      doc.setFont('helvetica', 'normal');
+      const mins = [
+        { l: 'Calcium', v: nutritionPerServing?.minerals?.calcium, u: 'mg' },
+        { l: 'Fer', v: nutritionPerServing?.minerals?.iron, u: 'mg' },
+        { l: 'Mag.', v: nutritionPerServing?.minerals?.magnesium, u: 'mg' },
+        { l: 'Phos.', v: nutritionPerServing?.minerals?.phosphorus, u: 'mg' },
+        { l: 'Potas.', v: nutritionPerServing?.minerals?.potassium, u: 'mg' },
+        { l: 'Zinc', v: nutritionPerServing?.minerals?.zinc, u: 'mg' },
+        { l: 'Cuivre', v: nutritionPerServing?.minerals?.copper, u: 'mg' }
+      ];
+      mins.forEach(m => {
+        doc.text(`${m.l}: ${m.v || 0}${m.u}`, col3X, yMin);
+        yMin += 3.5;
+      });
+
+      y = Math.max(yMacro, yVit, yMin) + 5;
     }
 
     doc.save(`recette-${this.recipe.title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
