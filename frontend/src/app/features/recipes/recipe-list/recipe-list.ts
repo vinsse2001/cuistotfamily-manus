@@ -22,10 +22,73 @@ export class RecipeListComponent implements OnInit {
   searchQuery: string = '';
   activeFilter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' = 'all';
   activeCategory: string = 'all';
-  categories = ['Entrée', 'Plat', 'Dessert', 'Cocktail', 'Soupe', 'Autre'];
+  categories = ['Entree', 'Plat', 'Dessert', 'Cocktail', 'Soupe', 'Autre'];
+
+  // Pagination
+  currentPage: number = 1;
+  itemsPerPage: number = 20;
+  itemsPerPageOptions = [10, 20, 50];
+  displayMode: 'grid' | 'list' = 'grid';
+  paginatedRecipes: Recipe[] = [];
 
   ngOnInit() {
+    this.loadDisplayMode();
+    this.loadItemsPerPage();
     this.loadRecipes();
+  }
+
+  loadDisplayMode() {
+    const saved = localStorage.getItem('recipeDisplayMode');
+    if (saved === 'list' || saved === 'grid') {
+      this.displayMode = saved;
+    }
+  }
+
+  loadItemsPerPage() {
+    const saved = localStorage.getItem('recipeItemsPerPage');
+    if (saved && [10, 20, 50].includes(parseInt(saved))) {
+      this.itemsPerPage = parseInt(saved);
+    }
+  }
+
+  setDisplayMode(mode: 'grid' | 'list') {
+    this.displayMode = mode;
+    localStorage.setItem('recipeDisplayMode', mode);
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  setItemsPerPage(count: number) {
+    this.itemsPerPage = count;
+    localStorage.setItem('recipeItemsPerPage', count.toString());
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredRecipes.length / this.itemsPerPage);
+  }
+
+  updatePagination() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    this.paginatedRecipes = this.filteredRecipes.slice(start, end);
+    this.cdr.detectChanges();
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  nextPage() {
+    this.goToPage(this.currentPage + 1);
+  }
+
+  previousPage() {
+    this.goToPage(this.currentPage - 1);
   }
 
   getCurrentUserId(): string | null {
@@ -94,7 +157,8 @@ export class RecipeListComponent implements OnInit {
         return titleMatch || descMatch || ingredientsMatch;
       });
     }
-    this.cdr.detectChanges();
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
   getFullUrl(url: string): string {

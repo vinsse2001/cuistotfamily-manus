@@ -48,11 +48,11 @@
     </button>
   </div>
 
-  <!-- Filtres de catégorie -->
+  <!-- Filtres de categorie -->
   <div class="mb-6 flex flex-wrap gap-2">
     <button (click)="toggleCategory('all')" 
       [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeCategory === 'all' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-      Toutes les catégories
+      Toutes les categories
     </button>
     <button *ngFor="let cat of categories" (click)="toggleCategory(cat)" 
       [class]="'px-4 py-2 rounded-lg font-medium transition-all ' + (activeCategory === cat ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
@@ -60,8 +60,31 @@
     </button>
   </div>
 
-  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    <div *ngFor="let recipe of filteredRecipes" 
+  <!-- Controles d'affichage et de pagination -->
+  <div class="mb-6 flex flex-wrap gap-4 items-center justify-between">
+    <div class="flex gap-2 items-center">
+      <span class="text-sm font-medium text-nature-700 dark:text-nature-300">Affichage :</span>
+      <button (click)="setDisplayMode('grid')" 
+        [class]="'p-2 rounded-lg transition-all ' + (displayMode === 'grid' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" /></svg>
+      </button>
+      <button (click)="setDisplayMode('list')" 
+        [class]="'p-2 rounded-lg transition-all ' + (displayMode === 'list' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" /></svg>
+      </button>
+    </div>
+
+    <div class="flex gap-2 items-center">
+      <span class="text-sm font-medium text-nature-700 dark:text-nature-300">Par page :</span>
+      <button *ngFor="let count of itemsPerPageOptions" (click)="setItemsPerPage(count)"
+        [class]="'px-3 py-1 rounded-lg text-sm transition-all ' + (itemsPerPage === count ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+        {{ count }}
+      </button>
+    </div>
+  </div>
+
+  <div [ngClass]="displayMode === 'grid' ? 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-2'">
+    <div *ngFor="let recipe of paginatedRecipes" 
       (click)="goToDetail(recipe.id)"
       class="bg-white dark:bg-nature-800 overflow-hidden shadow-md rounded-xl border border-nature-100 dark:border-nature-700 hover:shadow-xl transition-all group cursor-pointer transform hover:-translate-y-1">
       
@@ -134,8 +157,35 @@
       </div>
     </div>
     
+    
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="mt-8 flex flex-wrap gap-4 items-center justify-between">
+      <div class="flex gap-1 items-center">
+        <button (click)="previousPage()" [disabled]="currentPage === 1"
+          [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === 1 ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+          ← Précédent
+        </button>
+        
+        <div class="flex gap-1">
+          <button *ngFor="let page of [].constructor(totalPages); let i = index" 
+            (click)="goToPage(i + 1)"
+            [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === i + 1 ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+            {{ i + 1 }}
+          </button>
+        </div>
+        
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+          [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === totalPages ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
+          Suivant →
+        </button>
+      </div>
+      
+      <div class="text-sm text-nature-600 dark:text-nature-400">
+        Page {{ currentPage }} sur {{ totalPages }} ({{ filteredRecipes.length }} recettes)
+      </div>
+    </div>
     <!-- Empty State -->
-    <div *ngIf="filteredRecipes.length === 0" class="col-span-full text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
+    <div *ngIf="paginatedRecipes.length === 0 && filteredRecipes.length === 0" class="col-span-full text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
       <div class="mx-auto w-16 h-16 bg-nature-100 dark:bg-nature-700 rounded-full flex items-center justify-center mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
       </div>
