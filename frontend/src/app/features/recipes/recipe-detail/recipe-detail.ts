@@ -206,7 +206,28 @@ export class RecipeDetailComponent implements OnInit {
       .map(ing => `${ing.quantity} ${ing.unit} de ${ing.name}`)
       .join(', ');
     
-    const prompt = 'Analysez les valeurs nutritionnelles pour cette recette avec ingrédients: ' + ingredientsList;
+    const prompt = `Analysez les valeurs nutritionnelles de cette recette en utilisant la base de données CIQUAL comme référence.
+Ingrédients : ${this.recipe.ingredients.map(i => \`\${i.quantity} \${i.unit} de \${i.name}\`).join(', ')}
+
+Retournez un JSON avec cette structure exacte (valeurs pour la recette complète) :
+{
+  "calories": <nombre>,
+  "protein": <nombre en g>,
+  "carbs": <nombre en g>,
+  "fat": <nombre en g>,
+  "fiber": <nombre en g>,
+  "sugar": <nombre en g>,
+  "sodium": <nombre en mg>,
+  "vitamins": {
+    "vitaminA": <nombre en µg>,
+    "vitaminC": <nombre en mg>,
+    ...
+  },
+  "minerals": {
+    "calcium": <nombre en mg>,
+    ...
+  }
+}`;
     
     console.log('[NUTRITION] Prompt envoyé :', prompt);
     console.log('[NUTRITION] Ingredients analysés :', ingredientsList);
