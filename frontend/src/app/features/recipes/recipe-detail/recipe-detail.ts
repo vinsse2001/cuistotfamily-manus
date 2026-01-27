@@ -128,6 +128,75 @@ export class RecipeDetailComponent implements OnInit {
     });
   }
 
+  // Calculer les valeurs nutritionnelles par part
+  getNutritionPerServing() {
+    if (!this.recipe?.nutritionalInfo) return null;
+    const servings = 4; // Nombre de parts par défaut
+    const info = this.recipe.nutritionalInfo as any;
+    return {
+      calories: Math.round(info.calories / servings),
+      protein: (info.protein / servings).toFixed(1),
+      carbs: (info.carbs / servings).toFixed(1),
+      fat: (info.fat / servings).toFixed(1),
+      fiber: (info.fiber / servings).toFixed(1),
+      sugar: (info.sugar / servings).toFixed(1),
+      sodium: Math.round(info.sodium / servings),
+      vitamins: info.vitamins ? {
+        vitaminA: Math.round(info.vitamins.vitaminA / servings),
+        vitaminC: Math.round(info.vitamins.vitaminC / servings),
+        vitaminD: (info.vitamins.vitaminD / servings).toFixed(1),
+        vitaminE: (info.vitamins.vitaminE / servings).toFixed(1),
+        vitaminK: Math.round(info.vitamins.vitaminK / servings),
+        vitaminB12: (info.vitamins.vitaminB12 / servings).toFixed(2),
+        folate: Math.round(info.vitamins.folate / servings)
+      } : null,
+      minerals: info.minerals ? {
+        calcium: Math.round(info.minerals.calcium / servings),
+        iron: (info.minerals.iron / servings).toFixed(1),
+        magnesium: Math.round(info.minerals.magnesium / servings),
+        phosphorus: Math.round(info.minerals.phosphorus / servings),
+        potassium: Math.round(info.minerals.potassium / servings),
+        zinc: (info.minerals.zinc / servings).toFixed(1),
+        copper: (info.minerals.copper / servings).toFixed(2)
+      } : null
+    };
+  }
+
+  // Calculer les valeurs nutritionnelles pour 100g
+  getNutritionPer100g() {
+    if (!this.recipe?.nutritionalInfo) return null;
+    // Estimer le poids total (approximation simple: 150g par ingrédient en moyenne)
+    const totalWeight = Math.max(this.recipe.ingredients.length * 150, 100);
+    const info = this.recipe.nutritionalInfo as any;
+    return {
+      calories: Math.round(((info.calories || 0) / totalWeight) * 100),
+      protein: (((info.protein || 0) / totalWeight) * 100).toFixed(1),
+      carbs: (((info.carbs || 0) / totalWeight) * 100).toFixed(1),
+      fat: (((info.fat || 0) / totalWeight) * 100).toFixed(1),
+      fiber: (((info.fiber || 0) / totalWeight) * 100).toFixed(1),
+      sugar: (((info.sugar || 0) / totalWeight) * 100).toFixed(1),
+      sodium: Math.round(((info.sodium || 0) / totalWeight) * 100),
+      vitamins: info.vitamins ? {
+        vitaminA: Math.round(((info.vitamins.vitaminA || 0) / totalWeight) * 100),
+        vitaminC: Math.round(((info.vitamins.vitaminC || 0) / totalWeight) * 100),
+        vitaminD: (((info.vitamins.vitaminD || 0) / totalWeight) * 100).toFixed(1),
+        vitaminE: (((info.vitamins.vitaminE || 0) / totalWeight) * 100).toFixed(1),
+        vitaminK: Math.round(((info.vitamins.vitaminK || 0) / totalWeight) * 100),
+        vitaminB12: (((info.vitamins.vitaminB12 || 0) / totalWeight) * 100).toFixed(2),
+        folate: Math.round(((info.vitamins.folate || 0) / totalWeight) * 100)
+      } : null,
+      minerals: info.minerals ? {
+        calcium: Math.round(((info.minerals.calcium || 0) / totalWeight) * 100),
+        iron: (((info.minerals.iron || 0) / totalWeight) * 100).toFixed(1),
+        magnesium: Math.round(((info.minerals.magnesium || 0) / totalWeight) * 100),
+        phosphorus: Math.round(((info.minerals.phosphorus || 0) / totalWeight) * 100),
+        potassium: Math.round(((info.minerals.potassium || 0) / totalWeight) * 100),
+        zinc: (((info.minerals.zinc || 0) / totalWeight) * 100).toFixed(1),
+        copper: (((info.minerals.copper || 0) / totalWeight) * 100).toFixed(2)
+      } : null
+    };
+  }
+
   onAnalyze() {
     if (!this.recipe) return;
     this.isAnalyzing = true;

@@ -121,51 +121,41 @@
           <table class="w-full text-xs border-collapse">
             <thead>
               <tr class="bg-saumon-50 dark:bg-saumon-900/20 border-b border-saumon-200 dark:border-saumon-700">
-                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Macronutriments</th>
-                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Vitamines</th>
-                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Minéraux</th>
+                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Nutriment</th>
+                <th class="px-3 py-2 text-center font-bold text-saumon-700 dark:text-saumon-300">Pour 100g</th>
+                <th class="px-3 py-2 text-center font-bold text-saumon-700 dark:text-saumon-300">Par part</th>
               </tr>
             </thead>
             <tbody>
+              <tr class="border-b border-nature-100 dark:border-nature-700 bg-nature-50 dark:bg-nature-900/10">
+                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Calories</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.calories }}</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.calories }}</strong></td>
+              </tr>
               <tr class="border-b border-nature-100 dark:border-nature-700">
-                <!-- Macronutriments -->
-                <td class="px-3 py-2 text-nature-700 dark:text-nature-300">
-                  <div class="space-y-1">
-                    <div><strong>{{ recipe.nutritionalInfo.calories }}</strong> kcal</div>
-                    <div>Prot. <strong>{{ recipe.nutritionalInfo.protein }}g</strong></div>
-                    <div>Gluc. <strong>{{ recipe.nutritionalInfo.carbs }}g</strong></div>
-                    <div>Lip. <strong>{{ recipe.nutritionalInfo.fat }}g</strong></div>
-                    <div>Fibres <strong>{{ recipe.nutritionalInfo.fiber }}g</strong></div>
-                    <div>Sucre <strong>{{ recipe.nutritionalInfo.sugar }}g</strong></div>
-                    <div>Sodium <strong>{{ recipe.nutritionalInfo.sodium }}mg</strong></div>
-                  </div>
-                </td>
-                
-                <!-- Vitamines -->
-                <td class="px-3 py-2 text-nature-700 dark:text-nature-300">
-                  <div class="space-y-1" *ngIf="recipe.nutritionalInfo.vitamins">
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminA">Vit. A <strong>{{ recipe.nutritionalInfo.vitamins.vitaminA }}µg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminC">Vit. C <strong>{{ recipe.nutritionalInfo.vitamins.vitaminC }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminD">Vit. D <strong>{{ recipe.nutritionalInfo.vitamins.vitaminD }}µg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminE">Vit. E <strong>{{ recipe.nutritionalInfo.vitamins.vitaminE }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminK">Vit. K <strong>{{ recipe.nutritionalInfo.vitamins.vitaminK }}µg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminB12">B12 <strong>{{ recipe.nutritionalInfo.vitamins.vitaminB12 }}µg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.vitamins.folate">Folate <strong>{{ recipe.nutritionalInfo.vitamins.folate }}µg</strong></div>
-                  </div>
-                </td>
-                
-                <!-- Minéraux -->
-                <td class="px-3 py-2 text-nature-700 dark:text-nature-300">
-                  <div class="space-y-1" *ngIf="recipe.nutritionalInfo.minerals">
-                    <div *ngIf="recipe.nutritionalInfo.minerals.calcium">Calcium <strong>{{ recipe.nutritionalInfo.minerals.calcium }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.minerals.iron">Fer <strong>{{ recipe.nutritionalInfo.minerals.iron }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.minerals.magnesium">Mag. <strong>{{ recipe.nutritionalInfo.minerals.magnesium }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.minerals.phosphorus">Phos. <strong>{{ recipe.nutritionalInfo.minerals.phosphorus }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.minerals.potassium">Pot. <strong>{{ recipe.nutritionalInfo.minerals.potassium }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.minerals.zinc">Zinc <strong>{{ recipe.nutritionalInfo.minerals.zinc }}mg</strong></div>
-                    <div *ngIf="recipe.nutritionalInfo.minerals.copper">Cuivre <strong>{{ recipe.nutritionalInfo.minerals.copper }}mg</strong></div>
-                  </div>
-                </td>
+                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Prot. (g)</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.protein }}</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.protein }}</strong></td>
+              </tr>
+              <tr class="border-b border-nature-100 dark:border-nature-700 bg-nature-50 dark:bg-nature-900/10">
+                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Gluc. (g)</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.carbs }}</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.carbs }}</strong></td>
+              </tr>
+              <tr class="border-b border-nature-100 dark:border-nature-700">
+                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Lip. (g)</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.fat }}</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.fat }}</strong></td>
+              </tr>
+              <tr class="border-b border-nature-100 dark:border-nature-700 bg-nature-50 dark:bg-nature-900/10">
+                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Fibres (g)</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.fiber }}</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.fiber }}</strong></td>
+              </tr>
+              <tr class="border-b border-nature-100 dark:border-nature-700">
+                <td class="px-3 py-2 font-semibold text-nature-700 dark:text-nature-300">Sodium (mg)</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300">{{ getNutritionPer100g()?.sodium }}</td>
+                <td class="px-3 py-2 text-center text-nature-700 dark:text-nature-300"><strong>{{ getNutritionPerServing()?.sodium }}</strong></td>
               </tr>
             </tbody>
           </table>
