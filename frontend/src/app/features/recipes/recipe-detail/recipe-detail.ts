@@ -212,7 +212,7 @@ export class RecipeDetailComponent implements OnInit {
     
     setTimeout(() => {
       if (this.recipe) {
-        const result = {
+                const result = {
           calories: 350,
           protein: 12,
           carbs: 45,
