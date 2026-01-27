@@ -157,6 +157,8 @@ export class RecipeListComponent implements OnInit {
         return titleMatch || descMatch || ingredientsMatch;
       });
     }
+    // Tri alphabétique par titre
+    this.filteredRecipes.sort((a, b) => a.title.localeCompare(b.title));
     this.currentPage = 1;
     this.updatePagination();
   }
