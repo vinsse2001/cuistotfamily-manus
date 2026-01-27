@@ -84,57 +84,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-saumon-600 dark:text-saumon-400">Ingrédients</h2>
-            <button *ngIf="!recipe.nutritionalInfo" (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-xs bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-2 py-1 rounded hover:bg-saumon-200 dark:hover:bg-saumon-800 disabled:opacity-50 transition-colors">
-              {{ isAnalyzing ? 'Analyse...' : 'Analyser nutrition' }}
-            </button>
-          </div>
-          
-          <div *ngIf="recipe.nutritionalInfo" class="bg-saumon-50 dark:bg-saumon-900/20 p-4 rounded-md mb-4">
-            <!-- Macronutriments -->
-            <div class="grid grid-cols-4 gap-2 text-center text-xs mb-4">
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.calories }}</span> kcal</div>
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.protein }}g</span> Prot.</div>
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.carbs }}g</span> Gluc.</div>
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.fat }}g</span> Lip.</div>
-            </div>
-            
-            <!-- Autres macronutriments -->
-            <div class="grid grid-cols-3 gap-2 text-center text-xs mb-4 border-t border-saumon-200 dark:border-saumon-700 pt-3">
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.fiber }}g</span> Fibres</div>
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.sugar }}g</span> Sucre</div>
-              <div><span class="block font-bold text-saumon-800 dark:text-saumon-300">{{ recipe.nutritionalInfo.sodium }}mg</span> Sodium</div>
-            </div>
-            
-            <!-- Vitamines -->
-            <div *ngIf="recipe.nutritionalInfo.vitamins" class="mb-3 border-t border-saumon-200 dark:border-saumon-700 pt-3">
-              <p class="text-xs font-bold text-saumon-700 dark:text-saumon-300 mb-2">Vitamines :</p>
-              <div class="grid grid-cols-4 gap-1 text-xs">
-                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminA"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminA }}</span> Vit. A (µg)</div>
-                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminC"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminC }}</span> Vit. C (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminD"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminD }}</span> Vit. D (µg)</div>
-                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminE"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminE }}</span> Vit. E (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminK"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminK }}</span> Vit. K (µg)</div>
-                <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminB12"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.vitaminB12 }}</span> Vit. B12 (µg)</div>
-                <div *ngIf="recipe.nutritionalInfo.vitamins.folate"><span class="block font-semibold">{{ recipe.nutritionalInfo.vitamins.folate }}</span> Folate (µg)</div>
-              </div>
-            </div>
-            
-            <!-- Minéraux -->
-            <div *ngIf="recipe.nutritionalInfo.minerals" class="border-t border-saumon-200 dark:border-saumon-700 pt-3">
-              <p class="text-xs font-bold text-saumon-700 dark:text-saumon-300 mb-2">Minéraux :</p>
-              <div class="grid grid-cols-4 gap-1 text-xs">
-                <div *ngIf="recipe.nutritionalInfo.minerals.calcium"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.calcium }}</span> Calcium (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.minerals.iron"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.iron }}</span> Fer (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.minerals.magnesium"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.magnesium }}</span> Mag. (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.minerals.phosphorus"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.phosphorus }}</span> Phos. (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.minerals.potassium"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.potassium }}</span> Pot. (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.minerals.zinc"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.zinc }}</span> Zinc (mg)</div>
-                <div *ngIf="recipe.nutritionalInfo.minerals.copper"><span class="block font-semibold">{{ recipe.nutritionalInfo.minerals.copper }}</span> Cuivre (mg)</div>
-              </div>
-            </div>
-          </div>
+          <h2 class="text-xl font-semibold text-saumon-600 dark:text-saumon-400 mb-4">Ingrédients</h2>
           <ul class="space-y-2">
             <li *ngFor="let ing of recipe.ingredients" class="flex justify-between border-b border-nature-200 dark:border-nature-700 pb-2">
               <span class="text-nature-900 dark:text-nature-100">{{ ing.name }}</span>
@@ -156,6 +106,77 @@
             </li>
           </ol>
         </div>
+      </div>
+
+      <!-- Tableau Nutritionnel Compact en Fin de Recette -->
+      <div *ngIf="recipe.nutritionalInfo" class="mt-8 pt-6 border-t border-nature-200 dark:border-nature-700">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-saumon-600 dark:text-saumon-400">Informations Nutritionnelles</h2>
+          <button *ngIf="recipe.nutritionalInfo" (click)="onAnalyze()" [disabled]="isAnalyzing" class="text-xs bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300 px-2 py-1 rounded hover:bg-saumon-200 dark:hover:bg-saumon-800 disabled:opacity-50 transition-colors">
+            {{ isAnalyzing ? 'Analyse...' : 'Mettre à jour' }}
+          </button>
+        </div>
+        
+        <div class="w-full overflow-x-auto">
+          <table class="w-full text-xs border-collapse">
+            <thead>
+              <tr class="bg-saumon-50 dark:bg-saumon-900/20 border-b border-saumon-200 dark:border-saumon-700">
+                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Macronutriments</th>
+                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Vitamines</th>
+                <th class="px-3 py-2 text-left font-bold text-saumon-700 dark:text-saumon-300">Minéraux</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-nature-100 dark:border-nature-700">
+                <!-- Macronutriments -->
+                <td class="px-3 py-2 text-nature-700 dark:text-nature-300">
+                  <div class="space-y-1">
+                    <div><strong>{{ recipe.nutritionalInfo.calories }}</strong> kcal</div>
+                    <div>Prot. <strong>{{ recipe.nutritionalInfo.protein }}g</strong></div>
+                    <div>Gluc. <strong>{{ recipe.nutritionalInfo.carbs }}g</strong></div>
+                    <div>Lip. <strong>{{ recipe.nutritionalInfo.fat }}g</strong></div>
+                    <div>Fibres <strong>{{ recipe.nutritionalInfo.fiber }}g</strong></div>
+                    <div>Sucre <strong>{{ recipe.nutritionalInfo.sugar }}g</strong></div>
+                    <div>Sodium <strong>{{ recipe.nutritionalInfo.sodium }}mg</strong></div>
+                  </div>
+                </td>
+                
+                <!-- Vitamines -->
+                <td class="px-3 py-2 text-nature-700 dark:text-nature-300">
+                  <div class="space-y-1" *ngIf="recipe.nutritionalInfo.vitamins">
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminA">Vit. A <strong>{{ recipe.nutritionalInfo.vitamins.vitaminA }}µg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminC">Vit. C <strong>{{ recipe.nutritionalInfo.vitamins.vitaminC }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminD">Vit. D <strong>{{ recipe.nutritionalInfo.vitamins.vitaminD }}µg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminE">Vit. E <strong>{{ recipe.nutritionalInfo.vitamins.vitaminE }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminK">Vit. K <strong>{{ recipe.nutritionalInfo.vitamins.vitaminK }}µg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.vitaminB12">B12 <strong>{{ recipe.nutritionalInfo.vitamins.vitaminB12 }}µg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.vitamins.folate">Folate <strong>{{ recipe.nutritionalInfo.vitamins.folate }}µg</strong></div>
+                  </div>
+                </td>
+                
+                <!-- Minéraux -->
+                <td class="px-3 py-2 text-nature-700 dark:text-nature-300">
+                  <div class="space-y-1" *ngIf="recipe.nutritionalInfo.minerals">
+                    <div *ngIf="recipe.nutritionalInfo.minerals.calcium">Calcium <strong>{{ recipe.nutritionalInfo.minerals.calcium }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.minerals.iron">Fer <strong>{{ recipe.nutritionalInfo.minerals.iron }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.minerals.magnesium">Mag. <strong>{{ recipe.nutritionalInfo.minerals.magnesium }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.minerals.phosphorus">Phos. <strong>{{ recipe.nutritionalInfo.minerals.phosphorus }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.minerals.potassium">Pot. <strong>{{ recipe.nutritionalInfo.minerals.potassium }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.minerals.zinc">Zinc <strong>{{ recipe.nutritionalInfo.minerals.zinc }}mg</strong></div>
+                    <div *ngIf="recipe.nutritionalInfo.minerals.copper">Cuivre <strong>{{ recipe.nutritionalInfo.minerals.copper }}mg</strong></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Bouton Analyser si pas encore d'infos nutritionnelles -->
+      <div *ngIf="!recipe.nutritionalInfo" class="mt-8 pt-6 border-t border-nature-200 dark:border-nature-700 text-center">
+        <button (click)="onAnalyze()" [disabled]="isAnalyzing" class="bg-saumon-600 hover:bg-saumon-700 dark:bg-saumon-600 dark:hover:bg-saumon-500 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all disabled:opacity-50">
+          {{ isAnalyzing ? 'Analyse en cours...' : 'Analyser les informations nutritionnelles' }}
+        </button>
       </div>
     </div>
   </div>
