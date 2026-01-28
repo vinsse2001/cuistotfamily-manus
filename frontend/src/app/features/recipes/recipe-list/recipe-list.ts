@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,10 +13,6 @@ import { Recipe } from '../../../core/models/recipe';
   styleUrl: './recipe-list.css'
 })
 export class RecipeListComponent implements OnInit {
-  private recipesService = inject(RecipesService);
-  private cdr = inject(ChangeDetectorRef);
-  private router = inject(Router);
-  
   recipes: Recipe[] = [];
   filteredRecipes: Recipe[] = [];
   searchQuery: string = '';
@@ -34,6 +30,12 @@ export class RecipeListComponent implements OnInit {
   // Tri
   sortBy: 'title' | 'date' | 'rating' = 'title';
   sidebarOpen: boolean = true;
+
+  constructor(
+    private recipesService: RecipesService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadDisplayMode();
@@ -180,7 +182,11 @@ export class RecipeListComponent implements OnInit {
     const sorted = [...recipes];
     switch (this.sortBy) {
       case 'date':
-        sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        sorted.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
         break;
       case 'rating':
         sorted.sort((a, b) => {
@@ -197,7 +203,7 @@ export class RecipeListComponent implements OnInit {
   }
 
   getAverageRating(recipe: Recipe): number {
-    // À implémenter selon votre modèle de notes
+    if (recipe.averageRating) return recipe.averageRating;
     return 0;
   }
 
