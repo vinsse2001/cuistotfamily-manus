@@ -161,8 +161,8 @@ export class RecipeListComponent implements OnInit {
         return titleMatch || descMatch || ingredientsMatch;
       });
     }
-    // Tri alphabétique par titre
-    this.filteredRecipes.sort((a, b) => a.title.localeCompare(b.title));
+    // Appliquer le tri sélectionné
+    this.filteredRecipes = this.sortRecipes(this.filteredRecipes);
     this.currentPage = 1;
     this.updatePagination();
   }
@@ -171,14 +171,10 @@ export class RecipeListComponent implements OnInit {
     if (!url) return '';
     if (url.startsWith('http')) return url;
     return `http://localhost:3000${url}`;
-  }
 
   goToDetail(id?: string) {
     if (id) {
       this.router.navigate(['/recipes', id]);
-    }
-  }
-}
   sortRecipes(recipes: Recipe[]): Recipe[] {
     const sorted = [...recipes];
     switch (this.sortBy) {
@@ -213,6 +209,4 @@ export class RecipeListComponent implements OnInit {
     const saved = localStorage.getItem('recipeSidebarOpen');
     if (saved !== null) {
       this.sidebarOpen = saved === 'true';
-    }
-  }
 }
