@@ -30,6 +30,10 @@ export class RecipeListComponent implements OnInit {
   itemsPerPageOptions = [10, 20, 50];
   displayMode: 'grid' | 'list' = 'grid';
   paginatedRecipes: Recipe[] = [];
+  
+  // Tri
+  sortBy: 'title' | 'date' | 'rating' = 'title';
+  sidebarOpen: boolean = true;
 
   ngOnInit() {
     this.loadDisplayMode();
@@ -172,6 +176,43 @@ export class RecipeListComponent implements OnInit {
   goToDetail(id?: string) {
     if (id) {
       this.router.navigate(['/recipes', id]);
+    }
+  }
+}
+  sortRecipes(recipes: Recipe[]): Recipe[] {
+    const sorted = [...recipes];
+    switch (this.sortBy) {
+      case 'date':
+        sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      case 'rating':
+        sorted.sort((a, b) => {
+          const avgA = this.getAverageRating(a);
+          const avgB = this.getAverageRating(b);
+          return avgB - avgA;
+        });
+        break;
+      case 'title':
+      default:
+        sorted.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    return sorted;
+  }
+
+  getAverageRating(recipe: Recipe): number {
+    // À implémenter selon votre modèle de notes
+    return 0;
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+    localStorage.setItem('recipeSidebarOpen', this.sidebarOpen.toString());
+  }
+
+  loadSidebarState() {
+    const saved = localStorage.getItem('recipeSidebarOpen');
+    if (saved !== null) {
+      this.sidebarOpen = saved === 'true';
     }
   }
 }
