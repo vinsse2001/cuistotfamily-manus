@@ -38,6 +38,7 @@ export class RecipeListComponent implements OnInit {
   ngOnInit() {
     this.loadDisplayMode();
     this.loadItemsPerPage();
+    this.loadSidebarState();
     this.loadRecipes();
   }
 
@@ -52,6 +53,13 @@ export class RecipeListComponent implements OnInit {
     const saved = localStorage.getItem('recipeItemsPerPage');
     if (saved && [10, 20, 50].includes(parseInt(saved))) {
       this.itemsPerPage = parseInt(saved);
+    }
+  }
+
+  loadSidebarState() {
+    const saved = localStorage.getItem('recipeSidebarOpen');
+    if (saved !== null) {
+      this.sidebarOpen = saved === 'true';
     }
   }
 
@@ -161,20 +169,13 @@ export class RecipeListComponent implements OnInit {
         return titleMatch || descMatch || ingredientsMatch;
       });
     }
+    
     // Appliquer le tri sélectionné
     this.filteredRecipes = this.sortRecipes(this.filteredRecipes);
     this.currentPage = 1;
     this.updatePagination();
   }
 
-  getFullUrl(url: string): string {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `http://localhost:3000${url}`;
-
-  goToDetail(id?: string) {
-    if (id) {
-      this.router.navigate(['/recipes', id]);
   sortRecipes(recipes: Recipe[]): Recipe[] {
     const sorted = [...recipes];
     switch (this.sortBy) {
@@ -205,8 +206,15 @@ export class RecipeListComponent implements OnInit {
     localStorage.setItem('recipeSidebarOpen', this.sidebarOpen.toString());
   }
 
-  loadSidebarState() {
-    const saved = localStorage.getItem('recipeSidebarOpen');
-    if (saved !== null) {
-      this.sidebarOpen = saved === 'true';
+  getFullUrl(url: string): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `http://localhost:3000${url}`;
+  }
+
+  goToDetail(id?: string) {
+    if (id) {
+      this.router.navigate(['/recipes', id]);
+    }
+  }
 }
