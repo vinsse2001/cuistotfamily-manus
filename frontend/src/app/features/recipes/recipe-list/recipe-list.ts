@@ -28,7 +28,7 @@ export class RecipeListComponent implements OnInit {
   paginatedRecipes: Recipe[] = [];
   
   // Tri
-  sortBy: 'title' | 'date' | 'rating' = 'title';
+  sortBy: 'title' | 'date' | 'rating' | 'userRating' = 'title';
   sidebarOpen: boolean = true;
 
   constructor(
@@ -193,6 +193,13 @@ export class RecipeListComponent implements OnInit {
           const avgA = this.getAverageRating(a);
           const avgB = this.getAverageRating(b);
           return avgB - avgA;
+        });
+        break;
+      case 'userRating':
+        sorted.sort((a, b) => {
+          const ratingA = a.userRating || 0;
+          const ratingB = b.userRating || 0;
+          return ratingB - ratingA;
         });
         break;
       case 'title':

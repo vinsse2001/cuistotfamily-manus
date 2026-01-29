@@ -76,12 +76,26 @@ export class FriendsListComponent implements OnInit {
   }
 
   sendRequest(nickname: string): void {
+    // Optimistic UI update
+    const user = this.searchResults.find(u => u.nickname === nickname);
+    if (user) {
+      user.friendshipStatus = 'pending';
+      user.isRequester = true;
+    }
+
     this.socialService.sendFriendRequest(nickname).subscribe({
       next: () => {
         this.notificationService.show(`Demande envoyée à ${nickname}`, 'success');
-        this.searchUsers(); // Refresh search results to show pending status
+        // No need to call searchUsers() as we already updated the UI optimistically
+        // but we can do it to be sure we have the latest state from server
+        this.searchUsers();
       },
       error: (err) => {
+        // Rollback on error
+        if (user) {
+          user.friendshipStatus = null;
+          user.isRequester = false;
+        }
         this.notificationService.show(err.error?.message || 'Erreur lors de l\'envoi de la demande', 'error');
       }
     });
