@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import { Recipe } from './entities/recipe.entity';
 import { Favorite } from './entities/favorite.entity';
 import { Rating } from './entities/rating.entity';
+import { SocialService } from '../social/social.service';
 
 @Injectable()
 export class RecipesService {
@@ -14,6 +15,7 @@ export class RecipesService {
     private favoritesRepository: Repository<Favorite>,
     @InjectRepository(Rating)
     private ratingsRepository: Repository<Rating>,
+    private socialService: SocialService,
   ) {}
 
   async create(recipeData: Partial<Recipe>, userId: string): Promise<Recipe> {
@@ -25,10 +27,15 @@ export class RecipesService {
   }
 
   async findAll(userId: string): Promise<any[]> {
+    // Récupérer les IDs des amis
+    const friends = await this.socialService.getFriends(userId);
+    const friendIds = friends.map(f => f.id);
+
     const recipes = await this.recipesRepository.find({
       where: [
         { ownerId: userId },
-        { visibility: 'public' }
+        { visibility: 'public' },
+        { visibility: 'friends', ownerId: In(friendIds.length > 0 ? friendIds : ['none']) }
       ],
       order: { createdAt: 'DESC' }
     });
@@ -74,6 +81,18 @@ export class RecipesService {
     const recipe = await this.recipesRepository.findOne({ where: { id } });
     if (!recipe) {
       throw new NotFoundException(`Recipe with ID ${id} not found`);
+    }
+
+    // Vérifier la visibilité
+    if (recipe.ownerId !== userId && recipe.visibility !== 'public') {
+      if (recipe.visibility === 'friends') {
+        const isFriend = userId ? await this.socialService.isFriend(userId, recipe.ownerId) : false;
+        if (!isFriend) {
+          throw new ForbiddenException('Cette recette est réservée aux amis de l\'auteur');
+        }
+      } else {
+        throw new ForbiddenException('Cette recette est privée');
+      }
     }
 
     // Récupérer les notes moyennes et le nombre de votes

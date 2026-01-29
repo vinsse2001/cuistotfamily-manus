@@ -5,9 +5,13 @@ import { RecipesController } from './recipes.controller';
 import { Recipe } from './entities/recipe.entity';
 import { Favorite } from './entities/favorite.entity';
 import { Rating } from './entities/rating.entity';
+import { SocialModule } from '../social/social.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Recipe, Favorite, Rating])],
+  imports: [
+    TypeOrmModule.forFeature([Recipe, Favorite, Rating]),
+    SocialModule
+  ],
   controllers: [RecipesController],
   providers: [RecipesService],
   exports: [RecipesService],

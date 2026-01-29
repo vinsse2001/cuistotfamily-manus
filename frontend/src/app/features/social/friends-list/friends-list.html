@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-nature-50 dark:bg-nature-900 p-4 md:p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400 mb-8">Ma Famille & Mes Amis</h1>
+
+    <!-- Recherche d'utilisateurs -->
+    <div class="bg-white dark:bg-nature-800 rounded-2xl shadow-lg p-6 mb-8 border border-nature-100 dark:border-nature-700">
+      <h2 class="text-xl font-bold text-nature-900 dark:text-white mb-4">Ajouter un membre</h2>
+      <div class="relative">
+        <input type="text" [(ngModel)]="searchQuery" (input)="searchUsers()" 
+          placeholder="Rechercher par pseudo..."
+          class="w-full pl-10 pr-4 py-3 rounded-xl border border-nature-200 dark:border-nature-700 dark:bg-nature-900 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-3 top-3 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      <!-- Résultats de recherche -->
+      <div *ngIf="isSearching && searchResults.length > 0" class="mt-4 divide-y divide-nature-100 dark:divide-nature-700">
+        <div *ngFor="let user of searchResults" class="py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-saumon-100 dark:bg-saumon-900/30 rounded-full flex items-center justify-center text-saumon-600 font-bold">
+              {{ user.nickname.charAt(0).toUpperCase() }}
+            </div>
+            <span class="font-medium text-nature-900 dark:text-white">{{ user.nickname }}</span>
+          </div>
+          
+          <button *ngIf="!user.friendshipStatus" (click)="sendRequest(user.nickname)"
+            class="bg-saumon-600 hover:bg-saumon-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold transition-all">
+            Ajouter
+          </button>
+          
+          <span *ngIf="user.friendshipStatus === 'pending'" class="text-sm text-nature-500 italic">
+            {{ user.isRequester ? 'Demande envoyée' : 'Demande reçue' }}
+          </span>
+          
+          <span *ngIf="user.friendshipStatus === 'accepted'" class="text-sm text-green-600 font-bold">
+            Déjà amis
+          </span>
+        </div>
+      </div>
+      <p *ngIf="isSearching && searchResults.length === 0 && searchQuery" class="mt-4 text-sm text-nature-500 text-center">
+        Aucun utilisateur trouvé avec ce pseudo.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Demandes en attente -->
+      <div class="bg-white dark:bg-nature-800 rounded-2xl shadow-lg p-6 border border-nature-100 dark:border-nature-700">
+        <h2 class="text-xl font-bold text-nature-900 dark:text-white mb-4 flex items-center gap-2">
+          Demandes reçues
+          <span *ngIf="pendingRequests.length > 0" class="bg-saumon-600 text-white text-xs px-2 py-0.5 rounded-full">
+            {{ pendingRequests.length }}
+          </span>
+        </h2>
+        
+        <div *ngIf="pendingRequests.length === 0" class="text-center py-8 text-nature-500 text-sm">
+          Aucune demande en attente.
+        </div>
+
+        <div class="space-y-4">
+          <div *ngFor="let request of pendingRequests" class="flex items-center justify-between p-3 bg-nature-50 dark:bg-nature-900/50 rounded-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-saumon-100 dark:bg-saumon-900/30 rounded-full flex items-center justify-center text-saumon-600 font-bold">
+                {{ request.requester.nickname.charAt(0).toUpperCase() }}
+              </div>
+              <span class="font-medium text-nature-900 dark:text-white">{{ request.requester.nickname }}</span>
+            </div>
+            <div class="flex gap-2">
+              <button (click)="acceptRequest(request.id)" class="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+              <button (click)="declineRequest(request.id)" class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste d'amis -->
+      <div class="bg-white dark:bg-nature-800 rounded-2xl shadow-lg p-6 border border-nature-100 dark:border-nature-700">
+        <h2 class="text-xl font-bold text-nature-900 dark:text-white mb-4">Mes Amis ({{ friends.length }})</h2>
+        
+        <div *ngIf="friends.length === 0" class="text-center py-8 text-nature-500 text-sm">
+          Vous n'avez pas encore d'amis.
+        </div>
+
+        <div class="space-y-4">
+          <div *ngFor="let friend of friends" class="flex items-center justify-between p-3 hover:bg-nature-50 dark:hover:bg-nature-900/30 rounded-xl transition-colors group">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-nature-100 dark:bg-nature-700 rounded-full flex items-center justify-center text-nature-600 dark:text-nature-400 font-bold">
+                {{ friend.nickname.charAt(0).toUpperCase() }}
+              </div>
+              <span class="font-medium text-nature-900 dark:text-white">{{ friend.nickname }}</span>
+            </div>
+            <button (click)="removeFriend(friend.id, friend.nickname)" 
+              class="text-nature-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

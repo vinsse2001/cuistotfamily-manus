@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { AiModule } from './ai/ai.module';
+import { SocialModule } from './social/social.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AiModule } from './ai/ai.module';
     UsersModule,
     RecipesModule,
     AiModule,
+    SocialModule,
   ],
   controllers: [AppController],
   providers: [AppService],
