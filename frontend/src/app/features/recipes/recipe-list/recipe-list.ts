@@ -18,7 +18,7 @@ export class RecipeListComponent implements OnInit {
   searchQuery: string = '';
   activeFilter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' = 'all';
   activeCategory: string = 'all';
-  categories = ['Entree', 'Plat', 'Dessert', 'Cocktail', 'Soupe', 'Autre'];
+  categories = ['Entrée', 'Plat', 'Dessert', 'Cocktail', 'Soupe', 'Autre'];
 
   // Pagination
   currentPage: number = 1;
