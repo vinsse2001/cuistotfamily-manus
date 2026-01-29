@@ -31,12 +31,17 @@ export class RecipesService {
     const friends = await this.socialService.getFriends(userId);
     const friendIds = friends.map(f => f.id);
 
+    const whereConditions: any[] = [
+      { ownerId: userId },
+      { visibility: 'public' }
+    ];
+
+    if (friendIds.length > 0) {
+      whereConditions.push({ visibility: 'friends', ownerId: In(friendIds) });
+    }
+
     const recipes = await this.recipesRepository.find({
-      where: [
-        { ownerId: userId },
-        { visibility: 'public' },
-        { visibility: 'friends', ownerId: In(friendIds.length > 0 ? friendIds : ['none']) }
-      ],
+      where: whereConditions,
       order: { createdAt: 'DESC' }
     });
 
