@@ -22,6 +22,13 @@ export class NavbarComponent {
   private statusSubscription?: Subscription;
 
   ngOnInit() {
+    // Immediate check on init
+    if (localStorage.getItem('token')) {
+      this.socialService.getPendingRequests().subscribe(requests => {
+        this.pendingRequestsCount = requests.length;
+      });
+    }
+
     // Poll for pending requests every 30 seconds if logged in
     this.statusSubscription = this.authService.currentUser$.pipe(
       switchMap(user => {
@@ -31,6 +38,7 @@ export class NavbarComponent {
             switchMap(() => this.socialService.getPendingRequests())
           );
         }
+        this.pendingRequestsCount = 0;
         return of([]);
       })
     ).subscribe({

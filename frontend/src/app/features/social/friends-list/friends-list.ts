@@ -29,6 +29,10 @@ export class FriendsListComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
+    // Reset lists to ensure UI updates
+    this.friends = [];
+    this.pendingRequests = [];
+    
     let loadedCount = 0;
     const totalToLoad = 2;
 
@@ -41,7 +45,7 @@ export class FriendsListComponent implements OnInit {
 
     this.socialService.getFriends().subscribe({
       next: (friends) => {
-        this.friends = friends;
+        this.friends = [...friends];
         checkComplete();
       },
       error: () => {
@@ -52,7 +56,7 @@ export class FriendsListComponent implements OnInit {
 
     this.socialService.getPendingRequests().subscribe({
       next: (requests) => {
-        this.pendingRequests = requests;
+        this.pendingRequests = [...requests];
         checkComplete();
       },
       error: () => {
@@ -63,16 +67,17 @@ export class FriendsListComponent implements OnInit {
   }
 
   searchUsers(): void {
-    if (!this.searchQuery.trim()) {
+    const query = this.searchQuery.trim();
+    if (!query) {
       this.searchResults = [];
       this.isSearching = false;
       return;
     }
 
     this.isSearching = true;
-    this.socialService.searchUsers(this.searchQuery).subscribe({
+    this.socialService.searchUsers(query).subscribe({
       next: (results) => {
-        this.searchResults = results;
+        this.searchResults = [...results];
       },
       error: () => {
         this.notificationService.show('Erreur lors de la recherche', 'error');
@@ -109,13 +114,18 @@ export class FriendsListComponent implements OnInit {
   }
 
   acceptRequest(requestId: string): void {
+    // Optimistic UI: remove from pending immediately
+    this.pendingRequests = this.pendingRequests.filter(r => r.id !== requestId);
+    
     this.socialService.acceptFriendRequest(requestId).subscribe({
       next: () => {
         this.notificationService.show('Demande acceptée', 'success');
+        // Full reload to sync everything
         this.loadData();
       },
-      error: () => {
-        this.notificationService.show('Erreur lors de l\'acceptation', 'error');
+      error: (err) => {
+        this.notificationService.show(err.error?.message || 'Erreur lors de l\'acceptation', 'error');
+        this.loadData(); // Reload to restore the request if it failed
       }
     });
   }
