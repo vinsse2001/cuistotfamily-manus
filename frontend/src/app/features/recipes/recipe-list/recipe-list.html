@@ -50,6 +50,10 @@
             <input type="radio" name="filter" value="public" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
             <span class="text-sm text-nature-700 dark:text-nature-300">Public</span>
           </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="filter" value="hidden" [(ngModel)]="activeFilter" (change)="toggleFilter('hidden')" class="w-4 h-4">
+            <span class="text-sm text-nature-700 dark:text-nature-300">Masquées</span>
+          </label>
         </div>
       </div>
 
@@ -161,12 +165,32 @@
             <img [src]="getFullUrl(recipe.photoUrl || '')" 
               [alt]="recipe.title"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-            <div class="absolute top-4 right-4 bg-white/90 dark:bg-nature-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-saumon-600 shadow-sm">
-              {{ recipe.category }}
+            <div class="absolute top-4 right-4 flex flex-col gap-1 items-end">
+              <div class="bg-white/90 dark:bg-nature-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-saumon-600 shadow-sm">
+                {{ recipe.category }}
+              </div>
+              <div class="flex gap-1">
+                <div *ngIf="recipe.isVegetarian" title="Végétarien" class="bg-green-500/90 text-white p-1 rounded-full shadow-sm">
+                  <span class="text-[10px]">🥕</span>
+                </div>
+                <div *ngIf="recipe.isVegan" title="Végétalien" class="bg-emerald-500/90 text-white p-1 rounded-full shadow-sm">
+                  <span class="text-[10px]">🌿</span>
+                </div>
+                <div *ngIf="recipe.isGlutenFree" title="Sans Gluten" class="bg-yellow-500/90 text-white p-1 rounded-full shadow-sm">
+                  <span class="text-[10px]">🌾</span>
+                </div>
+              </div>
             </div>
             <div *ngIf="recipe.isFavorite" class="absolute top-4 left-4 text-yellow-500 drop-shadow-md">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
             </div>
+            <button (click)="toggleHide($event, recipe)" class="absolute bottom-4 right-4 p-2 rounded-full bg-white/80 dark:bg-nature-800/80 text-nature-500 hover:bg-white dark:hover:bg-nature-800 transition-colors shadow-sm" [title]="recipe.isHidden ? 'Afficher' : 'Masquer'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path *ngIf="!recipe.isHidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                <path *ngIf="recipe.isHidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path *ngIf="recipe.isHidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
           </div>
 
           <!-- Contenu de la carte -->

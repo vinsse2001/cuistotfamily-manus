@@ -30,6 +30,18 @@ export class Recipe {
   @Column({ default: 'private' })
   visibility: 'private' | 'friends' | 'public';
 
+  @Column({ default: false })
+  isHidden: boolean;
+
+  @Column({ default: false })
+  isVegetarian: boolean;
+
+  @Column({ default: false })
+  isVegan: boolean;
+
+  @Column({ default: false })
+  isGlutenFree: boolean;
+
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId' })
   owner: User;

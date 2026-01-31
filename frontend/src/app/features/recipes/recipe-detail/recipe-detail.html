@@ -38,10 +38,19 @@
     </div>
 
     <div class="border-t border-nature-200 dark:border-nature-700 px-4 py-5 sm:px-6">
-      <!-- Catégorie -->
-      <div class="mb-4 inline-block">
+      <!-- Catégorie et Régimes -->
+      <div class="mb-4 flex flex-wrap gap-2">
         <span class="px-3 py-1 text-sm font-bold rounded-full bg-saumon-100 dark:bg-saumon-900 text-saumon-700 dark:text-saumon-300">
           {{ recipe.category || 'Autre' }}
+        </span>
+        <span *ngIf="recipe.isVegetarian" class="px-3 py-1 text-sm font-bold rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+          🥕 Végétarien
+        </span>
+        <span *ngIf="recipe.isVegan" class="px-3 py-1 text-sm font-bold rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
+          🌿 Végétalien
+        </span>
+        <span *ngIf="recipe.isGlutenFree" class="px-3 py-1 text-sm font-bold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300">
+          🌾 Sans Gluten
         </span>
       </div>
 

@@ -49,4 +49,8 @@ export interface Recipe {
   ratingCount?: number;
   userRating?: number;
   isFavorite?: boolean;
+  isHidden?: boolean;
+  isVegetarian?: boolean;
+  isVegan?: boolean;
+  isGlutenFree?: boolean;
 }
