@@ -100,6 +100,24 @@
             <option value="public">Public (Tout le monde)</option>
           </select>
         </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-2">Régimes alimentaires</label>
+          <div class="flex flex-wrap gap-4">
+            <label class="flex items-center gap-2 cursor-pointer bg-nature-50 dark:bg-nature-700/50 px-4 py-2 rounded-lg border border-nature-200 dark:border-nature-600">
+              <input type="checkbox" name="isVegetarian" [(ngModel)]="recipeData.isVegetarian" class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+              <span class="text-sm font-medium text-nature-700 dark:text-nature-300">🥕 Végétarien</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-nature-50 dark:bg-nature-700/50 px-4 py-2 rounded-lg border border-nature-200 dark:border-nature-600">
+              <input type="checkbox" name="isVegan" [(ngModel)]="recipeData.isVegan" class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+              <span class="text-sm font-medium text-nature-700 dark:text-nature-300">🌿 Végétalien</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-nature-50 dark:bg-nature-700/50 px-4 py-2 rounded-lg border border-nature-200 dark:border-nature-600">
+              <input type="checkbox" name="isGlutenFree" [(ngModel)]="recipeData.isGlutenFree" class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+              <span class="text-sm font-medium text-nature-700 dark:text-nature-300">🌾 Sans Gluten</span>
+            </label>
+          </div>
+        </div>
+
         <div>
           <label class="block text-sm font-bold text-nature-800 dark:text-nature-200 mb-1">Illustration de la recette</label>
           <div class="mt-1 flex items-center space-x-4">

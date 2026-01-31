@@ -32,12 +32,12 @@ export class RecipesService {
     const friendIds = friends.map(f => f.id);
 
     const whereConditions: any[] = [
-      { ownerId: userId },
-      { visibility: 'public' }
+      { ownerId: userId, isHidden: false },
+      { visibility: 'public', isHidden: false }
     ];
 
     if (friendIds.length > 0) {
-      whereConditions.push({ visibility: 'friends', ownerId: In(friendIds) });
+      whereConditions.push({ visibility: 'friends', ownerId: In(friendIds), isHidden: false });
     }
 
     const recipes = await this.recipesRepository.find({
@@ -166,15 +166,34 @@ export class RecipesService {
   }
 
   async toggleFavorite(recipeId: string, userId: string) {
-    const favorite = await this.favoritesRepository.findOne({ where: { recipeId, userId } });
+    const favorite = await this.favoritesRepository.findOne({
+      where: { userId, recipeId }
+    });
+
     if (favorite) {
       await this.favoritesRepository.remove(favorite);
       return { isFavorite: false };
     } else {
-      const newFavorite = this.favoritesRepository.create({ recipeId, userId });
+      const newFavorite = this.favoritesRepository.create({ userId, recipeId });
       await this.favoritesRepository.save(newFavorite);
       return { isFavorite: true };
     }
+  }
+
+  async toggleHide(userId: string, recipeId: string) {
+    const recipe = await this.recipesRepository.findOne({ where: { id: recipeId } });
+    if (!recipe) throw new NotFoundException('Recette non trouvée');
+    
+    recipe.isHidden = !recipe.isHidden;
+    await this.recipesRepository.save(recipe);
+    return { isHidden: recipe.isHidden };
+  }
+
+  async getHidden(userId: string) {
+    return this.recipesRepository.find({
+      where: { ownerId: userId, isHidden: true },
+      order: { createdAt: 'DESC' }
+    });
   }
 
   async rate(recipeId: string, userId: string, score: number) {

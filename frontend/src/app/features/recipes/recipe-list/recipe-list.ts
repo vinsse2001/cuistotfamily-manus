@@ -16,7 +16,7 @@ export class RecipeListComponent implements OnInit {
   recipes: Recipe[] = [];
   filteredRecipes: Recipe[] = [];
   searchQuery: string = '';
-  activeFilter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' = 'all';
+  activeFilter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' | 'hidden' = 'all';
   activeCategory: string = 'all';
   categories = ['Entrée', 'Plat', 'Dessert', 'Cocktail', 'Soupe', 'Autre'];
 
@@ -129,9 +129,26 @@ export class RecipeListComponent implements OnInit {
     });
   }
 
-  toggleFilter(filter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public') {
+  toggleFilter(filter: 'all' | 'mine' | 'favorites' | 'private' | 'friends' | 'public' | 'hidden') {
     this.activeFilter = filter;
-    this.filterRecipes();
+    if (filter === 'hidden') {
+      this.loadHiddenRecipes();
+    } else {
+      this.loadRecipes();
+    }
+  }
+
+  loadHiddenRecipes() {
+    this.recipesService.getHidden().subscribe({
+      next: (data) => {
+        this.recipes = [...data];
+        this.filterRecipes();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des recettes masquées', err);
+      }
+    });
   }
 
   toggleCategory(category: string) {
@@ -153,6 +170,8 @@ export class RecipeListComponent implements OnInit {
       filtered = filtered.filter(r => r.visibility === 'friends');
     } else if (this.activeFilter === 'public') {
       filtered = filtered.filter(r => r.visibility === 'public');
+    } else if (this.activeFilter === 'hidden') {
+      filtered = filtered.filter(r => r.isHidden === true);
     }
 
     // Filtre par categorie
@@ -229,5 +248,23 @@ export class RecipeListComponent implements OnInit {
     if (id) {
       this.router.navigate(['/recipes', id]);
     }
+  }
+
+  toggleHide(event: Event, recipe: Recipe) {
+    event.stopPropagation();
+    if (!recipe.id) return;
+    
+    this.recipesService.toggleHide(recipe.id).subscribe({
+      next: (res) => {
+        recipe.isHidden = res.isHidden;
+        // Si on est dans un filtre autre que 'hidden', on retire la recette de la liste
+        if (this.activeFilter !== 'hidden') {
+          this.recipes = this.recipes.filter(r => r.id !== recipe.id);
+        }
+        this.filterRecipes();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erreur lors du masquage', err)
+    });
   }
 }

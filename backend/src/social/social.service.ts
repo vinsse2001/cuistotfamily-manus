@@ -48,6 +48,7 @@ export class SocialService {
       existingFriendship.status = FriendshipStatus.PENDING;
       existingFriendship.requesterId = requesterId;
       existingFriendship.addresseeId = addressee.id;
+      existingFriendship.createdAt = new Date(); // Update timestamp
       (existingFriendship as any).acceptedAt = null;
       return this.friendshipRepository.save(existingFriendship);
     }

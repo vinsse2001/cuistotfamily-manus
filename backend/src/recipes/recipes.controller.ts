@@ -22,6 +22,11 @@ export class RecipesController {
     return this.recipesService.findAll(req.user.userId);
   }
 
+  @Get('hidden')
+  getHidden(@Request() req) {
+    return this.recipesService.getHidden(req.user.userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Request() req) {
     return this.recipesService.findOne(id, req.user.userId);
@@ -45,6 +50,11 @@ export class RecipesController {
   @Post(':id/favorite')
   toggleFavorite(@Param('id') id: string, @Request() req) {
     return this.recipesService.toggleFavorite(id, req.user.userId);
+  }
+
+  @Post(':id/hide')
+  toggleHide(@Param('id') id: string, @Request() req) {
+    return this.recipesService.toggleHide(req.user.userId, id);
   }
 
   @Post(':id/rate')

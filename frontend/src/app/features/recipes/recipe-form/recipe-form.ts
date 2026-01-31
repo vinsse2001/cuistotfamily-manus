@@ -31,7 +31,10 @@ export class RecipeFormComponent implements OnInit {
     instructions: [{ text: '' }],
     visibility: 'private' as 'private' | 'friends' | 'public',
     category: 'Autre' as 'Entrée' | 'Plat' | 'Dessert' | 'Cocktail' | 'Soupe' | 'Autre',
-    photoUrl: ''
+    photoUrl: '',
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false
   };
 
   recipeId?: string;
@@ -59,7 +62,10 @@ export class RecipeFormComponent implements OnInit {
       instructions: [{ text: '' }],
       visibility: 'private',
       category: 'Autre',
-      photoUrl: ''
+      photoUrl: '',
+      isVegetarian: false,
+      isVegan: false,
+      isGlutenFree: false
     };
   }
 
@@ -80,7 +86,10 @@ export class RecipeFormComponent implements OnInit {
           instructions: mappedInstructions,
           visibility: data.visibility || 'private',
           category: data.category || 'Autre',
-          photoUrl: data.photoUrl || ''
+          photoUrl: data.photoUrl || '',
+          isVegetarian: data.isVegetarian || false,
+          isVegan: data.isVegan || false,
+          isGlutenFree: data.isGlutenFree || false
         };
         
         this.cdr.detectChanges();
@@ -199,7 +208,10 @@ export class RecipeFormComponent implements OnInit {
       instructions: cleanInstructions,
       visibility: this.recipeData.visibility,
       category: this.recipeData.category,
-      photoUrl: this.recipeData.photoUrl
+      photoUrl: this.recipeData.photoUrl,
+      isVegetarian: this.recipeData.isVegetarian,
+      isVegan: this.recipeData.isVegan,
+      isGlutenFree: this.recipeData.isGlutenFree
     };
 
     if (this.isEdit && this.recipeId) {

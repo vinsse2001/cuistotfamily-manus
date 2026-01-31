@@ -43,6 +43,14 @@ export class RecipesService {
     return this.http.post<{ isFavorite: boolean }>(`${this.apiUrl}/${id}/favorite`, {}, { headers: this.getHeaders() });
   }
 
+  toggleHide(id: string): Observable<{ isHidden: boolean }> {
+    return this.http.post<{ isHidden: boolean }>(`${this.apiUrl}/${id}/hide`, {}, { headers: this.getHeaders() });
+  }
+
+  getHidden(): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/hidden`, { headers: this.getHeaders() });
+  }
+
   rate(id: string, score: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/rate`, { score }, { headers: this.getHeaders() });
   }
