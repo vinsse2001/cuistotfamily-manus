@@ -8,7 +8,7 @@
         </a>
         <div class="hidden md:flex ml-10 space-x-6">
           <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Mes Recettes</a>
-          <a routerLink="/friends" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Ma Famille</a>
+          <a routerLink="/friends" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Famille & Amis</a>
           <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="text-white hover:text-nature-200 transition-colors font-bold">Administration</a>
         </div>
       </div>
