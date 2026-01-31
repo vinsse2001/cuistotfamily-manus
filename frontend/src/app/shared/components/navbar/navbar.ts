@@ -25,7 +25,10 @@ export class NavbarComponent {
     // Immediate check on init
     if (localStorage.getItem('token')) {
       this.socialService.getPendingRequests().subscribe(requests => {
-        this.pendingRequestsCount = requests.length;
+        // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => {
+          this.pendingRequestsCount = requests.length;
+        });
       });
     }
 
@@ -43,7 +46,9 @@ export class NavbarComponent {
       })
     ).subscribe({
       next: (requests) => {
-        this.pendingRequestsCount = requests.length;
+        setTimeout(() => {
+          this.pendingRequestsCount = requests.length;
+        });
       },
       error: (err) => console.error('Error fetching pending requests', err)
     });

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SocialService, UserSummary, FriendRequest } from '../../../core/services/social';
@@ -11,6 +11,7 @@ import { NotificationService } from '../../../core/services/notification';
   templateUrl: './friends-list.html'
 })
 export class FriendsListComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
   friends: UserSummary[] = [];
   pendingRequests: FriendRequest[] = [];
   searchResults: UserSummary[] = [];
@@ -40,12 +41,14 @@ export class FriendsListComponent implements OnInit {
       loadedCount++;
       if (loadedCount >= totalToLoad) {
         this.loading = false;
+        this.cdr.detectChanges();
       }
     };
 
     this.socialService.getFriends().subscribe({
       next: (friends) => {
         this.friends = [...friends];
+        this.cdr.detectChanges();
         checkComplete();
       },
       error: () => {
@@ -57,6 +60,7 @@ export class FriendsListComponent implements OnInit {
     this.socialService.getPendingRequests().subscribe({
       next: (requests) => {
         this.pendingRequests = [...requests];
+        this.cdr.detectChanges();
         checkComplete();
       },
       error: () => {
@@ -71,6 +75,7 @@ export class FriendsListComponent implements OnInit {
     if (!query) {
       this.searchResults = [];
       this.isSearching = false;
+      this.cdr.detectChanges();
       return;
     }
 
@@ -78,9 +83,11 @@ export class FriendsListComponent implements OnInit {
     this.socialService.searchUsers(query).subscribe({
       next: (results) => {
         this.searchResults = [...results];
+        this.cdr.detectChanges();
       },
       error: () => {
         this.notificationService.show('Erreur lors de la recherche', 'error');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -94,19 +101,19 @@ export class FriendsListComponent implements OnInit {
     if (user) {
       user.friendshipStatus = 'pending';
       user.isRequester = true;
+      this.cdr.detectChanges();
     }
 
     this.socialService.sendFriendRequest(nickname).subscribe({
       next: () => {
         this.notificationService.show(`Demande envoyée à ${nickname}`, 'success');
-        // Refresh to get the exact state from server
         this.searchUsers();
       },
       error: (err) => {
-        // Rollback on error
         if (user) {
           user.friendshipStatus = null;
           user.isRequester = false;
+          this.cdr.detectChanges();
         }
         this.notificationService.show(err.error?.message || 'Erreur lors de l\'envoi de la demande', 'error');
       }
@@ -116,16 +123,16 @@ export class FriendsListComponent implements OnInit {
   acceptRequest(requestId: string): void {
     // Optimistic UI: remove from pending immediately
     this.pendingRequests = this.pendingRequests.filter(r => r.id !== requestId);
+    this.cdr.detectChanges();
     
     this.socialService.acceptFriendRequest(requestId).subscribe({
       next: () => {
         this.notificationService.show('Demande acceptée', 'success');
-        // Full reload to sync everything
         this.loadData();
       },
       error: (err) => {
         this.notificationService.show(err.error?.message || 'Erreur lors de l\'acceptation', 'error');
-        this.loadData(); // Reload to restore the request if it failed
+        this.loadData();
       }
     });
   }
