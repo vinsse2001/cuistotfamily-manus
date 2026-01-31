@@ -4,11 +4,15 @@
       <div class="flex items-center">
         <a routerLink="/" class="flex-shrink-0 flex items-center">
           <img class="h-14 w-auto" src="logo.png" alt="Cuistot Family">
-          <!-- Texte retiré car déjà présent dans le logo -->
         </a>
         <div class="hidden md:flex ml-10 space-x-6">
           <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Mes Recettes</a>
-          <a routerLink="/friends" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Famille & Amis</a>
+          <a routerLink="/friends" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold flex items-center gap-2">
+            Ma Famille
+            <span *ngIf="pendingRequestsCount > 0" class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-saumon-600 animate-pulse">
+              {{ pendingRequestsCount }}
+            </span>
+          </a>
           <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="text-white hover:text-nature-200 transition-colors font-bold">Administration</a>
         </div>
       </div>
