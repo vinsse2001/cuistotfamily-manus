@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { ThemeService } from '../../../core/services/theme';
 import { SocialService } from '../../../core/services/social';
-import { Subscription, interval, startWith, switchMap, of } from 'rxjs';
+import { Subscription, interval, startWith, switchMap, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -16,21 +16,13 @@ import { Subscription, interval, startWith, switchMap, of } from 'rxjs';
 export class NavbarComponent {
   public authService = inject(AuthService);
   public themeService = inject(ThemeService);
-  private socialService = inject(SocialService);
+  public socialService = inject(SocialService);
   
-  pendingRequestsCount = 0;
   private statusSubscription?: Subscription;
 
   ngOnInit() {
-    // Immediate check on init
-    if (localStorage.getItem('token')) {
-      this.socialService.getPendingRequests().subscribe(requests => {
-        // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
-        setTimeout(() => {
-          this.pendingRequestsCount = requests.length;
-        });
-      });
-    }
+    // Initial fetch
+    this.socialService.updatePendingRequestsCount();
 
     // Poll for pending requests every 30 seconds if logged in
     this.statusSubscription = this.authService.currentUser$.pipe(
@@ -38,20 +30,12 @@ export class NavbarComponent {
         if (user) {
           return interval(30000).pipe(
             startWith(0),
-            switchMap(() => this.socialService.getPendingRequests())
+            tap(() => this.socialService.updatePendingRequestsCount())
           );
         }
-        this.pendingRequestsCount = 0;
-        return of([]);
+        return of(null);
       })
-    ).subscribe({
-      next: (requests) => {
-        setTimeout(() => {
-          this.pendingRequestsCount = requests.length;
-        });
-      },
-      error: (err) => console.error('Error fetching pending requests', err)
-    });
+    ).subscribe();
   }
 
   ngOnDestroy() {

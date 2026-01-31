@@ -9,8 +9,8 @@
           <a routerLink="/recipes" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold">Mes Recettes</a>
           <a routerLink="/friends" *ngIf="authService.currentUser$ | async" class="text-white hover:text-nature-200 transition-colors font-bold flex items-center gap-2">
             Famille & Amis
-            <span *ngIf="pendingRequestsCount > 0" class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-saumon-600 animate-pulse">
-              {{ pendingRequestsCount }}
+            <span *ngIf="(socialService.pendingRequestsCount$ | async) || 0 > 0" class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-saumon-600 animate-pulse">
+              {{ socialService.pendingRequestsCount$ | async }}
             </span>
           </a>
           <a routerLink="/admin" *ngIf="(authService.currentUser$ | async)?.role === 'admin'" class="text-white hover:text-nature-200 transition-colors font-bold">Administration</a>
