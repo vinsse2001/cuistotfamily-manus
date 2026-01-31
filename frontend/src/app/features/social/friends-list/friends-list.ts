@@ -29,32 +29,37 @@ export class FriendsListComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
+    let loadedCount = 0;
+    const totalToLoad = 2;
+
+    const checkComplete = () => {
+      loadedCount++;
+      if (loadedCount >= totalToLoad) {
+        this.loading = false;
+      }
+    };
+
     this.socialService.getFriends().subscribe({
       next: (friends) => {
         this.friends = friends;
-        this.checkLoadingComplete();
+        checkComplete();
       },
       error: () => {
         this.notificationService.show('Erreur lors du chargement des amis', 'error');
-        this.checkLoadingComplete();
+        checkComplete();
       }
     });
 
     this.socialService.getPendingRequests().subscribe({
       next: (requests) => {
         this.pendingRequests = requests;
-        this.checkLoadingComplete();
+        checkComplete();
       },
       error: () => {
         this.notificationService.show('Erreur lors du chargement des demandes', 'error');
-        this.checkLoadingComplete();
+        checkComplete();
       }
     });
-  }
-
-  private checkLoadingComplete(): void {
-    // Simple check, could be more robust with forkJoin
-    this.loading = false;
   }
 
   searchUsers(): void {
@@ -76,8 +81,11 @@ export class FriendsListComponent implements OnInit {
   }
 
   sendRequest(nickname: string): void {
-    // Optimistic UI update
+    // Prevent multiple clicks
     const user = this.searchResults.find(u => u.nickname === nickname);
+    if (user && user.friendshipStatus === 'pending') return;
+
+    // Optimistic UI update
     if (user) {
       user.friendshipStatus = 'pending';
       user.isRequester = true;
@@ -86,8 +94,7 @@ export class FriendsListComponent implements OnInit {
     this.socialService.sendFriendRequest(nickname).subscribe({
       next: () => {
         this.notificationService.show(`Demande envoyée à ${nickname}`, 'success');
-        // No need to call searchUsers() as we already updated the UI optimistically
-        // but we can do it to be sure we have the latest state from server
+        // Refresh to get the exact state from server
         this.searchUsers();
       },
       error: (err) => {

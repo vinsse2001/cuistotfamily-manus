@@ -14,16 +14,21 @@ export class SocialService {
   ) {}
 
   async sendFriendRequest(requesterId: string, addresseeNickname: string) {
-    const addressee = await this.userRepository.findOne({ where: { nickname: addresseeNickname } });
+    // Trim and normalize nickname search
+    const normalizedNickname = addresseeNickname.trim();
+    const addressee = await this.userRepository.findOne({ 
+      where: { nickname: normalizedNickname } 
+    });
     
     if (!addressee) {
-      throw new NotFoundException('Utilisateur non trouvé');
+      throw new NotFoundException(`Utilisateur "${normalizedNickname}" non trouvé`);
     }
 
     if (requesterId === addressee.id) {
       throw new BadRequestException('Vous ne pouvez pas vous ajouter vous-même');
     }
 
+    // Check for any existing relationship in both directions
     const existingFriendship = await this.friendshipRepository.findOne({
       where: [
         { requesterId, addresseeId: addressee.id },
@@ -38,14 +43,13 @@ export class SocialService {
       if (existingFriendship.status === FriendshipStatus.PENDING) {
         throw new BadRequestException('Une demande est déjà en cours');
       }
-      // Si décliné ou bloqué, on peut éventuellement permettre de renvoyer ou non selon la politique
-      // Ici on va simplement mettre à jour le statut en PENDING si c'était décliné
-      if (existingFriendship.status === FriendshipStatus.DECLINED) {
-        existingFriendship.status = FriendshipStatus.PENDING;
-        existingFriendship.requesterId = requesterId;
-        existingFriendship.addresseeId = addressee.id;
-        return this.friendshipRepository.save(existingFriendship);
-      }
+      
+      // Reset to pending if it was declined or blocked
+      existingFriendship.status = FriendshipStatus.PENDING;
+      existingFriendship.requesterId = requesterId;
+      existingFriendship.addresseeId = addressee.id;
+      (existingFriendship as any).acceptedAt = null;
+      return this.friendshipRepository.save(existingFriendship);
     }
 
     const friendship = this.friendshipRepository.create({
@@ -97,9 +101,14 @@ export class SocialService {
   }
 
   async getPendingRequests(userId: string) {
+    // Ensure we only get requests where the current user is the addressee
     return this.friendshipRepository.find({
-      where: { addresseeId: userId, status: FriendshipStatus.PENDING },
-      relations: ['requester']
+      where: { 
+        addresseeId: userId, 
+        status: FriendshipStatus.PENDING 
+      },
+      relations: ['requester'],
+      order: { createdAt: 'DESC' }
     });
   }
 
