@@ -120,6 +120,18 @@ export class FriendsListComponent implements OnInit {
     });
   }
 
+  cancelRequest(userId: string): void {
+    this.socialService.cancelFriendRequest(userId).subscribe({
+      next: () => {
+        this.notificationService.show('Demande annulée', 'success');
+        this.searchUsers();
+      },
+      error: () => {
+        this.notificationService.show('Erreur lors de l\'annulation', 'error');
+      }
+    });
+  }
+
   acceptRequest(requestId: string): void {
     // Optimistic UI: remove from pending immediately
     this.pendingRequests = this.pendingRequests.filter(r => r.id !== requestId);

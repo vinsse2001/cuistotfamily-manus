@@ -44,11 +44,9 @@ export class SocialService {
       }
       
       // Si la demande a été refusée (DECLINED), on la supprime pour en créer une nouvelle propre
-      // Cela évite les problèmes de mise à jour complexe et garantit un nouvel ID de demande
       if (existingFriendship.status === FriendshipStatus.DECLINED) {
         await this.friendshipRepository.remove(existingFriendship);
       } else {
-        // Pour tout autre statut non géré, on lève une erreur par sécurité
         throw new BadRequestException('Une relation existe déjà avec cet utilisateur');
       }
     }
@@ -61,6 +59,18 @@ export class SocialService {
     });
 
     return this.friendshipRepository.save(friendship);
+  }
+
+  async cancelFriendRequest(requesterId: string, addresseeId: string) {
+    const friendship = await this.friendshipRepository.findOne({
+      where: { requesterId, addresseeId, status: FriendshipStatus.PENDING }
+    });
+
+    if (!friendship) {
+      throw new NotFoundException('Demande d\'ami non trouvée ou déjà traitée');
+    }
+
+    return this.friendshipRepository.remove(friendship);
   }
 
   async acceptFriendRequest(userId: string, requestId: string) {

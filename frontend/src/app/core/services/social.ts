@@ -46,6 +46,10 @@ export class SocialService {
     return this.http.post(`${this.apiUrl}/request`, { nickname }, { headers: this.getHeaders() });
   }
 
+  cancelFriendRequest(addresseeId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/request/${addresseeId}`, { headers: this.getHeaders() });
+  }
+
   acceptFriendRequest(requestId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/accept/${requestId}`, {}, { headers: this.getHeaders() }).pipe(
       tap(() => this.updatePendingRequestsCount())

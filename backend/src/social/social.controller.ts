@@ -12,6 +12,11 @@ export class SocialController {
     return this.socialService.sendFriendRequest(req.user.userId, nickname);
   }
 
+  @Delete('request/:addresseeId')
+  cancelFriendRequest(@Request() req, @Param('addresseeId') addresseeId: string) {
+    return this.socialService.cancelFriendRequest(req.user.userId, addresseeId);
+  }
+
   @Post('accept/:id')
   acceptFriendRequest(@Request() req, @Param('id') requestId: string) {
     return this.socialService.acceptFriendRequest(req.user.userId, requestId);

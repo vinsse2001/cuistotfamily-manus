@@ -29,9 +29,15 @@
             Ajouter
           </button>
           
-          <span *ngIf="user.friendshipStatus === 'pending'" class="text-sm text-nature-500 italic">
-            {{ user.isRequester ? 'Demande envoyée' : 'Demande reçue' }}
-          </span>
+          <div *ngIf="user.friendshipStatus === 'pending'" class="flex items-center gap-2">
+            <span class="text-sm text-nature-500 italic">
+              {{ user.isRequester ? 'Demande envoyée' : 'Demande reçue' }}
+            </span>
+            <button *ngIf="user.isRequester" (click)="cancelRequest(user.id)" 
+              class="text-xs text-red-500 hover:underline ml-2">
+              Annuler
+            </button>
+          </div>
           
           <span *ngIf="user.friendshipStatus === 'accepted'" class="text-sm text-green-600 font-bold">
             Déjà amis
