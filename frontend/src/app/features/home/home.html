@@ -7,11 +7,11 @@
       </h1>
     </div>
     <p class="mt-5 max-w-xl mx-auto text-xl text-nature-600 dark:text-nature-300">
-      Le carnet de recettes à partager avec famille et amis !
+      Gérez votre carnet de recettes, partagez-le avec famille et amis !
     </p>
     
     <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4" *ngIf="!(authService.currentUser$ | async)">
-      <a routerLink="/register" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-lg text-white bg-saumon-600 hover:bg-saumon-700 shadow-md transition-all transform hover:scale-105">
+      <a routerLink="/register" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-lg text-black dark:text-black bg-saumon-500 hover:bg-saumon-600 dark:bg-saumon-500 dark:hover:bg-saumon-600 shadow-md transition-all transform hover:scale-105">
         Commencer
       </a>
       <a routerLink="/login" class="inline-flex items-center justify-center px-6 py-3 border-2 border-saumon-600 dark:border-saumon-400 text-base font-bold rounded-lg text-saumon-700 dark:text-saumon-400 bg-saumon-50 dark:bg-nature-800 hover:bg-saumon-100 dark:hover:bg-nature-700 transition-all">
