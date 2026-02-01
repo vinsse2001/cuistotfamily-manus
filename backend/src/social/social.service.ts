@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Friendship, FriendshipStatus } from './entities/friendship.entity';
 import { User } from '../users/entities/user.entity';
 
@@ -14,7 +14,6 @@ export class SocialService {
   ) {}
 
   async sendFriendRequest(requesterId: string, addresseeNickname: string) {
-    // Trim and normalize nickname search
     const normalizedNickname = addresseeNickname.trim();
     const addressee = await this.userRepository.findOne({ 
       where: { nickname: normalizedNickname } 
@@ -28,7 +27,6 @@ export class SocialService {
       throw new BadRequestException('Vous ne pouvez pas vous ajouter vous-même');
     }
 
-    // Check for any existing relationship in both directions
     const existingFriendship = await this.friendshipRepository.findOne({
       where: [
         { requesterId, addresseeId: addressee.id },
@@ -44,11 +42,12 @@ export class SocialService {
         throw new BadRequestException('Une demande est déjà en cours');
       }
       
-      // Reset to pending if it was declined or blocked
+      // Si la demande a été refusée (declined), on permet de la renvoyer
+      // On réinitialise le statut à PENDING et on met à jour le demandeur
       existingFriendship.status = FriendshipStatus.PENDING;
       existingFriendship.requesterId = requesterId;
       existingFriendship.addresseeId = addressee.id;
-      existingFriendship.createdAt = new Date(); // Update timestamp
+      existingFriendship.createdAt = new Date();
       (existingFriendship as any).acceptedAt = null;
       return this.friendshipRepository.save(existingFriendship);
     }
@@ -102,7 +101,6 @@ export class SocialService {
   }
 
   async getPendingRequests(userId: string) {
-    // Ensure we only get requests where the current user is the addressee
     return this.friendshipRepository.find({
       where: { 
         addresseeId: userId, 
@@ -139,8 +137,6 @@ export class SocialService {
   }
 
   async searchUsers(query: string, currentUserId: string) {
-    // Recherche par nickname, excluant l'utilisateur actuel
-    // On pourrait aussi retourner le statut de la relation avec chaque utilisateur trouvé
     const users = await this.userRepository.createQueryBuilder('user')
       .where('user.nickname ILIKE :query', { query: `%${query}%` })
       .andWhere('user.id != :currentUserId', { currentUserId })
@@ -148,7 +144,6 @@ export class SocialService {
       .limit(10)
       .getMany();
 
-    // Pour chaque utilisateur trouvé, on cherche s'il y a une relation existante
     const results = await Promise.all(users.map(async (user) => {
       const friendship = await this.friendshipRepository.findOne({
         where: [

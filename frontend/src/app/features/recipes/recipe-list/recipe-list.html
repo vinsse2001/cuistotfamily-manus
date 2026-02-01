@@ -1,303 +1,262 @@
-<div class="flex h-screen bg-white dark:bg-nature-900">
-  <!-- Sidebar -->
-  <div [class]="'fixed md:relative w-64 bg-nature-50 dark:bg-nature-800 border-r border-nature-200 dark:border-nature-700 h-screen overflow-y-auto transition-all duration-300 z-40 ' + (sidebarOpen ? 'left-0' : '-left-64 md:left-0')">
-    <div class="p-4">
-      <div class="flex justify-between items-center mb-4 md:hidden">
-        <h2 class="font-bold text-saumon-600">Filtres</h2>
-        <button (click)="toggleSidebar()" class="text-nature-500 hover:text-nature-700">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <!-- Tri -->
-      <div class="mb-6">
-        <h3 class="font-bold text-saumon-600 dark:text-saumon-400 mb-3 text-sm">Trier par</h3>
-        <select [(ngModel)]="sortBy" (change)="filterRecipes()" class="w-full px-3 py-2 rounded-lg border border-nature-200 dark:border-nature-600 dark:bg-nature-700 dark:text-white text-sm">
-          <option value="title">Titre (A-Z)</option>
-          <option value="date">Plus récentes</option>
-          <option value="rating">Note moyenne</option>
-          <option value="userRating">Ma note</option>
-        </select>
-      </div>
-
-      <!-- Filtres de visibilité -->
-      <div class="mb-6">
-        <h3 class="font-bold text-saumon-600 dark:text-saumon-400 mb-3 text-sm">Visibilité</h3>
-        <div class="space-y-2">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="all" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Toutes</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="mine" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Mes recettes</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="favorites" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">⭐ Favoris</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="private" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Privé</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="friends" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Amis</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="public" [(ngModel)]="activeFilter" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Public</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="filter" value="hidden" [(ngModel)]="activeFilter" (change)="toggleFilter('hidden')" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Masquées</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Filtres de catégorie -->
+<div class="min-h-screen bg-nature-50 dark:bg-nature-900 py-8 transition-colors">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- En-tête avec titre et bouton -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div>
-        <h3 class="font-bold text-saumon-600 dark:text-saumon-400 mb-3 text-sm">Catégorie</h3>
-        <div class="space-y-2">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="category" value="all" [(ngModel)]="activeCategory" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">Toutes</span>
-          </label>
-          <label *ngFor="let cat of categories" class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="category" [value]="cat" [(ngModel)]="activeCategory" (change)="filterRecipes()" class="w-4 h-4">
-            <span class="text-sm text-nature-700 dark:text-nature-300">{{ cat }}</span>
-          </label>
+        <h1 class="text-3xl font-black text-nature-900 dark:text-white tracking-tight">Nos Recettes</h1>
+        <p class="text-nature-500 dark:text-nature-400 mt-1">Découvrez et partagez vos meilleures créations culinaires.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <!-- Toggle Vue Grille/Tableau -->
+        <div class="bg-white dark:bg-nature-800 p-1 rounded-lg shadow-sm border border-nature-200 dark:border-nature-700 flex">
+          <button (click)="viewMode = 'grid'" [class.bg-saumon-100]="viewMode === 'grid'" [class.text-saumon-600]="viewMode === 'grid'" class="p-2 rounded-md transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+          </button>
+          <button (click)="viewMode = 'table'" [class.bg-saumon-100]="viewMode === 'table'" [class.text-saumon-600]="viewMode === 'table'" class="p-2 rounded-md transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+          </button>
         </div>
+        <a routerLink="/recipes/new" class="inline-flex items-center px-5 py-2.5 bg-saumon-600 hover:bg-saumon-700 text-white font-bold rounded-lg shadow-md transition-all transform hover:scale-105 dark:bg-saumon-600 dark:hover:bg-saumon-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+          Nouvelle Recette
+        </a>
       </div>
     </div>
-  </div>
 
-  <!-- Overlay pour mobile -->
-  <div *ngIf="sidebarOpen" (click)="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 md:hidden z-30"></div>
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Sidebar de Filtres -->
+      <aside class="w-full lg:w-64 flex-shrink-0">
+        <div class="bg-white dark:bg-nature-800 rounded-2xl shadow-sm border border-nature-100 dark:border-nature-700 p-6 sticky top-24 transition-colors">
+          <h2 class="text-lg font-bold text-nature-900 dark:text-white mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-saumon-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 01-.293.707V17l-4 4v-6.586a1 1 0 01-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+            Filtres
+          </h2>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 overflow-auto">
-    <div class="p-8">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400">Mes Recettes</h1>
-        
-        <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4 items-center">
-          <!-- Bouton toggle sidebar (mobile) -->
-          <button (click)="toggleSidebar()" class="md:hidden p-2 bg-nature-100 dark:bg-nature-700 rounded-lg hover:bg-nature-200 dark:hover:bg-nature-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-nature-700 dark:text-nature-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <div class="space-y-6">
+            <!-- Recherche -->
+            <div>
+              <label class="block text-xs font-black text-nature-400 dark:text-nature-500 uppercase tracking-wider mb-2">Rechercher</label>
+              <div class="relative">
+                <input type="text" [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Un ingrédient, un titre..." 
+                  class="w-full pl-10 pr-4 py-2 rounded-xl border border-nature-200 dark:border-nature-700 dark:bg-nature-900 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </div>
+            </div>
 
-          <!-- Barre de recherche -->
-          <div class="relative w-full sm:w-64">
-            <input type="text" [(ngModel)]="searchQuery" (input)="filterRecipes()" 
-              placeholder="Rechercher une recette..."
-              class="w-full pl-10 pr-4 py-2 rounded-lg border border-nature-200 dark:border-nature-700 dark:bg-nature-800 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+            <!-- Catégorie (Select) -->
+            <div>
+              <label class="block text-xs font-black text-nature-400 dark:text-nature-500 uppercase tracking-wider mb-2">Catégorie</label>
+              <select [(ngModel)]="selectedCategory" (change)="applyFilters()" 
+                class="w-full px-3 py-2 rounded-xl border border-nature-200 dark:border-nature-700 dark:bg-nature-900 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all text-sm">
+                <option value="Toutes">Toutes les catégories</option>
+                <option value="Entrée">Entrée</option>
+                <option value="Plat">Plat</option>
+                <option value="Dessert">Dessert</option>
+                <option value="Cocktail">Cocktail</option>
+                <option value="Soupe">Soupe</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
 
-          <a routerLink="/recipes/new" 
-            class="w-full sm:w-auto bg-saumon-600 hover:bg-saumon-700 dark:bg-saumon-700 dark:hover:bg-saumon-600 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all transform hover:scale-105 active:scale-95 text-center">
-            Nouvelle Recette
-          </a>
-        </div>
-      </div>
+            <!-- Visibilité (Select) -->
+            <div>
+              <label class="block text-xs font-black text-nature-400 dark:text-nature-500 uppercase tracking-wider mb-2">Visibilité</label>
+              <select [(ngModel)]="selectedVisibility" (change)="applyFilters()" 
+                class="w-full px-3 py-2 rounded-xl border border-nature-200 dark:border-nature-700 dark:bg-nature-900 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all text-sm">
+                <option value="Toutes">Toutes les recettes</option>
+                <option value="private">Mes recettes privées</option>
+                <option value="friends">Recettes des amis</option>
+                <option value="public">Recettes publiques</option>
+                <option value="favorites">Mes favoris ⭐</option>
+                <option value="hidden">Recettes masquées 🙈</option>
+              </select>
+            </div>
 
-      <!-- Controles d'affichage et de pagination -->
-      <div class="mb-6 flex flex-wrap gap-4 items-center justify-between">
-        <div class="flex gap-2 items-center">
-          <span class="text-sm font-medium text-nature-700 dark:text-nature-300">Affichage :</span>
-          <button (click)="setDisplayMode('grid')" 
-            [class]="'p-2 rounded-lg transition-all ' + (displayMode === 'grid' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" /></svg>
-          </button>
-          <button (click)="setDisplayMode('list')" 
-            [class]="'p-2 rounded-lg transition-all ' + (displayMode === 'list' ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" /></svg>
-          </button>
-        </div>
+            <!-- Régimes Alimentaires (Checkboxes) -->
+            <div>
+              <label class="block text-xs font-black text-nature-400 dark:text-nature-500 uppercase tracking-wider mb-2">Régimes</label>
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" [(ngModel)]="filterVegetarian" (change)="applyFilters()" class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+                  <span class="text-sm text-nature-600 dark:text-nature-400 group-hover:text-saumon-600 transition-colors">🥕 Végétarien</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" [(ngModel)]="filterVegan" (change)="applyFilters()" class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+                  <span class="text-sm text-nature-600 dark:text-nature-400 group-hover:text-saumon-600 transition-colors">🌿 Végétalien</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" [(ngModel)]="filterGlutenFree" (change)="applyFilters()" class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+                  <span class="text-sm text-nature-600 dark:text-nature-400 group-hover:text-saumon-600 transition-colors">🌾 Sans Gluten</span>
+                </label>
+              </div>
+            </div>
 
-        <div class="flex gap-2 items-center">
-          <span class="text-sm font-medium text-nature-700 dark:text-nature-300">Par page :</span>
-          <button *ngFor="let count of itemsPerPageOptions" (click)="setItemsPerPage(count)"
-            [class]="'px-3 py-1 rounded-lg text-sm transition-all ' + (itemsPerPage === count ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            {{ count }}
-          </button>
-        </div>
-      </div>
+            <!-- Tri -->
+            <div>
+              <label class="block text-xs font-black text-nature-400 dark:text-nature-500 uppercase tracking-wider mb-2">Trier par</label>
+              <select [(ngModel)]="sortBy" (change)="applyFilters()" 
+                class="w-full px-3 py-2 rounded-xl border border-nature-200 dark:border-nature-700 dark:bg-nature-900 dark:text-white focus:ring-2 focus:ring-saumon-500 outline-none transition-all text-sm">
+                <option value="newest">Plus récentes</option>
+                <option value="oldest">Plus anciennes</option>
+                <option value="rating">Note moyenne</option>
+                <option value="userRating">Ma note</option>
+                <option value="title">Ordre alphabétique</option>
+              </select>
+            </div>
 
-      <!-- Pagination Haut -->
-      <div *ngIf="totalPages > 1" class="mb-6 flex flex-wrap gap-4 items-center justify-between bg-nature-50 dark:bg-nature-800 p-4 rounded-xl border border-nature-200 dark:border-nature-700">
-        <div class="flex gap-2">
-          <button (click)="previousPage()" [disabled]="currentPage === 1"
-            [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === 1 ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            ← Précédent
-          </button>
-          
-          <div class="flex gap-1">
-            <button *ngFor="let page of [].constructor(totalPages); let i = index" 
-              (click)="goToPage(i + 1)"
-              [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === i + 1 ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-              {{ i + 1 }}
+            <button (click)="resetFilters()" class="w-full py-2 text-xs font-bold text-nature-400 hover:text-saumon-600 transition-colors uppercase tracking-widest">
+              Réinitialiser
             </button>
           </div>
-          
-          <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-            [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === totalPages ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            Suivant →
-          </button>
         </div>
-      </div>
+      </aside>
 
-      <!-- Mode Grille (Vignettes) -->
-      <div *ngIf="displayMode === 'grid' && paginatedRecipes.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div *ngFor="let recipe of paginatedRecipes" 
-          (click)="goToDetail(recipe.id)"
-          class="bg-white dark:bg-nature-800 rounded-2xl shadow-lg overflow-hidden border border-nature-100 dark:border-nature-700 hover:shadow-2xl transition-all duration-300 cursor-pointer group transform hover:-translate-y-2">
-          
-          <!-- Image de la recette -->
-          <div class="relative h-52 overflow-hidden">
-            <img [src]="getFullUrl(recipe.photoUrl || '')" 
-              [alt]="recipe.title"
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-            <div class="absolute top-4 right-4 flex flex-col gap-1 items-end">
-              <div class="bg-white/90 dark:bg-nature-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-saumon-600 shadow-sm">
-                {{ recipe.category }}
-              </div>
-              <div class="flex gap-1">
-                <div *ngIf="recipe.isVegetarian" title="Végétarien" class="bg-green-500/90 text-white p-1 rounded-full shadow-sm">
-                  <span class="text-[10px]">🥕</span>
-                </div>
-                <div *ngIf="recipe.isVegan" title="Végétalien" class="bg-emerald-500/90 text-white p-1 rounded-full shadow-sm">
-                  <span class="text-[10px]">🌿</span>
-                </div>
-                <div *ngIf="recipe.isGlutenFree" title="Sans Gluten" class="bg-yellow-500/90 text-white p-1 rounded-full shadow-sm">
-                  <span class="text-[10px]">🌾</span>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="recipe.isFavorite" class="absolute top-4 left-4 text-yellow-500 drop-shadow-md">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-            </div>
-            <button (click)="toggleHide($event, recipe)" class="absolute bottom-4 right-4 p-2 rounded-full bg-white/80 dark:bg-nature-800/80 text-nature-500 hover:bg-white dark:hover:bg-nature-800 transition-colors shadow-sm" [title]="recipe.isHidden ? 'Afficher' : 'Masquer'">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path *ngIf="!recipe.isHidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                <path *ngIf="recipe.isHidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path *ngIf="recipe.isHidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Contenu de la carte -->
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-nature-900 dark:text-white mb-2 group-hover:text-saumon-600 transition-colors">{{ recipe.title }}</h3>
-            <p class="text-nature-600 dark:text-nature-400 text-sm line-clamp-2 mb-4">{{ recipe.description }}</p>
-            
-            <div class="flex items-center justify-between mt-4 pt-4 border-t border-nature-50 dark:border-nature-700">
-              <div class="flex items-center gap-4">
-                <div *ngIf="recipe.userRating" class="flex items-center gap-1">
-                  <span class="text-saumon-500">★</span>
-                  <span class="text-sm font-bold text-nature-700 dark:text-nature-300">Ma note : {{ recipe.userRating }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <span class="text-nature-400">★</span>
-                  <span class="text-sm text-nature-500">Moyenne : {{ recipe.averageRating || 0 }}</span>
-                </div>
-              </div>
-              <div class="text-nature-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-              </div>
-            </div>
-          </div>
+      <!-- Liste des Recettes -->
+      <main class="flex-1">
+        <!-- État de chargement -->
+        <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-saumon-600"></div>
+          <p class="mt-4 text-nature-500">Mise à feu des fourneaux...</p>
         </div>
-      </div>
 
-      <!-- Mode Liste (Tableau Compact) -->
-      <div *ngIf="displayMode === 'list' && paginatedRecipes.length > 0" class="overflow-x-auto bg-white dark:bg-nature-800 rounded-2xl shadow-lg border border-nature-100 dark:border-nature-700">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-nature-50 dark:bg-nature-700/50 text-nature-700 dark:text-nature-300 text-sm uppercase tracking-wider">
-              <th class="px-6 py-4 font-bold">Catégorie</th>
-              <th class="px-6 py-4 font-bold">Titre</th>
-              <th class="px-6 py-4 font-bold">Description</th>
-              <th class="px-6 py-4 font-bold">Ma note</th>
-              <th class="px-6 py-4 font-bold">Date</th>
-              <th class="px-6 py-4 font-bold">Visibilité</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-nature-100 dark:divide-nature-700">
-            <tr *ngFor="let recipe of paginatedRecipes" 
-              (click)="goToDetail(recipe.id)"
-              class="hover:bg-nature-50 dark:hover:bg-nature-700/30 cursor-pointer transition-colors group">
-              <td class="px-6 py-4">
-                <span class="px-2 py-1 bg-saumon-100 dark:bg-saumon-900/30 text-saumon-600 dark:text-saumon-400 text-xs font-bold rounded-full">
+        <!-- Aucun résultat -->
+        <div *ngIf="!isLoading && filteredRecipes.length === 0" class="bg-white dark:bg-nature-800 rounded-3xl p-12 text-center shadow-sm border border-nature-100 dark:border-nature-700 transition-colors">
+          <div class="bg-saumon-50 dark:bg-nature-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-saumon-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <h3 class="text-xl font-bold text-nature-900 dark:text-white mb-2">Aucune recette trouvée</h3>
+          <p class="text-nature-500 dark:text-nature-400 mb-8">Essayez de modifier vos filtres ou créez votre première recette !</p>
+          <button (click)="resetFilters()" class="text-saumon-600 font-bold hover:underline">Voir toutes les recettes</button>
+        </div>
+
+        <!-- Vue Grille -->
+        <div *ngIf="!isLoading && viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div *ngFor="let recipe of filteredRecipes" class="group bg-white dark:bg-nature-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-nature-100 dark:border-nature-700 flex flex-col h-full">
+            <!-- Image -->
+            <div class="relative h-52 overflow-hidden">
+              <img [src]="getFullUrl(recipe.photoUrl || '')" 
+                [alt]="recipe.title"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+              
+              <!-- Badges -->
+              <div class="absolute top-4 right-4 flex flex-col gap-1 items-end">
+                <div class="bg-white/90 dark:bg-nature-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-saumon-600 shadow-sm">
                   {{ recipe.category }}
-                </span>
-              </td>
-              <td class="px-6 py-4 font-bold text-nature-900 dark:text-white group-hover:text-saumon-600">{{ recipe.title }}</td>
-              <td class="px-6 py-4 text-sm text-nature-600 dark:text-nature-400 max-w-xs truncate">{{ recipe.description }}</td>
-              <td class="px-6 py-4">
-                <span *ngIf="recipe.userRating" class="text-saumon-500 font-bold">★ {{ recipe.userRating }}</span>
-                <span *ngIf="!recipe.userRating" class="text-nature-300">-</span>
-              </td>
-              <td class="px-6 py-4 text-sm text-nature-500">{{ recipe.createdAt | date:'dd/MM/yyyy' }}</td>
-              <td class="px-6 py-4">
-                <span [class]="'text-xs px-2 py-1 rounded-full ' + (recipe.visibility === 'public' ? 'bg-green-100 text-green-700' : recipe.visibility === 'friends' ? 'bg-blue-100 text-blue-700' : 'bg-nature-100 text-nature-700')">
-                  {{ recipe.visibility === 'public' ? 'Public' : recipe.visibility === 'friends' ? 'Amis' : 'Privé' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                </div>
+                <div class="flex gap-1">
+                  <div *ngIf="recipe.isVegetarian" title="Végétarien" class="bg-green-500/90 text-white p-1 rounded-full shadow-sm">
+                    <span class="text-[10px]">🥕</span>
+                  </div>
+                  <div *ngIf="recipe.isVegan" title="Végétalien" class="bg-emerald-500/90 text-white p-1 rounded-full shadow-sm">
+                    <span class="text-[10px]">🌿</span>
+                  </div>
+                  <div *ngIf="recipe.isGlutenFree" title="Sans Gluten" class="bg-yellow-500/90 text-white p-1 rounded-full shadow-sm">
+                    <span class="text-[10px]">🌾</span>
+                  </div>
+                </div>
+              </div>
 
-      <!-- Pagination Bas -->
-      <div *ngIf="totalPages > 1" class="mt-8 flex flex-wrap gap-4 items-center justify-between bg-nature-50 dark:bg-nature-800 p-4 rounded-xl border border-nature-200 dark:border-nature-700">
-        <div class="flex gap-2">
-          <button (click)="previousPage()" [disabled]="currentPage === 1"
-            [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === 1 ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            ← Précédent
-          </button>
-          
-          <div class="flex gap-1">
-            <button *ngFor="let page of [].constructor(totalPages); let i = index" 
-              (click)="goToPage(i + 1)"
-              [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === i + 1 ? 'bg-saumon-600 text-white' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-              {{ i + 1 }}
-            </button>
+              <div *ngIf="recipe.isFavorite" class="absolute top-4 left-4 text-yellow-500 drop-shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              </div>
+
+              <!-- Bouton Masquer -->
+              <button (click)="toggleHide($event, recipe)" class="absolute bottom-4 right-4 p-2 rounded-full bg-white/80 dark:bg-nature-800/80 text-nature-500 hover:bg-white dark:hover:bg-nature-800 transition-colors shadow-sm" [title]="recipe.isHidden ? 'Afficher' : 'Masquer'">
+                <svg *ngIf="!recipe.isHidden" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                <svg *ngIf="recipe.isHidden" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              </button>
+            </div>
+
+            <!-- Contenu -->
+            <div class="p-6 flex-1 flex flex-col">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-lg font-bold text-nature-900 dark:text-white group-hover:text-saumon-600 transition-colors line-clamp-1">
+                  {{ recipe.title }}
+                </h3>
+              </div>
+              <p class="text-nature-500 dark:text-nature-400 text-sm line-clamp-2 mb-4 flex-1">
+                {{ recipe.description || 'Aucune description.' }}
+              </p>
+              
+              <div class="flex items-center justify-between pt-4 border-t border-nature-50 dark:border-nature-700">
+                <div class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <span class="text-sm font-bold text-nature-700 dark:text-nature-200">{{ recipe.averageRating || 0 }}</span>
+                  <span class="text-xs text-nature-400">({{ recipe.ratingCount || 0 }})</span>
+                </div>
+                <a [routerLink]="['/recipes', recipe.id]" class="text-saumon-600 dark:text-saumon-400 text-sm font-bold hover:underline">Voir plus →</a>
+              </div>
+            </div>
           </div>
-          
-          <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-            [class]="'px-3 py-2 rounded-lg transition-all ' + (currentPage === totalPages ? 'bg-nature-100 dark:bg-nature-700 text-nature-400 cursor-not-allowed' : 'bg-nature-100 dark:bg-nature-700 text-nature-700 dark:text-nature-300 hover:bg-nature-200 dark:hover:bg-nature-600')">
-            Suivant →
-          </button>
         </div>
-        
-        <div class="text-sm text-nature-600 dark:text-nature-400">
-          Page {{ currentPage }} sur {{ totalPages }} ({{ filteredRecipes.length }} recettes)
-        </div>
-      </div>
 
-      <!-- Empty State -->
-      <div *ngIf="paginatedRecipes.length === 0" class="text-center py-20 bg-white dark:bg-nature-800 rounded-xl border-2 border-dashed border-nature-200 dark:border-nature-700">
-        <div class="mx-auto w-16 h-16 bg-nature-100 dark:bg-nature-700 rounded-full flex items-center justify-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-nature-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+        <!-- Vue Tableau -->
+        <div *ngIf="!isLoading && viewMode === 'table'" class="bg-white dark:bg-nature-800 rounded-3xl shadow-sm border border-nature-100 dark:border-nature-700 overflow-hidden transition-colors">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-nature-50 dark:bg-nature-900/50 border-b border-nature-100 dark:border-nature-700">
+                  <th class="px-6 py-4 text-xs font-black text-nature-400 uppercase tracking-wider">Recette</th>
+                  <th class="px-6 py-4 text-xs font-black text-nature-400 uppercase tracking-wider">Catégorie</th>
+                  <th class="px-6 py-4 text-xs font-black text-nature-400 uppercase tracking-wider">Régime</th>
+                  <th class="px-6 py-4 text-xs font-black text-nature-400 uppercase tracking-wider">Visibilité</th>
+                  <th class="px-6 py-4 text-xs font-black text-nature-400 uppercase tracking-wider">Note</th>
+                  <th class="px-6 py-4 text-xs font-black text-nature-400 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-nature-50 dark:divide-nature-700">
+                <tr *ngFor="let recipe of filteredRecipes" class="hover:bg-nature-50/50 dark:hover:bg-nature-900/30 transition-colors group">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img [src]="getFullUrl(recipe.photoUrl || '')" class="h-10 w-10 rounded-lg object-cover shadow-sm">
+                      <div>
+                        <a [routerLink]="['/recipes', recipe.id]" class="font-bold text-nature-900 dark:text-white hover:text-saumon-600 transition-colors">{{ recipe.title }}</a>
+                        <p class="text-xs text-nature-400 line-clamp-1">{{ recipe.description || 'Aucune description.' }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="px-2 py-1 text-[10px] font-bold rounded-md bg-saumon-50 dark:bg-saumon-900/30 text-saumon-600 dark:text-saumon-400">
+                      {{ recipe.category }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex gap-1">
+                      <span *ngIf="recipe.isVegetarian" title="Végétarien">🥕</span>
+                      <span *ngIf="recipe.isVegan" title="Végétalien">🌿</span>
+                      <span *ngIf="recipe.isGlutenFree" title="Sans Gluten">🌾</span>
+                      <span *ngIf="!recipe.isVegetarian && !recipe.isVegan && !recipe.isGlutenFree" class="text-nature-300">-</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="text-xs font-medium text-nature-600 dark:text-nature-400">
+                      {{ recipe.visibility === 'public' ? 'Public' : (recipe.visibility === 'friends' ? 'Amis' : 'Privé') }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      <span class="text-xs font-bold text-nature-700 dark:text-nature-200">{{ recipe.averageRating || 0 }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end gap-2">
+                      <button (click)="toggleHide($event, recipe)" class="p-1.5 rounded-lg hover:bg-nature-100 dark:hover:bg-nature-700 text-nature-400 transition-colors" [title]="recipe.isHidden ? 'Afficher' : 'Masquer'">
+                        <svg *ngIf="!recipe.isHidden" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                        <svg *ngIf="recipe.isHidden" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      </button>
+                      <a [routerLink]="['/recipes', recipe.id]" class="p-1.5 rounded-lg hover:bg-saumon-50 dark:hover:bg-saumon-900/30 text-saumon-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <p class="text-nature-600 dark:text-nature-400 font-medium">
-          {{ searchQuery ? 'Aucune recette ne correspond à votre recherche.' : "Vous n'avez pas encore de recettes." }}
-        </p>
-        <a *ngIf="!searchQuery" routerLink="/recipes/new" class="mt-4 inline-block text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
-          Créez votre première recette !
-        </a>
-        <button *ngIf="searchQuery" (click)="searchQuery = ''; filterRecipes()" class="mt-4 text-saumon-600 dark:text-saumon-400 font-bold hover:underline">
-          Effacer la recherche
-        </button>
-      </div>
+      </main>
     </div>
   </div>
 </div>

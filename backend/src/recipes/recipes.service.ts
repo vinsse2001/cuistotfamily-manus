@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import { Recipe } from './entities/recipe.entity';
 import { Favorite } from './entities/favorite.entity';
 import { Rating } from './entities/rating.entity';
+import { UserHiddenRecipe } from './entities/user-hidden-recipe.entity';
 import { SocialService } from '../social/social.service';
 
 @Injectable()
@@ -15,6 +16,8 @@ export class RecipesService {
     private favoritesRepository: Repository<Favorite>,
     @InjectRepository(Rating)
     private ratingsRepository: Repository<Rating>,
+    @InjectRepository(UserHiddenRecipe)
+    private hiddenRepository: Repository<UserHiddenRecipe>,
     private socialService: SocialService,
   ) {}
 
@@ -31,13 +34,17 @@ export class RecipesService {
     const friends = await this.socialService.getFriends(userId);
     const friendIds = friends.map(f => f.id);
 
+    // Récupérer les IDs des recettes masquées par l'utilisateur
+    const hiddenRecipes = await this.hiddenRepository.find({ where: { userId } });
+    const hiddenIds = hiddenRecipes.map(h => h.recipeId);
+
     const whereConditions: any[] = [
-      { ownerId: userId, isHidden: false },
-      { visibility: 'public', isHidden: false }
+      { ownerId: userId },
+      { visibility: 'public' }
     ];
 
     if (friendIds.length > 0) {
-      whereConditions.push({ visibility: 'friends', ownerId: In(friendIds), isHidden: false });
+      whereConditions.push({ visibility: 'friends', ownerId: In(friendIds) });
     }
 
     const recipes = await this.recipesRepository.find({
@@ -66,6 +73,8 @@ export class RecipesService {
       where: { recipeId: In(recipeIds) }
     });
 
+    const hiddenSet = new Set(hiddenIds);
+
     return recipes.map(recipe => {
       const recipeRatings = allRatings.filter(r => r.recipeId === recipe.id);
       const averageRating = recipeRatings.length > 0 
@@ -75,6 +84,7 @@ export class RecipesService {
       return {
         ...recipe,
         isFavorite: favoriteSet.has(recipe.id),
+        isHidden: hiddenSet.has(recipe.id),
         userRating: ratingMap.get(recipe.id) || 0,
         averageRating: Math.round(averageRating * 10) / 10,
         ratingCount: recipeRatings.length
@@ -107,11 +117,15 @@ export class RecipesService {
       : 0;
 
     let isFavorite = false;
+    let isHidden = false;
     let userRating = 0;
 
     if (userId) {
       const favorite = await this.favoritesRepository.findOne({ where: { recipeId: id, userId } });
       isFavorite = !!favorite;
+
+      const hidden = await this.hiddenRepository.findOne({ where: { recipeId: id, userId } });
+      isHidden = !!hidden;
 
       const rating = await this.ratingsRepository.findOne({ where: { recipeId: id, userId } });
       userRating = rating ? rating.score : 0;
@@ -120,6 +134,7 @@ export class RecipesService {
     return {
       ...recipe,
       isFavorite,
+      isHidden,
       userRating,
       averageRating: Math.round(averageRating * 10) / 10,
       ratingCount: ratings.length
@@ -181,19 +196,42 @@ export class RecipesService {
   }
 
   async toggleHide(userId: string, recipeId: string) {
-    const recipe = await this.recipesRepository.findOne({ where: { id: recipeId } });
-    if (!recipe) throw new NotFoundException('Recette non trouvée');
-    
-    recipe.isHidden = !recipe.isHidden;
-    await this.recipesRepository.save(recipe);
-    return { isHidden: recipe.isHidden };
+    const hidden = await this.hiddenRepository.findOne({
+      where: { userId, recipeId }
+    });
+
+    if (hidden) {
+      await this.hiddenRepository.remove(hidden);
+      return { isHidden: false };
+    } else {
+      const newHidden = this.hiddenRepository.create({ userId, recipeId });
+      await this.hiddenRepository.save(newHidden);
+      return { isHidden: true };
+    }
   }
 
   async getHidden(userId: string) {
-    return this.recipesRepository.find({
-      where: { ownerId: userId, isHidden: true },
-      order: { createdAt: 'DESC' }
+    const hiddenEntries = await this.hiddenRepository.find({
+      where: { userId },
+      relations: ['recipe']
     });
+    
+    const recipes = hiddenEntries.map(h => h.recipe);
+    
+    // On doit aussi ajouter les infos de favoris/notes pour ces recettes
+    if (recipes.length === 0) return [];
+    
+    const recipeIds = recipes.map(r => r.id);
+    const userFavorites = await this.favoritesRepository.find({
+      where: { userId, recipeId: In(recipeIds) }
+    });
+    const favoriteSet = new Set(userFavorites.map(f => f.recipeId));
+
+    return recipes.map(recipe => ({
+      ...recipe,
+      isFavorite: favoriteSet.has(recipe.id),
+      isHidden: true
+    }));
   }
 
   async rate(recipeId: string, userId: string, score: number) {
