@@ -161,7 +161,7 @@ export class RecipeListComponent implements OnInit {
   }
 
   getFullUrl(path: string): string {
-    if (!path) return 'assets/default-recipe.jpg';
+    if (!path) return '/no_picture.jpg';
     if (path.startsWith('http')) return path;
     return `http://localhost:3000${path.startsWith('/') ? '' : '/'}${path}`;
   }

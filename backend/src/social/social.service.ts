@@ -27,6 +27,7 @@ export class SocialService {
       throw new BadRequestException('Vous ne pouvez pas vous ajouter vous-même');
     }
 
+    // On cherche une relation existante dans n'importe quel sens
     const existingFriendship = await this.friendshipRepository.findOne({
       where: [
         { requesterId, addresseeId: addressee.id },
@@ -42,16 +43,17 @@ export class SocialService {
         throw new BadRequestException('Une demande est déjà en cours');
       }
       
-      // Si la demande a été refusée (declined), on permet de la renvoyer
-      // On réinitialise le statut à PENDING et on met à jour le demandeur
-      existingFriendship.status = FriendshipStatus.PENDING;
-      existingFriendship.requesterId = requesterId;
-      existingFriendship.addresseeId = addressee.id;
-      existingFriendship.createdAt = new Date();
-      (existingFriendship as any).acceptedAt = null;
-      return this.friendshipRepository.save(existingFriendship);
+      // Si la demande a été refusée (DECLINED), on la supprime pour en créer une nouvelle propre
+      // Cela évite les problèmes de mise à jour complexe et garantit un nouvel ID de demande
+      if (existingFriendship.status === FriendshipStatus.DECLINED) {
+        await this.friendshipRepository.remove(existingFriendship);
+      } else {
+        // Pour tout autre statut non géré, on lève une erreur par sécurité
+        throw new BadRequestException('Une relation existe déjà avec cet utilisateur');
+      }
     }
 
+    // Création d'une nouvelle demande
     const friendship = this.friendshipRepository.create({
       requesterId,
       addresseeId: addressee.id,
