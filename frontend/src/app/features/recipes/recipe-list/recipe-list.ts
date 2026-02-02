@@ -222,4 +222,9 @@ export class RecipeListComponent implements OnInit {
     if (path.startsWith('http')) return path;
     return `http://localhost:3000${path.startsWith('/') ? '' : '/'}${path}`;
   }
+
+  displayVotes(ratingCount: number): string {
+    const count = ratingCount || 0;
+    return `(${count} vote${count > 1 ? 's' : ''})`;
+  }
 }
