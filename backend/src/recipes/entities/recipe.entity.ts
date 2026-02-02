@@ -42,6 +42,9 @@ export class Recipe {
   @Column({ default: false })
   isGlutenFree: boolean;
 
+  @Column({ default: 4 })
+  servings: number;
+
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId' })
   owner: User;

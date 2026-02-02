@@ -32,6 +32,7 @@ export class RecipeFormComponent implements OnInit {
     visibility: 'private' as 'private' | 'friends' | 'public',
     category: 'Autre' as 'Entrée' | 'Plat' | 'Dessert' | 'Cocktail' | 'Soupe' | 'Autre',
     photoUrl: '',
+    servings: 4,
     isVegetarian: false,
     isVegan: false,
     isGlutenFree: false
@@ -63,6 +64,7 @@ export class RecipeFormComponent implements OnInit {
       visibility: 'private',
       category: 'Autre',
       photoUrl: '',
+      servings: 4,
       isVegetarian: false,
       isVegan: false,
       isGlutenFree: false
@@ -87,6 +89,7 @@ export class RecipeFormComponent implements OnInit {
           visibility: data.visibility || 'private',
           category: data.category || 'Autre',
           photoUrl: data.photoUrl || '',
+          servings: data.servings || 4,
           isVegetarian: data.isVegetarian || false,
           isVegan: data.isVegan || false,
           isGlutenFree: data.isGlutenFree || false
@@ -209,6 +212,7 @@ export class RecipeFormComponent implements OnInit {
       visibility: this.recipeData.visibility,
       category: this.recipeData.category,
       photoUrl: this.recipeData.photoUrl,
+      servings: this.recipeData.servings,
       isVegetarian: this.recipeData.isVegetarian,
       isVegan: this.recipeData.isVegan,
       isGlutenFree: this.recipeData.isGlutenFree

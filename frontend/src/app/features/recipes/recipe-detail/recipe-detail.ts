@@ -49,8 +49,8 @@ export class RecipeDetailComponent implements OnInit {
     this.recipesService.getOne(id).subscribe({
       next: (data: Recipe) => {
         this.recipe = data;
-        this.servings = 4;
-        this.baseServings = 4;
+        this.servings = data.servings || 4;
+        this.baseServings = data.servings || 4;
         
         const currentUserId = this.getCurrentUserId();
         // On vérifie ownerId ou userId selon ce que le backend renvoie
@@ -302,6 +302,19 @@ export class RecipeDetailComponent implements OnInit {
     if (!this.recipe) return;
 
     const doc = new jsPDF();
+
+    // Logo Cuistot Family
+    try {
+      // On utilise le logo réduit logo_img_seule.png
+      doc.addImage('/logo_img_seule.png', 'PNG', 10, 5, 12, 12);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Cuistot Family', 23, 12);
+    } catch (e) {
+      console.warn('Logo non chargé pour le PDF');
+    }
+
     const saumonColor = [255, 120, 100];
     const natureColor = [45, 55, 72];
     

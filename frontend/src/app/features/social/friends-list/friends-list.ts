@@ -150,15 +150,17 @@ export class FriendsListComponent implements OnInit {
   }
 
   declineRequest(requestId: string): void {
-    this.socialService.declineFriendRequest(requestId).subscribe({
-      next: () => {
-        this.notificationService.show('Demande déclinée', 'success');
-        this.loadData();
-      },
-      error: () => {
-        this.notificationService.show('Erreur lors du refus', 'error');
-      }
-    });
+    if (confirm('Voulez-vous vraiment refuser cette invitation ? Si vous refusez, cette personne ne pourra plus vous envoyer de demande.')) {
+      this.socialService.declineFriendRequest(requestId).subscribe({
+        next: () => {
+          this.notificationService.show('Demande déclinée', 'success');
+          this.loadData();
+        },
+        error: () => {
+          this.notificationService.show('Erreur lors du refus', 'error');
+        }
+      });
+    }
   }
 
   removeFriend(friendId: string, nickname: string): void {

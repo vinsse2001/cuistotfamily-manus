@@ -53,4 +53,5 @@ export interface Recipe {
   isVegetarian?: boolean;
   isVegan?: boolean;
   isGlutenFree?: boolean;
+  servings?: number;
 }

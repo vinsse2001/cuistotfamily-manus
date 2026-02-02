@@ -43,12 +43,8 @@ export class SocialService {
         throw new BadRequestException('Une demande est déjà en cours');
       }
       
-      // Si la demande a été refusée (DECLINED), on la supprime pour en créer une nouvelle propre
-      if (existingFriendship.status === FriendshipStatus.DECLINED) {
-        await this.friendshipRepository.remove(existingFriendship);
-      } else {
-        throw new BadRequestException('Une relation existe déjà avec cet utilisateur');
-      }
+      // On supprime toute relation non acceptée (DECLINED ou autre) pour permettre une nouvelle demande
+      await this.friendshipRepository.remove(existingFriendship);
     }
 
     // Création d'une nouvelle demande

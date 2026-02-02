@@ -19,8 +19,14 @@ export class RecipeListComponent implements OnInit {
 
   allRecipes: Recipe[] = [];
   filteredRecipes: Recipe[] = [];
+  paginatedRecipes: Recipe[] = [];
   isLoading = true;
   viewMode: 'grid' | 'table' = 'grid';
+
+  // Pagination
+  currentPage = 1;
+  pageSize = 12;
+  totalPages = 1;
 
   // Filtres
   searchTerm = '';
@@ -34,7 +40,39 @@ export class RecipeListComponent implements OnInit {
   filterGlutenFree = false;
 
   ngOnInit() {
+    this.loadSavedFilters();
     this.loadRecipes();
+  }
+
+  private loadSavedFilters(): void {
+    const saved = localStorage.getItem('recipe_filters');
+    if (saved) {
+      try {
+        const filters = JSON.parse(saved);
+        this.viewMode = filters.viewMode || 'grid';
+        this.selectedCategory = filters.selectedCategory || 'Toutes';
+        this.selectedVisibility = filters.selectedVisibility || 'Toutes';
+        this.sortBy = filters.sortBy || 'newest';
+        this.filterVegetarian = !!filters.filterVegetarian;
+        this.filterVegan = !!filters.filterVegan;
+        this.filterGlutenFree = !!filters.filterGlutenFree;
+      } catch (e) {
+        console.error('Erreur lors du chargement des filtres sauvegardés', e);
+      }
+    }
+  }
+
+  private saveFilters(): void {
+    const filters = {
+      viewMode: this.viewMode,
+      selectedCategory: this.selectedCategory,
+      selectedVisibility: this.selectedVisibility,
+      sortBy: this.sortBy,
+      filterVegetarian: this.filterVegetarian,
+      filterVegan: this.filterVegan,
+      filterGlutenFree: this.filterGlutenFree
+    };
+    localStorage.setItem('recipe_filters', JSON.stringify(filters));
   }
 
   loadRecipes() {
@@ -55,6 +93,7 @@ export class RecipeListComponent implements OnInit {
   }
 
   applyFilters() {
+    this.saveFilters();
     let result = [...this.allRecipes];
 
     // 1. Filtre de visibilité / favoris / masqués
@@ -120,7 +159,25 @@ export class RecipeListComponent implements OnInit {
     });
 
     this.filteredRecipes = result;
+    this.updatePagination();
     this.cdr.detectChanges();
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredRecipes.length / this.pageSize);
+    if (this.currentPage > this.totalPages) this.currentPage = Math.max(1, this.totalPages);
+    
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedRecipes = this.filteredRecipes.slice(start, end);
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   resetFilters() {
