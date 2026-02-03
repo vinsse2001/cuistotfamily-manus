@@ -8,8 +8,8 @@ export class SocialController {
   constructor(private readonly socialService: SocialService) {}
 
   @Post('request')
-  sendFriendRequest(@Request() req, @Body('nickname') nickname: string) {
-    return this.socialService.sendFriendRequest(req.user.userId, nickname);
+  sendFriendRequest(@Request() req, @Body('nickname') nickname: string, @Body('message') message?: string) {
+    return this.socialService.sendFriendRequest(req.user.userId, nickname, message);
   }
 
   @Delete('request/:addresseeId')

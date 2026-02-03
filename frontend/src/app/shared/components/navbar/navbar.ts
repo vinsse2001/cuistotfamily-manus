@@ -19,8 +19,10 @@ export class NavbarComponent {
   public socialService = inject(SocialService);
   
   private statusSubscription?: Subscription;
+  showCookieBanner = false;
 
   ngOnInit() {
+    this.checkCookies();
     // Initial fetch
     this.socialService.updatePendingRequestsCount();
 
@@ -44,5 +46,17 @@ export class NavbarComponent {
 
   logout() {
     this.authService.logout();
+  }
+
+  checkCookies() {
+    const consent = localStorage.getItem('cookie-consent');
+    if (!consent) {
+      this.showCookieBanner = true;
+    }
+  }
+
+  acceptCookies() {
+    localStorage.setItem('cookie-consent', 'true');
+    this.showCookieBanner = false;
   }
 }

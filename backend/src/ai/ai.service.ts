@@ -7,9 +7,17 @@ export class AiService {
   private openai: OpenAI;
 
   constructor(private configService: ConfigService) {
-    this.openai = new OpenAI({
-      apiKey: this.configService.get<string>('OPENAI_API_KEY'),
-    });
+    const mistralKey = this.configService.get<string>('MISTRAL_API_KEY');
+    if (mistralKey) {
+      this.openai = new OpenAI({
+        apiKey: mistralKey,
+        baseURL: 'https://api.mistral.ai/v1',
+      });
+    } else {
+      this.openai = new OpenAI({
+        apiKey: this.configService.get<string>('OPENAI_API_KEY'),
+      });
+    }
   }
 
   async analyzeRecipe(recipe: any) {
@@ -20,10 +28,11 @@ export class AiService {
     Fournis une estimation des calories, protéines, glucides et lipides pour une portion.
     Réponds uniquement au format JSON avec les clés: calories, proteins, carbs, fat.`;
 
+    const isMistral = this.configService.get<string>('MISTRAL_API_KEY');
     const response = await this.openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
+      model: isMistral ? 'mistral-small-latest' : 'gpt-4.1-mini',
       messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
+      response_format: isMistral ? undefined : { type: 'json_object' },
     });
 
     const content = response.choices[0].message.content;
@@ -38,8 +47,9 @@ export class AiService {
     Tu es experte en cuisine, nutrition et organisation familiale. 
     Tu es chaleureuse, aidante et concise.`;
 
+    const isMistral = this.configService.get<string>('MISTRAL_API_KEY');
     const response = await this.openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
+      model: isMistral ? 'mistral-small-latest' : 'gpt-4.1-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: question }

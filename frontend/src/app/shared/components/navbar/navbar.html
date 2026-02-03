@@ -43,3 +43,26 @@
     </div>
   </div>
 </nav>
+
+<!-- Bandeau Cookies -->
+<div *ngIf="showCookieBanner" class="fixed bottom-0 left-0 right-0 bg-nature-900 text-white p-4 z-50 shadow-2xl border-t border-nature-700 animate-slide-up">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="bg-saumon-600 p-2 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+      <p class="text-sm text-nature-300">
+        <span class="font-bold text-white">Respect de votre vie privée.</span> 
+        Nous utilisons des cookies locaux pour mémoriser vos préférences d'affichage et vos filtres. 
+        Aucune donnée personnelle n'est partagée avec des tiers.
+      </p>
+    </div>
+    <div class="flex gap-3">
+      <button (click)="acceptCookies()" class="bg-saumon-600 hover:bg-saumon-700 text-white px-6 py-2 rounded-lg font-bold transition-all text-sm">
+        J'ai compris
+      </button>
+    </div>
+  </div>
+</div>

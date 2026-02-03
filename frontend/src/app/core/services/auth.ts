@@ -15,9 +15,23 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      this.currentUserSubject.next(JSON.parse(savedUser));
+    this.loadUserFromToken();
+  }
+
+  private loadUserFromToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.currentUserSubject.next({
+          id: payload.sub,
+          email: payload.email,
+          role: payload.role,
+          nickname: payload.nickname || 'Utilisateur'
+        });
+      } catch (e) {
+        this.logout();
+      }
     }
   }
 
@@ -29,15 +43,13 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         localStorage.setItem('token', response.access_token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        this.currentUserSubject.next(response.user);
+        this.loadUserFromToken();
       })
     );
   }
 
   logout() {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     this.currentUserSubject.next(null);
     // Redirection vers l'accueil après déconnexion
     this.router.navigate(['/']);

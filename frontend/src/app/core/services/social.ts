@@ -13,6 +13,7 @@ export interface FriendRequest {
   requesterId: string;
   requester: UserSummary;
   status: string;
+  message?: string;
   createdAt: string;
 }
 
@@ -42,8 +43,8 @@ export class SocialService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  sendFriendRequest(nickname: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/request`, { nickname }, { headers: this.getHeaders() });
+  sendFriendRequest(nickname: string, message?: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/request`, { nickname, message }, { headers: this.getHeaders() });
   }
 
   cancelFriendRequest(addresseeId: string): Observable<any> {

@@ -13,7 +13,7 @@ export class SocialService {
     private userRepository: Repository<User>,
   ) {}
 
-  async sendFriendRequest(requesterId: string, addresseeNickname: string) {
+  async sendFriendRequest(requesterId: string, addresseeNickname: string, message?: string) {
     const normalizedNickname = addresseeNickname.trim();
     const addressee = await this.userRepository.findOne({ 
       where: { nickname: normalizedNickname } 
@@ -51,7 +51,8 @@ export class SocialService {
     const friendship = this.friendshipRepository.create({
       requesterId,
       addresseeId: addressee.id,
-      status: FriendshipStatus.PENDING
+      status: FriendshipStatus.PENDING,
+      message: message || undefined
     });
 
     return this.friendshipRepository.save(friendship);

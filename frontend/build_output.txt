@@ -1,0 +1,8 @@
+
+> frontend@0.0.0 build
+> ng build
+
+❯ Building...
+✔ Building...
+Application bundle generation failed. [2.723 seconds] - 2026-02-03T18:50:00.086Z
+

@@ -212,7 +212,7 @@ export class RecipeFormComponent implements OnInit {
       visibility: this.recipeData.visibility,
       category: this.recipeData.category,
       photoUrl: this.recipeData.photoUrl,
-      servings: this.recipeData.servings,
+      servings: Math.floor(this.recipeData.servings || 4),
       isVegetarian: this.recipeData.isVegetarian,
       isVegan: this.recipeData.isVegan,
       isGlutenFree: this.recipeData.isGlutenFree

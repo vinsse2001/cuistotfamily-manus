@@ -35,6 +35,9 @@ export class Friendship {
   })
   status: FriendshipStatus;
 
+  @Column({ type: 'text', nullable: true })
+  message: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

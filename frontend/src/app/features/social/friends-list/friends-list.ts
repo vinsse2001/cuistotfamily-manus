@@ -97,6 +97,9 @@ export class FriendsListComponent implements OnInit {
     const user = this.searchResults.find(u => u.nickname === nickname);
     if (user && user.friendshipStatus === 'pending') return;
 
+    const message = prompt(`Ajouter un message pour ${nickname} (optionnel) :`);
+    if (message === null) return; // Annulation du prompt
+
     // Optimistic UI update
     if (user) {
       user.friendshipStatus = 'pending';
@@ -104,7 +107,7 @@ export class FriendsListComponent implements OnInit {
       this.cdr.detectChanges();
     }
 
-    this.socialService.sendFriendRequest(nickname).subscribe({
+    this.socialService.sendFriendRequest(nickname, message).subscribe({
       next: () => {
         this.notificationService.show(`Demande envoyée à ${nickname}`, 'success');
         this.searchUsers();
