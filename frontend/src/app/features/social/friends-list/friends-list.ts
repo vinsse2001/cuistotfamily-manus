@@ -181,8 +181,12 @@ export class FriendsListComponent implements OnInit {
   }
 
   getFullUrl(url: string | undefined): string {
-    if (!url) return 'assets/no_picture.jpg';
-    if (url.startsWith('http')) return url;
+    if (!url) {
+      return '/assets/no_picture.jpg';
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
     return `http://localhost:3000${url}`;
   }
 }
