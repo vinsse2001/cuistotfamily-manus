@@ -146,9 +146,21 @@ export class RecipesService {
     if (!recipe) {
       throw new NotFoundException(`Recipe with ID ${id} not found`);
     }
-    if (recipe.ownerId !== userId) {
-      throw new ForbiddenException('You can only update your own recipes');
+
+    // Si on ne met à jour QUE les infos nutritionnelles, on autorise tous ceux qui ont accès à la recette
+    const isOnlyNutrition = Object.keys(recipeData).every(key => 
+      ['calories', 'protein', 'carbs', 'fat'].includes(key)
+    );
+
+    if (!isOnlyNutrition && recipe.ownerId !== userId) {
+      throw new ForbiddenException('Vous ne pouvez modifier que vos propres recettes');
     }
+
+    // Si ce n'est pas le propriétaire, on vérifie quand même qu'il a le droit de voir la recette
+    if (recipe.ownerId !== userId) {
+      await this.findOne(id, userId); // Lance une ForbiddenException si pas d'accès
+    }
+
     Object.assign(recipe, recipeData);
     return this.recipesRepository.save(recipe);
   }

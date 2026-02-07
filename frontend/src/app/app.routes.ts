@@ -8,12 +8,16 @@ import { RecipeFormComponent } from './features/recipes/recipe-form/recipe-form'
 import { ProfileComponent } from './features/profile/profile';
 import { ContactComponent } from './features/contact/contact';
 import { FriendsListComponent } from './features/social/friends-list/friends-list';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
 import { authGuard, adminGuard } from './core/guards/auth';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'friends', component: FriendsListComponent, canActivate: [authGuard] },

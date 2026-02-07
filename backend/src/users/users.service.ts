@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, ForbiddenException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository, Not, MoreThan } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserAlias } from './entities/user-alias.entity';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -46,12 +47,12 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({ 
-      select: ['id', 'email', 'nickname', 'role', 'isActive', 'isEmailVerified', 'createdAt'],
+      select: ['id', 'email', 'nickname', 'role', 'isActive', 'isEmailVerified', 'photoUrl', 'createdAt'],
       order: { createdAt: 'DESC' } 
     });
   }
 
-  async updateProfile(id: string, updateData: any): Promise<User> {
+  async update(id: string, updateData: any): Promise<User> {
     const user = await this.findOneById(id);
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
 
@@ -97,6 +98,43 @@ export class UsersService {
     
     user.role = role;
     return this.usersRepository.save(user);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      return { message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' };
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 heure
+    await this.usersRepository.save(user);
+
+    console.log(`[EMAIL SIMULATION] Lien de réinitialisation pour ${user.email} : http://localhost:4200/reset-password?token=${token}`);
+    
+    return { message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' };
+  }
+
+  async resetPassword(token: string, newPass: string) {
+    const user = await this.usersRepository.findOne({
+      where: { 
+        resetPasswordToken: token,
+        resetPasswordExpires: MoreThan(new Date())
+      }
+    });
+
+    if (!user) {
+      throw new BadRequestException('Le jeton de réinitialisation est invalide ou a expiré.');
+    }
+
+    this.validatePassword(newPass);
+    user.password = await bcrypt.hash(newPass, 10);
+    user.resetPasswordToken = undefined as any;
+    user.resetPasswordExpires = undefined as any;
+    await this.usersRepository.save(user);
+
+    return { message: 'Mot de passe réinitialisé avec succès.' };
   }
 
   async remove(id: string, currentUserId: string): Promise<void> {

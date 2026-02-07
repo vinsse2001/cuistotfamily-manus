@@ -1,6 +1,9 @@
-import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Request, ForbiddenException, NotFoundException, Post } from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, Request, ForbiddenException, Post, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('users')
 export class UsersController {
@@ -19,68 +22,45 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(@Request() req, @Body() updateData: any) {
-    return this.usersService.updateProfile(req.user.userId, updateData);
+    return this.usersService.update(req.user.id, updateData);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.usersService.forgotPassword(email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() data: any) {
+    return this.usersService.resetPassword(data.token, data.newPassword);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('admin/status/:id')
-  async toggleStatus(@Request() req, @Param('id') id: string) {
-    if (req.user?.role !== 'admin') {
-      throw new ForbiddenException('Action non autorisée');
+  @Post('profile/photo')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads/profiles',
+      filename: (req, file, cb) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        return cb(null, `${randomName}${extname(file.originalname)}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        return cb(new BadRequestException('Seules les images sont autorisées'), false);
+      }
+      cb(null, true);
+    },
+    limits: {
+      fileSize: 2 * 1024 * 1024, // 2MB
     }
-    
-    // Sécurité : Empêcher de se désactiver soi-même
-    if (req.user.userId === id) {
-      throw new ForbiddenException('Vous ne pouvez pas désactiver votre propre compte administrateur');
+  }))
+  async uploadPhoto(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier téléchargé');
     }
-
-    return this.usersService.toggleStatus(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch('admin/role/:id')
-  async updateRole(@Request() req, @Param('id') id: string, @Body() data: { role: string }) {
-    if (req.user?.role !== 'admin') {
-      throw new ForbiddenException('Action non autorisée');
-    }
-
-    // Sécurité : Empêcher de se retirer les droits admin
-    if (req.user.userId === id && data.role !== 'admin') {
-      throw new ForbiddenException('Vous ne pouvez pas vous retirer les droits administrateur');
-    }
-
-    return this.usersService.updateRole(id, data.role);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete('admin/:id')
-  async remove(@Request() req, @Param('id') id: string) {
-    if (req.user?.role !== 'admin') {
-      throw new ForbiddenException('Action non autorisée');
-    }
-
-    // Sécurité : Empêcher de se supprimer soi-même
-    // Note: UsersService.remove vérifie aussi cela, mais on le fait ici pour la cohérence
-    return this.usersService.remove(id, req.user.userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('aliases')
-  async getAliases(@Request() req) {
-    return this.usersService.getAliases(req.user.userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('alias')
-  async setAlias(@Request() req, @Body() data: { targetUserId: string, alias: string }) {
-    return this.usersService.setAlias(req.user.userId, data.targetUserId, data.alias);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const user = await this.usersService.findOneById(id);
-    if (!user) throw new NotFoundException('Utilisateur non trouvé');
-    return user;
+    const photoUrl = `/uploads/profiles/${file.filename}`;
+    await this.usersService.update(req.user.id, { photoUrl });
+    return { photoUrl };
   }
 }

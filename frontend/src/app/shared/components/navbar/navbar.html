@@ -27,9 +27,13 @@
         </div>
 
         <div *ngIf="authService.currentUser$ | async as user" class="flex items-center">
-          <a routerLink="/profile" class="flex flex-col items-end mr-4 text-white hover:text-nature-200 transition-colors">
-            <span class="hidden sm:inline text-xs opacity-90">Bonjour,</span>
-            <span class="hidden sm:inline text-sm font-bold">{{ user.nickname }}</span>
+          <a routerLink="/profile" class="flex items-center gap-3 mr-4 text-white hover:text-nature-200 transition-colors group">
+            <img [src]="getFullUrl(user.photoUrl)" 
+                 class="h-10 w-10 rounded-full object-cover border-2 border-white/20 group-hover:border-white/50 transition-all shadow-sm">
+            <div class="flex flex-col items-end">
+              <span class="hidden sm:inline text-xs opacity-90">Bonjour,</span>
+              <span class="hidden sm:inline text-sm font-bold">{{ user.nickname }}</span>
+            </div>
           </a>
           <button (click)="logout()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md text-sm font-bold transition-all border border-white/20">
             Déconnexion
@@ -45,7 +49,7 @@
 </nav>
 
 <!-- Bandeau Cookies -->
-<div *ngIf="showCookieBanner" class="fixed bottom-0 left-0 right-0 bg-nature-900 text-white p-4 z-50 shadow-2xl border-t border-nature-700 animate-slide-up">
+<div *ngIf="showCookieBanner" class="fixed bottom-0 left-0 right-0 bg-nature-900 text-white p-4 z-[9999] shadow-2xl border-t border-nature-700 animate-slide-up">
   <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
     <div class="flex items-center gap-3">
       <div class="bg-saumon-600 p-2 rounded-full">

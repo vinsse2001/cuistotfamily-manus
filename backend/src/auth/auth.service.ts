@@ -42,7 +42,7 @@ export class AuthService {
       throw new UnauthorizedException('Code de vérification incorrect');
     }
 
-    await this.usersService.updateProfile(user.id, { 
+    await this.usersService.update(user.id, { 
       isEmailVerified: true, 
       verificationCode: null 
     });
