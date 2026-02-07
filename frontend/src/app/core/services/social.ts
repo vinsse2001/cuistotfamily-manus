@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 export interface UserSummary {
+  photoUrl?: string;
   id: string;
   nickname: string;
   friendshipStatus?: string | null;

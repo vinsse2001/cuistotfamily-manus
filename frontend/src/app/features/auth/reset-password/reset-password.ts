@@ -1,14 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { NotificationService } from '../../../core/services/notification';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="min-h-screen flex items-center justify-center bg-nature-50 dark:bg-nature-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div class="max-w-md w-full space-y-8 bg-white dark:bg-nature-800 p-8 rounded-xl shadow-lg border-t-4 border-saumon-500">
