@@ -149,7 +149,7 @@ export class RecipesService {
 
     // Si on ne met à jour QUE les infos nutritionnelles, on autorise tous ceux qui ont accès à la recette
     const isOnlyNutrition = Object.keys(recipeData).every(key => 
-      ['calories', 'protein', 'carbs', 'fat'].includes(key)
+      ['calories', 'protein', 'carbs', 'fat', 'fiber', 'sugar', 'sodium', 'vitamins', 'minerals'].includes(key)
     );
 
     if (!isOnlyNutrition && recipe.ownerId !== userId) {
@@ -161,7 +161,20 @@ export class RecipesService {
       await this.findOne(id, userId); // Lance une ForbiddenException si pas d'accès
     }
 
-    Object.assign(recipe, recipeData);
+    // Si on met à jour les données nutritionnelles, on les remplace complètement pour éviter les fusions partielles.
+    if (isOnlyNutrition) {
+      recipe.calories = recipeData.calories;
+      recipe.protein = recipeData.protein;
+      recipe.carbs = recipeData.carbs;
+      recipe.fat = recipeData.fat;
+      recipe.fiber = recipeData.fiber;
+      recipe.sugar = recipeData.sugar;
+      recipe.sodium = recipeData.sodium;
+      recipe.vitamins = recipeData.vitamins;
+      recipe.minerals = recipeData.minerals;
+    } else {
+      Object.assign(recipe, recipeData);
+    }
     return this.recipesRepository.save(recipe);
   }
 
