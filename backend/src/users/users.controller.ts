@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, UseGuards, Request, ForbiddenException, Post, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, Request, ForbiddenException, Post, UseInterceptors, UploadedFile, BadRequestException, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -57,10 +57,26 @@ export class UsersController {
   }))
   async uploadPhoto(@Request() req, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('Aucun fichier téléchargé');
+      throw new BadRequestException("Aucun fichier téléchargé");
     }
     const photoUrl = `/uploads/profiles/${file.filename}`;
     await this.usersService.update(req.user.id, { photoUrl });
     return { photoUrl };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(":id")
+  async findOne(@Request() req, @Param("id") id: string) {
+    // L'utilisateur ne peut voir que son propre profil ou si c'est un admin
+    if (req.user.id !== id && req.user.role !== "admin") {
+      throw new ForbiddenException("Vous n'êtes pas autorisé à voir ce profil");
+    }
+    const user = await this.usersService.findOneById(id);
+    if (!user) {
+      throw new NotFoundException("Utilisateur non trouvé");
+    }
+    // Ne pas retourner le mot de passe ou d'autres informations sensibles
+    const { password, resetPasswordToken, resetPasswordExpires, ...result } = user;
+    return result;
   }
 }
