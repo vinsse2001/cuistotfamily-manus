@@ -57,6 +57,15 @@ export class ResetPasswordComponent implements OnInit {
   confirmPass: string = '';
   loading: boolean = false;
 
+  validatePassword(pass: string): boolean {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(pass);
+    const hasLowerCase = /[a-z]/.test(pass);
+    const hasNumbers = /\d/.test(pass);
+    const hasNonalphas = /\W/.test(pass);
+    return pass.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasNonalphas;
+  }
+
   ngOnInit() {
     this.token = this.route.snapshot.queryParams['token'];
     if (!this.token) {
@@ -70,8 +79,8 @@ export class ResetPasswordComponent implements OnInit {
       this.notificationService.show('Les mots de passe ne correspondent pas', 'error');
       return;
     }
-    if (this.newPass.length < 6) {
-      this.notificationService.show('Le mot de passe doit faire au moins 6 caractères', 'error');
+    if (!this.validatePassword(this.newPass)) {
+      this.notificationService.show('Le mot de passe doit contenir au moins 8 caractères, dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.', 'error');
       return;
     }
 
@@ -83,8 +92,9 @@ export class ResetPasswordComponent implements OnInit {
       },
       error: (err) => {
         this.notificationService.show(err.error?.message || 'Erreur lors de la réinitialisation', 'error');
-        this.loading = false;
       }
+    }).add(() => {
+      this.loading = false;
     });
   }
 }
