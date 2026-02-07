@@ -74,7 +74,7 @@ export class AuthService {
   uploadPhoto(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('photo', file);
-    return this.http.post('http://localhost:3000/users/upload-photo', formData, {
+    return this.http.post("http://localhost:3000/users/profile/photo", formData, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
