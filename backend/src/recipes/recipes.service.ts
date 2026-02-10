@@ -164,15 +164,15 @@ export class RecipesService {
     if (isOnlyNutrition) {
       recipe.nutritionalInfo = {
         ...recipe.nutritionalInfo,
-        calories: recipeData.calories,
-        protein: recipeData.protein,
-        carbs: recipeData.carbs,
-        fat: recipeData.fat,
-        fiber: recipeData.fiber,
-        sugar: recipeData.sugar,
-        sodium: recipeData.sodium,
-        vitamins: recipeData.vitamins,
-        minerals: recipeData.minerals,
+        calories: recipeData.nutritionalInfo?.calories,
+        protein: recipeData.nutritionalInfo?.protein,
+        carbs: recipeData.nutritionalInfo?.carbs,
+        fat: recipeData.nutritionalInfo?.fat,
+        fiber: recipeData.nutritionalInfo?.fiber,
+        sugar: recipeData.nutritionalInfo?.sugar,
+        sodium: recipeData.nutritionalInfo?.sodium,
+        vitamins: recipeData.nutritionalInfo?.vitamins,
+        minerals: recipeData.nutritionalInfo?.minerals,
       };
     } else {
       Object.assign(recipe, recipeData);
