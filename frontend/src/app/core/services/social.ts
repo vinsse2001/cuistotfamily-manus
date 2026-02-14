@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 export interface UserSummary {
   photoUrl?: string;
@@ -39,49 +39,45 @@ export class SocialService {
     });
   }
 
-  private getHeaders() {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  }
+
 
   sendFriendRequest(nickname: string, message?: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/request`, { nickname, message }, { headers: this.getHeaders() });
+    return this.http.post(`${this.apiUrl}/request`, { nickname, message });
   }
 
   cancelFriendRequest(addresseeId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/request/${addresseeId}`, { headers: this.getHeaders() });
+    return this.http.delete(`${this.apiUrl}/request/${addresseeId}`);
   }
 
   acceptFriendRequest(requestId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/accept/${requestId}`, {}, { headers: this.getHeaders() }).pipe(
+    return this.http.post(`${this.apiUrl}/accept/${requestId}`, {}).pipe(
       tap(() => this.updatePendingRequestsCount())
     );
   }
 
   declineFriendRequest(requestId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/decline/${requestId}`, {}, { headers: this.getHeaders() }).pipe(
+    return this.http.post(`${this.apiUrl}/decline/${requestId}`, {}).pipe(
       tap(() => this.updatePendingRequestsCount())
     );
   }
 
   getFriends(): Observable<UserSummary[]> {
-    return this.http.get<UserSummary[]>(`${this.apiUrl}/friends`, { headers: this.getHeaders() });
+    return this.http.get<UserSummary[]>(`${this.apiUrl}/friends`);
   }
 
   getPendingRequests(): Observable<FriendRequest[]> {
-    return this.http.get<FriendRequest[]>(`${this.apiUrl}/requests/pending`, { headers: this.getHeaders() }).pipe(
+    return this.http.get<FriendRequest[]>(`${this.apiUrl}/requests/pending`).pipe(
       tap(requests => this.pendingRequestsCountSubject.next(requests.length))
     );
   }
 
   removeFriend(friendId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/friends/${friendId}`, { headers: this.getHeaders() });
+    return this.http.delete(`${this.apiUrl}/friends/${friendId}`);
   }
 
   searchUsers(query: string): Observable<UserSummary[]> {
     return this.http.get<UserSummary[]>(`${this.apiUrl}/search`, { 
-      params: { q: query },
-      headers: this.getHeaders() 
+      params: { q: query }
     });
   }
 }

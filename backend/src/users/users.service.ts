@@ -134,6 +134,7 @@ export class UsersService {
     user.resetPasswordExpires = undefined as any;
     await this.usersRepository.save(user);
 
+    console.log(`[PASSWORD RESET] Mot de passe de l'utilisateur ${user.email} réinitialisé avec succès.`);
     return { message: 'Mot de passe réinitialisé avec succès.' };
   }
 

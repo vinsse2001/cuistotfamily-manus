@@ -74,18 +74,10 @@ export class AuthService {
   uploadPhoto(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post("http://localhost:3000/users/profile/photo", formData, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
+    return this.http.post("http://localhost:3000/users/profile/photo", formData);
   }
 
   getUserProfile(id: string): Observable<any> {
-    return this.http.get(`http://localhost:3000/users/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
+    return this.http.get(`http://localhost:3000/users/${id}`);
   }
 }
