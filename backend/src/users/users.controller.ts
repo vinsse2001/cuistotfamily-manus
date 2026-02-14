@@ -56,6 +56,7 @@ export class UsersController {
     }
   }))
   async uploadPhoto(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    console.log("Upload Photo: Received file", file);
     if (!file) {
       throw new BadRequestException("Aucun fichier téléchargé");
     }

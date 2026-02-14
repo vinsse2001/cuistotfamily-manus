@@ -68,7 +68,8 @@ export class AuthService {
   }
 
   resetPassword(token: string, newPass: string): Observable<any> {
-    return this.http.post('http://localhost:3000/users/reset-password', { token, newPass });
+    console.log("AuthService: Calling resetPassword API with token and newPass");
+    return this.http.post("http://localhost:3000/users/reset-password", { token, newPass });
   }
 
   uploadPhoto(file: File): Observable<any> {
