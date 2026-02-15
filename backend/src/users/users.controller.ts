@@ -105,6 +105,24 @@ export class UsersController {
     return { message: 'Photo de profil supprimée avec succès', photoUrl: null, access_token };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('admin/status/:id')
+  async toggleUserStatus(@Request() req, @Param('id') id: string) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Accès refusé : rôle insuffisant');
+    }
+    return this.usersService.toggleUserStatus(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('admin/:id')
+  async deleteUser(@Request() req, @Param('id') id: string) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Accès refusé : rôle insuffisant');
+    }
+    return this.usersService.deleteUser(id);
+  }
+
   @Get(":id")
   async findOne(@Request() req, @Param("id") id: string) {
     // L'utilisateur ne peut voir que son propre profil ou si c'est un admin
