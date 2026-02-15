@@ -24,7 +24,7 @@
               <!-- Photo agrandie au survol -->
               <div class="absolute left-0 top-0 z-50 hidden group-hover/photo:block pointer-events-none">
                 <img [src]="getFullUrl(user.photoUrl)" 
-                     class="h-48 w-48 rounded-2xl object-cover shadow-2xl border-4 border-white dark:border-nature-700 bg-white dark:bg-nature-800">
+                     class="h-48 w-48 rounded-2xl object-cover shadow-2xl border-4 border-white dark:border-nature-700 bg-white dark:bg-nature-800 aspect-square">
               </div>
             </div>
             <span class="font-medium text-nature-900 dark:text-white">{{ user.nickname }}</span>
@@ -79,7 +79,7 @@
                   <!-- Photo agrandie au survol -->
                   <div class="absolute left-0 top-0 z-50 hidden group-hover/photo:block pointer-events-none">
                     <img [src]="getFullUrl(request.requester.photoUrl)" 
-                         class="h-48 w-48 rounded-2xl object-cover shadow-2xl border-4 border-white dark:border-nature-700 bg-white dark:bg-nature-800">
+                         class="h-48 w-48 rounded-2xl object-cover shadow-2xl border-4 border-white dark:border-nature-700 bg-white dark:bg-nature-800 aspect-square">
                   </div>
                 </div>
                 <span class="font-medium text-nature-900 dark:text-white">{{ request.requester.nickname }}</span>
@@ -121,7 +121,7 @@
                 <!-- Photo agrandie au survol -->
                 <div class="absolute left-0 top-0 z-50 hidden group-hover/photo:block pointer-events-none">
                   <img [src]="getFullUrl(friend.photoUrl)" 
-                       class="h-48 w-48 rounded-2xl object-cover shadow-2xl border-4 border-white dark:border-nature-700 bg-white dark:bg-nature-800">
+                       class="h-48 w-48 rounded-2xl object-cover shadow-2xl border-4 border-white dark:border-nature-700 bg-white dark:bg-nature-800 aspect-square">
                 </div>
               </div>
               <span class="font-medium text-nature-900 dark:text-white">{{ friend.nickname }}</span>

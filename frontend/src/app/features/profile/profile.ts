@@ -162,22 +162,22 @@ export class ProfileComponent implements OnInit {
       updateData.password = this.newPassword;
     }
 
-    // Note: On utilise l'id de l'utilisateur connecté
-    this.authService.currentUser$.subscribe(u => {
-      if (u) {
-        // On pourrait ajouter une méthode updateProfile dans AuthService
-        // Pour l'instant on utilise HttpClient directement via une méthode temporaire ou on l'ajoute à AuthService
-        this.authService.updateProfile(updateData).subscribe({
-          next: () => {
-            this.notificationService.show("Profil mis à jour avec succès", "success");
-            this.loading = false;
-            this.newPassword = "";
-          },
-          error: () => {
-            this.notificationService.show("Erreur lors de la mise à jour", "error");
-            this.loading = false;
-          }
-        });
+    this.authService.updateProfile(updateData).subscribe({
+      next: () => {
+        this.notificationService.show("Profil mis à jour avec succès", "success");
+        this.loading = false;
+        this.newPassword = "";
+        // Mettre à jour l'objet user localement avec les données du formulaire
+        // Les changements de photoUrl sont déjà gérés par le BehaviorSubject dans authService
+        // Mettre à jour l'utilisateur localement pour refléter les changements immédiatement
+        this.user.nickname = updateData.nickname;
+        this.user.email = updateData.email;
+        // Mettre à jour le currentUserSubject dans AuthService pour propager les changements à la navbar
+        this.authService.updateCurrentUser({ nickname: updateData.nickname, email: updateData.email });
+      },
+      error: (err) => {
+        this.notificationService.show(err.error?.message || "Erreur lors de la mise à jour", "error");
+        this.loading = false;
       }
     });
   }

@@ -14,6 +14,13 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  updateCurrentUser(partialUser: Partial<any>) {
+    const current = this.currentUserSubject.getValue();
+    if (current) {
+      this.currentUserSubject.next({ ...current, ...partialUser });
+    }
+  }
+
   constructor() {
     this.loadUserFromToken();
   }
@@ -104,13 +111,12 @@ export class AuthService {
     }
     return this.http.patch(`http://localhost:3000/users/profile`, updateData).pipe(
       tap(() => {
-        // Si le nickname ou l'email est mis à jour, rafraîchir le token
-        if (updateData.nickname || updateData.email) {
-          // Une solution plus robuste serait de demander un nouveau token au backend
-          // Pour l'instant, on se contente de recharger l'utilisateur depuis le token existant
-          this.loadUserFromToken();
+        // Après une mise à jour de profil (email/nickname), le token JWT ne change pas.
+        // Il n'est donc pas nécessaire de recharger le token.
+        // On met à jour directement le currentUserSubject avec les nouvelles données.
+        const currentUser = this.currentUserSubject.getValue();
+        if (currentUser) {
+          this.currentUserSubject.next({ ...currentUser, nickname: updateData.nickname || currentUser.nickname, email: updateData.email || currentUser.email });
         }
       })
     );
-  }
-}
