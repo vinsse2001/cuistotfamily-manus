@@ -131,7 +131,7 @@ export class ProfileComponent implements OnInit {
       
       this.authService.uploadPhoto(file).subscribe({
         next: (res) => {
-          this.user.photoUrl = res.photoUrl;
+          this.user.photoUrl = res.photoUrl || null;
           this.notificationService.show('Photo de profil mise à jour', 'success');
           // Plus besoin de recharger la page car le BehaviorSubject est mis à jour dans le service
         },
@@ -162,10 +162,11 @@ export class ProfileComponent implements OnInit {
     };
 
     let hasChanges = false;
-    if (this.user.nickname !== this.authService.currentUserSubject.getValue().nickname) {
+    const currentAuthUser = this.authService.getCurrentUserValue();
+    if (currentAuthUser && this.user.nickname !== currentAuthUser.nickname) {
       hasChanges = true;
     }
-    if (this.user.email !== this.authService.currentUserSubject.getValue().email) {
+    if (currentAuthUser && this.user.email !== currentAuthUser.email) {
       hasChanges = true;
     }
 
@@ -190,7 +191,7 @@ export class ProfileComponent implements OnInit {
         this.notificationService.show("Profil mis à jour avec succès", "success");
         this.loading = false;
         this.newPassword = "";
-        this.authService.updateCurrentUser({ nickname: updateData.nickname, email: updateData.email });
+        this.authService.updateCurrentUser({ nickname: updateData.nickname || null, email: updateData.email || null });
       },
       error: (err) => {
         this.notificationService.show(err.error?.message || "Erreur lors de la mise à jour", "error");
@@ -203,9 +204,9 @@ export class ProfileComponent implements OnInit {
     if (confirm("Voulez-vous vraiment supprimer votre photo de profil ?")) {
       this.authService.deletePhoto().subscribe({
         next: (res) => {
-          this.user.photoUrl = res.photoUrl;
+          this.user.photoUrl = res.photoUrl || null;
           this.notificationService.show("Photo de profil supprimée avec succès", "success");
-          this.authService.updateCurrentUser({ photoUrl: res.photoUrl });
+          this.authService.updateCurrentUser({ photoUrl: res.photoUrl || null });
         },
         error: (err) => {
           const errorMessage = err.error?.message || "Erreur lors de la suppression de la photo.";

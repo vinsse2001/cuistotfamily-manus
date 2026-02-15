@@ -27,7 +27,7 @@ export class User {
   isEmailVerified: boolean;
 
   @Column({ nullable: true })
-  photoUrl: string;
+  photoUrl: string | null;
 
   @Column({ nullable: true })
   resetPasswordToken: string;

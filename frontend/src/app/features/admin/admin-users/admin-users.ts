@@ -90,7 +90,8 @@ export class AdminUsersComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   
   users: any[] = [];
-  currentUserId: string = ‘’;
+    currentUserId: string = 
+  '';
 
   getFullUrl(url: string | undefined): string {
     if (!url || url === 'null' || url === 'undefined') {
@@ -107,7 +108,7 @@ export class AdminUsersComponent implements OnInit {
     console.log('AdminUsersComponent: Initializing...');
     this.authService.currentUser$.subscribe(user => {
       if (user) {
-        this.currentUserId = user.id || user.userId;
+                this.currentUserId = user.id;
         console.log('AdminUsersComponent: Current User ID set to', this.currentUserId);
       }
     });

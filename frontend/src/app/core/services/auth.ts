@@ -14,6 +14,10 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  getCurrentUserValue(): any {
+    return this.currentUserSubject.getValue();
+  }
+
   constructor() {
     this.loadUserFromToken();
   }
@@ -39,7 +43,7 @@ export class AuthService {
           email: payload.email,
           role: payload.role,
           nickname: payload.nickname || 'Utilisateur',
-          photoUrl: payload.photoUrl || null
+        photoUrl: payload.photoUrl as string | null
         });
       } catch (e) {
         this.logout();
@@ -84,19 +88,18 @@ export class AuthService {
     return this.http.post<any>("http://localhost:3000/users/profile/photo", formData).pipe(
       tap(response => {
         if (response && response.access_token) {
-          localStorage.setItem('token', response.access_token);
+          localStorage.setItem("token", response.access_token);
           this.loadUserFromToken();
         } else {
-          const currentUser = this.currentUserSubject.getValue();
-          if (currentUser) {
-            this.currentUserSubject.next({ ...currentUser, photoUrl: response.photoUrl });
-          }
+          this.updateCurrentUser({ photoUrl: response.photoUrl });
         }
       })
     );
   }
 
-    getUserProfile(id: string): Observable<any> { return this.http.get(`http://localhost:3000/users/${id}`); }
+  getUserProfile(id: string): Observable<any> { 
+    return this.http.get(`http://localhost:3000/users/${id}`); 
+  }
 
   deletePhoto(): Observable<any> {
     return this.http.delete<any>("http://localhost:3000/users/profile/photo").pipe(
@@ -105,14 +108,10 @@ export class AuthService {
           localStorage.setItem("token", response.access_token);
           this.loadUserFromToken();
         } else {
-          const currentUser = this.currentUserSubject.getValue();
-          if (currentUser) {
-            this.currentUserSubject.next({ ...currentUser, photoUrl: null });
-          }
+          this.updateCurrentUser({ photoUrl: null });
         }
       })
     );
-  }
   }
 
   updateProfile(updateData: any): Observable<any> {
@@ -122,9 +121,9 @@ export class AuthService {
     }
     return this.http.patch(`http://localhost:3000/users/profile`, updateData).pipe(
       tap(() => {
-        const currentUser = this.currentUserSubject.getValue();
-        if (currentUser) {
-          this.currentUserSubject.next({ ...currentUser, nickname: updateData.nickname || currentUser.nickname, email: updateData.email || currentUser.email });
+        const current = this.currentUserSubject.getValue();
+        if (current) {
+          this.currentUserSubject.next({ ...current, nickname: updateData.nickname || current.nickname, email: updateData.email || current.email });
         }
       })
     );

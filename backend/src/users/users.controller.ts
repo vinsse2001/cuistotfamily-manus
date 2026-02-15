@@ -1,5 +1,5 @@
 import { Controller, Get, Patch, Body, UseGuards, Request, ForbiddenException, Post, UseInterceptors, UploadedFile, BadRequestException, Param, NotFoundException, Delete } from '@nestjs/common';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { UsersService } from './users.service';
