@@ -21,3 +21,4 @@ Thumbs.db
 # Docker
 .docker/
 backend/uploads/recipes/*.webp
+backend/uploads/profiles/*
