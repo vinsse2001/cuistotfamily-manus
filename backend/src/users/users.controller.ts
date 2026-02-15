@@ -111,7 +111,7 @@ export class UsersController {
     if (req.user.role !== 'admin') {
       throw new ForbiddenException('Accès refusé : rôle insuffisant');
     }
-    return this.usersService.updateUserRole(id, role);
+    return this.usersService.updateRole(id, role);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -120,7 +120,7 @@ export class UsersController {
     if (req.user.role !== 'admin') {
       throw new ForbiddenException('Accès refusé : rôle insuffisant');
     }
-    return this.usersService.toggleUserStatus(id);
+    return this.usersService.toggleStatus(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -129,7 +129,7 @@ export class UsersController {
     if (req.user.role !== 'admin') {
       throw new ForbiddenException('Accès refusé : rôle insuffisant');
     }
-    return this.usersService.deleteUser(id);
+    return this.usersService.remove(id, req.user.id);
   }
 
   @Get(":id")
