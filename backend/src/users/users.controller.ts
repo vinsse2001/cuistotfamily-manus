@@ -106,6 +106,15 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Patch('admin/role/:id')
+  async updateUserRole(@Request() req, @Param('id') id: string, @Body('role') role: string) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Accès refusé : rôle insuffisant');
+    }
+    return this.usersService.updateUserRole(id, role);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('admin/status/:id')
   async toggleUserStatus(@Request() req, @Param('id') id: string) {
     if (req.user.role !== 'admin') {
