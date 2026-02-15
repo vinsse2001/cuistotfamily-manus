@@ -63,36 +63,60 @@ export class UsersController {
     if (!file) {
       throw new BadRequestException("Aucun fichier téléchargé");
     }
-    const filename = `${path.parse(file.filename).name}.jpeg`;
-    const outputPath = path.join(file.destination, filename);
+      const baseFilename = path.parse(file.filename).name;
+      const photoFilename = `${baseFilename}.jpeg`;
+      const thumbnailFilename = `${baseFilename}_thumb.jpeg`;
 
-    try {
-      await sharp(file.path)
-        .resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: 80 })
-        .toFile(outputPath);
+      const photoOutputPath = path.join(file.destination, photoFilename);
+      const thumbnailOutputPath = path.join(file.destination, thumbnailFilename);
 
-      // Supprimer le fichier original uploadé par Multer
-      await fs.unlink(file.path);
+      try {
+        // Process main image
+        await sharp(file.path)
+          .resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 80 })
+          .toFile(photoOutputPath);
 
-      const photoUrl = `/uploads/profiles/${filename}`;
-      const user = await this.usersService.findOneById(req.user.id);
-      if (user && user.photoUrl) {
-        const oldFilePath = path.join(__dirname, '../../..', user.photoUrl);
-        try {
-          await fs.unlink(oldFilePath);
-        } catch (error) {
-          console.warn(`Impossible de supprimer l'ancien fichier ${oldFilePath}:`, error);
+        // Process thumbnail image
+        await sharp(file.path)
+          .resize(150, 150, { fit: 'cover' })
+          .jpeg({ quality: 80 })
+          .toFile(thumbnailOutputPath);
+
+        // Supprimer le fichier original uploadé par Multer
+        await fs.unlink(file.path);
+
+        const photoUrl = `/uploads/profiles/${photoFilename}`;
+        const thumbnailUrl = `/uploads/profiles/${thumbnailFilename}`;
+
+        const user = await this.usersService.findOneById(req.user.id);
+        if (user) {
+          if (user.photoUrl) {
+            const oldPhotoFilePath = path.join(__dirname, '../../../', user.photoUrl);
+            try {
+              await fs.unlink(oldPhotoFilePath);
+            } catch (error) {
+              console.warn(`Impossible de supprimer l'ancien fichier photo ${oldPhotoFilePath}:`, error);
+            }
+          }
+          if (user.thumbnailUrl) {
+            const oldThumbnailFilePath = path.join(__dirname, '../../../', user.thumbnailUrl);
+            try {
+              await fs.unlink(oldThumbnailFilePath);
+            } catch (error) {
+              console.warn(`Impossible de supprimer l'ancien fichier miniature ${oldThumbnailFilePath}:`, error);
+            }
+          }
         }
-      }
-      await this.usersService.update(req.user.id, { photoUrl });
-      const updatedUser = await this.usersService.findOneById(req.user.id);
-      if (!updatedUser) {
-        throw new NotFoundException("Utilisateur non trouvé après la mise à jour de la photo.");
-      }
-      const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
-      const access_token = await this.usersService.generateJwtToken(payload);
-      return { photoUrl, access_token };
+
+        await this.usersService.update(req.user.id, { photoUrl, thumbnailUrl });
+        const updatedUser = await this.usersService.findOneById(req.user.id);
+        if (!updatedUser) {
+          throw new NotFoundException("Utilisateur non trouvé après la mise à jour de la photo.");
+        }
+        const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl, thumbnailUrl: updatedUser.thumbnailUrl };
+        const access_token = await this.usersService.generateJwtToken(payload);
+        return { photoUrl, thumbnailUrl, access_token };
     } catch (error) {
       // Supprimer le fichier original si Sharp échoue
       await fs.unlink(file.path).catch(() => {}); // Ignorer les erreurs si le fichier n'existe pas
@@ -109,9 +133,9 @@ export class UsersController {
     if (!updatedUser) {
       throw new NotFoundException("Utilisateur non trouvé après la suppression de la photo.");
     }
-    const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
+    const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl, thumbnailUrl: updatedUser.thumbnailUrl };
     const access_token = await this.usersService.generateJwtToken(payload);
-    return { message: 'Photo de profil supprimée avec succès', photoUrl: null, access_token };
+    return { message: 'Photo de profil supprimée avec succès', photoUrl: null, thumbnailUrl: null, access_token };
   }
 
   @UseGuards(JwtAuthGuard)

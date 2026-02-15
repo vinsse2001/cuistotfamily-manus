@@ -29,6 +29,9 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   photoUrl: string | null;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  thumbnailUrl: string | null;
+
   @Column({ nullable: true })
   resetPasswordToken: string;
 

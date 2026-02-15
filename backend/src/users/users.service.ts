@@ -165,15 +165,24 @@ export class UsersService {
     }
 
     if (user.photoUrl) {
-      const filePath = path.join(__dirname, '../../..', user.photoUrl);
+      const photoFilePath = path.join(__dirname, '../../..', user.photoUrl);
       try {
-        await fs.unlink(filePath);
+        await fs.unlink(photoFilePath);
       } catch (error) {
-        console.warn(`Impossible de supprimer le fichier ${filePath}:`, error);
+        console.warn(`Impossible de supprimer le fichier photo ${photoFilePath}:`, error);
+      }
+    }
+    if (user.thumbnailUrl) {
+      const thumbnailFilePath = path.join(__dirname, '../../..', user.thumbnailUrl);
+      try {
+        await fs.unlink(thumbnailFilePath);
+      } catch (error) {
+        console.warn(`Impossible de supprimer le fichier miniature ${thumbnailFilePath}:`, error);
       }
     }
 
     user.photoUrl = null;
+    user.thumbnailUrl = null;
     return this.usersRepository.save(user);
   }
 
