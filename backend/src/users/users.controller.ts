@@ -1,4 +1,7 @@
-import { Controller, Get, Patch, Body, UseGuards, Request, ForbiddenException, Post, UseInterceptors, UploadedFile, BadRequestException, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, Request, ForbiddenException, Post, UseInterceptors, UploadedFile, BadRequestException, Param, NotFoundException, Delete } from '@nestjs/common';
+import * as sharp from 'sharp';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -46,13 +49,13 @@ export class UsersController {
       },
     }),
     fileFilter: (req, file, cb) => {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-        return cb(new BadRequestException('Seules les images sont autorisées'), false);
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        return cb(new BadRequestException('Seules les images (jpg, jpeg, png, gif, webp) sont autorisées.'), false);
       }
       cb(null, true);
     },
     limits: {
-      fileSize: 2 * 1024 * 1024, // 2MB
+      fileSize: 10 * 1024 * 1024, // 10MB
     }
   }))
   async uploadPhoto(@Request() req, @UploadedFile() file: Express.Multer.File) {
@@ -60,18 +63,48 @@ export class UsersController {
     if (!file) {
       throw new BadRequestException("Aucun fichier téléchargé");
     }
-    const photoUrl = `/uploads/profiles/${file.filename}`;
-    await this.usersService.update(req.user.id, { photoUrl });
-    const updatedUser = await this.usersService.findOneById(req.user.id);
-    if (!updatedUser) {
-      throw new NotFoundException("Utilisateur non trouvé après la mise à jour de la photo.");
+    const filename = `${path.parse(file.filename).name}.jpeg`;
+    const outputPath = path.join(file.destination, filename);
+
+    try {
+      await sharp(file.path)
+        .resize(1024, 1024, { fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 80 })
+        .toFile(outputPath);
+
+      // Supprimer le fichier original uploadé par Multer
+      await fs.unlink(file.path);
+
+      const photoUrl = `/uploads/profiles/${filename}`;
+      await this.usersService.update(req.user.id, { photoUrl });
+      const updatedUser = await this.usersService.findOneById(req.user.id);
+      if (!updatedUser) {
+        throw new NotFoundException("Utilisateur non trouvé après la mise à jour de la photo.");
+      }
+      const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
+      const access_token = await this.usersService.generateJwtToken(payload);
+      return { photoUrl, access_token };
+    } catch (error) {
+      // Supprimer le fichier original si Sharp échoue
+      await fs.unlink(file.path).catch(() => {}); // Ignorer les erreurs si le fichier n'existe pas
+      throw new BadRequestException('Erreur lors du traitement de l\'image.');
     }
-    const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
-    const access_token = await this.usersService.generateJwtToken(payload);
-    return { photoUrl, access_token };
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete('profile/photo')
+  @UseGuards(JwtAuthGuard)
+  async deletePhoto(@Request() req) {
+    await this.usersService.deletePhoto(req.user.id);
+    const updatedUser = await this.usersService.findOneById(req.user.id);
+    if (!updatedUser) {
+      throw new NotFoundException("Utilisateur non trouvé après la suppression de la photo.");
+    }
+    const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
+    const access_token = await this.usersService.generateJwtToken(payload);
+    return { message: 'Photo de profil supprimée avec succès', photoUrl: null, access_token };
+  }
+
   @Get(":id")
   async findOne(@Request() req, @Param("id") id: string) {
     // L'utilisateur ne peut voir que son propre profil ou si c'est un admin

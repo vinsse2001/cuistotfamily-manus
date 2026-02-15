@@ -4,6 +4,8 @@ import { Repository, Not, MoreThan } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserAlias } from './entities/user-alias.entity';
 import * as bcrypt from 'bcrypt';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 
@@ -155,6 +157,25 @@ export class UsersService {
 
   async generateJwtToken(payload: any): Promise<string> {
     return this.jwtService.signAsync(payload);
+  }
+
+  async deletePhoto(userId: string): Promise<User> {
+    const user = await this.findOneById(userId);
+    if (!user) {
+      throw new NotFoundException("Utilisateur non trouvé");
+    }
+
+    if (user.photoUrl) {
+      const filePath = path.join(__dirname, '../../..', user.photoUrl);
+      try {
+        await fs.unlink(filePath);
+      } catch (error) {
+        console.warn(`Impossible de supprimer le fichier ${filePath}:`, error);
+      }
+    }
+
+    user.photoUrl = null;
+    return this.usersRepository.save(user);
   }
 
   async remove(id: string, currentUserId: string): Promise<void> {
