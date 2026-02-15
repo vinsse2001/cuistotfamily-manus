@@ -20,11 +20,11 @@ export class Friendship {
   @Column()
   addresseeId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'requesterId' })
   requester: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'addresseeId' })
   addressee: User;
 
