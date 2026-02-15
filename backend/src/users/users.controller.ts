@@ -46,7 +46,7 @@ export class UsersController {
       },
     }),
     fileFilter: (req, file, cb) => {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {{
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
         return cb(new BadRequestException('Seules les images sont autorisées'), false);
       }
       cb(null, true);
@@ -62,13 +62,17 @@ export class UsersController {
     }
     const photoUrl = `/uploads/profiles/${file.filename}`;
     await this.usersService.update(req.user.id, { photoUrl });
-    return { photoUrl };
+    const updatedUser = await this.usersService.findOneById(req.user.id);
+    const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
+    const access_token = await this.usersService.generateJwtToken(payload);
+    return { photoUrl, access_token };
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   async findOne(@Request() req, @Param("id") id: string) {
     // L'utilisateur ne peut voir que son propre profil ou si c'est un admin
+    console.log(`[UsersController] findOne: req.user.id=${req.user.id}, param.id=${id}, req.user.role=${req.user.role}`);
     if (req.user.id !== id && req.user.role !== "admin") {
       throw new ForbiddenException("Vous n'êtes pas autorisé à voir ce profil");
     }

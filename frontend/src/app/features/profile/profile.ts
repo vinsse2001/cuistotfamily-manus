@@ -111,10 +111,9 @@ export class ProfileComponent implements OnInit {
       
       this.authService.uploadPhoto(file).subscribe({
         next: (res) => {
-          this.user.photoUrl = res.url;
+          this.user.photoUrl = res.photoUrl;
           this.notificationService.show('Photo de profil mise à jour', 'success');
-          // On recharge pour mettre à jour la navbar
-          window.location.reload();
+          // Plus besoin de recharger la page car le BehaviorSubject est mis à jour dans le service
         },
         error: () => {
           this.notificationService.show('Erreur lors de l\'upload', 'error');
@@ -155,9 +154,17 @@ export class ProfileComponent implements OnInit {
       if (u) {
         // On pourrait ajouter une méthode updateProfile dans AuthService
         // Pour l'instant on utilise HttpClient directement via une méthode temporaire ou on l'ajoute à AuthService
-        this.notificationService.show('Profil mis à jour avec succès', 'success');
-        this.loading = false;
-        this.newPassword = '';
+        this.authService.updateProfile(updateData).subscribe({
+          next: () => {
+            this.notificationService.show("Profil mis à jour avec succès", "success");
+            this.loading = false;
+            this.newPassword = "";
+          },
+          error: () => {
+            this.notificationService.show("Erreur lors de la mise à jour", "error");
+            this.loading = false;
+          }
+        });
       }
     });
   }

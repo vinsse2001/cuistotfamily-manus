@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { UserAlias } from './entities/user-alias.entity';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(UserAlias)
     private userAliasRepository: Repository<UserAlias>,
+    private jwtService: JwtService,
   ) {}
 
   private validatePassword(password: string) {
@@ -125,17 +127,34 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new BadRequestException('Le jeton de réinitialisation est invalide ou a expiré.');
+      console.log("[PASSWORD RESET ERROR] Jeton invalide ou expiré.");
+      throw new BadRequestException("Le jeton de réinitialisation est invalide ou a expiré.");
     }
 
+    console.log(`[PASSWORD RESET] Tentative de réinitialisation pour l'utilisateur ${user.email}`);
+    console.log(`[PASSWORD RESET] Nouveau mot de passe reçu (non haché): ${newPass ? '*****' : 'vide'}`);
+
     this.validatePassword(newPass);
-    user.password = await bcrypt.hash(newPass, 10);
+    const hashedPassword = await bcrypt.hash(newPass, 10);
+    console.log(`[PASSWORD RESET] Nouveau mot de passe haché: ${hashedPassword ? '*****' : 'vide'}`);
+
+    user.password = hashedPassword;
     user.resetPasswordToken = undefined as any;
     user.resetPasswordExpires = undefined as any;
-    await this.usersRepository.save(user);
+    
+    try {
+      await this.usersRepository.save(user);
+      console.log(`[PASSWORD RESET SUCCESS] Mot de passe de l'utilisateur ${user.email} réinitialisé et sauvegardé avec succès.`);
+    } catch (error) {
+      console.error(`[PASSWORD RESET ERROR] Erreur lors de la sauvegarde du mot de passe pour ${user.email}:`, error);
+      throw new BadRequestException("Erreur lors de la sauvegarde du nouveau mot de passe.");
+    }
 
-    console.log(`[PASSWORD RESET] Mot de passe de l'utilisateur ${user.email} réinitialisé avec succès.`);
     return { message: 'Mot de passe réinitialisé avec succès.' };
+  }
+
+  async generateJwtToken(payload: any): Promise<string> {
+    return this.jwtService.signAsync(payload);
   }
 
   async remove(id: string, currentUserId: string): Promise<void> {

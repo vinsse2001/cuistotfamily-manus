@@ -106,7 +106,10 @@ export class SocialService {
       relations: ['requester', 'addressee']
     });
 
-    return friendships.map(f => f.requesterId === userId ? f.addressee : f.requester);
+    return friendships.map(f => {
+      const user = f.requesterId === userId ? f.addressee : f.requester;
+      return { id: user.id, nickname: user.nickname, photoUrl: user.photoUrl };
+    });
   }
 
   async getPendingRequests(userId: string) {
@@ -149,7 +152,7 @@ export class SocialService {
     const users = await this.userRepository.createQueryBuilder('user')
       .where('user.nickname ILIKE :query', { query: `%${query}%` })
       .andWhere('user.id != :currentUserId', { currentUserId })
-      .select(['user.id', 'user.nickname'])
+      .select(["user.id", "user.nickname", "user.photoUrl"])
       .limit(10)
       .getMany();
 

@@ -4,9 +4,10 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { User } from './entities/user.entity';
 import { UserAlias } from './entities/user-alias.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserAlias])],
+  imports: [TypeOrmModule.forFeature([User, UserAlias]), JwtModule.register({})],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],

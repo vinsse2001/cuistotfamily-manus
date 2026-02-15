@@ -31,7 +31,8 @@ export class AuthService {
           id: payload.sub,
           email: payload.email,
           role: payload.role,
-          nickname: payload.nickname || 'Utilisateur'
+          nickname: payload.nickname || 'Utilisateur',
+          photoUrl: payload.photoUrl || null
         });
       } catch (e) {
         this.logout();
@@ -77,9 +78,16 @@ export class AuthService {
     formData.append('file', file);
     return this.http.post<any>("http://localhost:3000/users/profile/photo", formData).pipe(
       tap(response => {
-        const currentUser = this.currentUserSubject.getValue();
-        if (currentUser) {
-          this.currentUserSubject.next({ ...currentUser, photoUrl: response.photoUrl });
+        // Le backend doit renvoyer un nouveau token avec la photoUrl mise à jour
+        if (response && response.access_token) {
+          localStorage.setItem('token', response.access_token);
+          this.loadUserFromToken(); // Recharger l'utilisateur avec le nouveau token
+        } else {
+          // Fallback si le backend ne renvoie pas de token (ancienne méthode)
+          const currentUser = this.currentUserSubject.getValue();
+          if (currentUser) {
+            this.currentUserSubject.next({ ...currentUser, photoUrl: response.photoUrl });
+          }
         }
       })
     );
@@ -87,5 +95,22 @@ export class AuthService {
 
   getUserProfile(id: string): Observable<any> {
     return this.http.get(`http://localhost:3000/users/${id}`);
+  }
+
+  updateProfile(updateData: any): Observable<any> {
+    const currentUser = this.currentUserSubject.getValue();
+    if (!currentUser) {
+      throw new Error("Utilisateur non connecté");
+    }
+    return this.http.patch(`http://localhost:3000/users/profile`, updateData).pipe(
+      tap(() => {
+        // Si le nickname ou l'email est mis à jour, rafraîchir le token
+        if (updateData.nickname || updateData.email) {
+          // Une solution plus robuste serait de demander un nouveau token au backend
+          // Pour l'instant, on se contente de recharger l'utilisateur depuis le token existant
+          this.loadUserFromToken();
+        }
+      })
+    );
   }
 }
