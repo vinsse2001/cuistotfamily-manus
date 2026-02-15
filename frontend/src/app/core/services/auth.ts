@@ -96,8 +96,23 @@ export class AuthService {
     );
   }
 
-  getUserProfile(id: string): Observable<any> {
-    return this.http.get(`http://localhost:3000/users/${id}`);
+    getUserProfile(id: string): Observable<any> { return this.http.get(`http://localhost:3000/users/${id}`); }
+
+  deletePhoto(): Observable<any> {
+    return this.http.delete<any>("http://localhost:3000/users/profile/photo").pipe(
+      tap(response => {
+        if (response && response.access_token) {
+          localStorage.setItem("token", response.access_token);
+          this.loadUserFromToken();
+        } else {
+          const currentUser = this.currentUserSubject.getValue();
+          if (currentUser) {
+            this.currentUserSubject.next({ ...currentUser, photoUrl: null });
+          }
+        }
+      })
+    );
+  }
   }
 
   updateProfile(updateData: any): Observable<any> {

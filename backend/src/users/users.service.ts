@@ -4,6 +4,8 @@ import { Repository, Not, MoreThan } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserAlias } from './entities/user-alias.entity';
 import * as bcrypt from 'bcrypt';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 
@@ -113,7 +115,7 @@ export class UsersService {
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 heure
     await this.usersRepository.save(user);
 
-    console.log(`[EMAIL SIMULATION] Lien de réinitialisation pour ${user.email} : http://localhost:4200/reset-password?token=${token}`);
+
     
     return { message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' };
   }
@@ -127,26 +129,19 @@ export class UsersService {
     });
 
     if (!user) {
-      console.log("[PASSWORD RESET ERROR] Jeton invalide ou expiré.");
       throw new BadRequestException("Le jeton de réinitialisation est invalide ou a expiré.");
     }
 
-    console.log(`[PASSWORD RESET] Tentative de réinitialisation pour l'utilisateur ${user.email}`);
-    console.log(`[PASSWORD RESET] Nouveau mot de passe reçu (non haché): ${newPass ? '*****' : 'vide'}`);
-
     this.validatePassword(newPass);
     const hashedPassword = await bcrypt.hash(newPass, 10);
-    console.log(`[PASSWORD RESET] Nouveau mot de passe haché: ${hashedPassword ? '*****' : 'vide'}`);
-
     user.password = hashedPassword;
     user.resetPasswordToken = undefined as any;
     user.resetPasswordExpires = undefined as any;
     
     try {
       await this.usersRepository.save(user);
-      console.log(`[PASSWORD RESET SUCCESS] Mot de passe de l'utilisateur ${user.email} réinitialisé et sauvegardé avec succès.`);
     } catch (error) {
-      console.error(`[PASSWORD RESET ERROR] Erreur lors de la sauvegarde du mot de passe pour ${user.email}:`, error);
+  
       throw new BadRequestException("Erreur lors de la sauvegarde du nouveau mot de passe.");
     }
 
@@ -155,6 +150,25 @@ export class UsersService {
 
   async generateJwtToken(payload: any): Promise<string> {
     return this.jwtService.signAsync(payload);
+  }
+
+  async deletePhoto(userId: string): Promise<User> {
+    const user = await this.findOneById(userId);
+    if (!user) {
+      throw new NotFoundException("Utilisateur non trouvé");
+    }
+
+    if (user.photoUrl) {
+      const filePath = path.join(__dirname, '../../..', user.photoUrl);
+      try {
+        await fs.unlink(filePath);
+      } catch (error) {
+        console.warn(`Impossible de supprimer le fichier ${filePath}:`, error);
+      }
+    }
+
+    user.photoUrl = null;
+    return this.usersRepository.save(user);
   }
 
   async remove(id: string, currentUserId: string): Promise<void> {

@@ -41,11 +41,11 @@ export class AppController {
 
   @Post('contact')
   async contact(@Body() contactData: { name: string; email: string; subject: string; message: string }) {
-    console.log('=== CONTACT MESSAGE ===');
-    console.log(`From: ${contactData.name} <${contactData.email}>`);
-    console.log(`Subject: ${contactData.subject}`);
-    console.log(`Message: ${contactData.message}`);
-    console.log('======================');
+
+
+
+
+
     
     // TODO: Intégrer un service d'envoi d'email (Nodemailer, SendGrid, etc.)
     return { success: true, message: 'Message reçu' };

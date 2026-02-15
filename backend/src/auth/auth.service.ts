@@ -30,7 +30,7 @@ export class AuthService {
     });
 
     // Simulation d'envoi d'email dans les logs
-    console.log(`[EMAIL SIMULATION] Code de vérification pour ${user.email} : ${verificationCode}`);
+
     
     const { password, ...result } = user;
     return result;

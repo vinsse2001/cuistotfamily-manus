@@ -20,7 +20,7 @@ async function bootstrap() {
       isEmailVerified: true,
       role: 'admin',
     });
-    console.log('Compte administrateur créé : admin@cuistotfamily.com / admin123');
+
   } else {
     // S'assurer que l'admin existant est actif et vérifié
     await usersService.update(existingAdmin.id, {
@@ -28,7 +28,7 @@ async function bootstrap() {
       isEmailVerified: true,
       role: 'admin'
     });
-    console.log('Le compte administrateur a été mis à jour (actif et vérifié).');
+
   }
 
   await app.close();

@@ -17,6 +17,7 @@ import { AuthService } from '../../../core/services/auth';
         <table class="min-w-full divide-y divide-nature-200 dark:divide-nature-700">
           <thead class="bg-nature-100 dark:bg-nature-700">
             <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Photo</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Utilisateur</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Email</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-nature-800 dark:text-nature-200 uppercase tracking-wider">Email Validé</th>
@@ -27,6 +28,9 @@ import { AuthService } from '../../../core/services/auth';
           </thead>
           <tbody class="bg-white dark:bg-nature-800 divide-y divide-nature-100 dark:divide-nature-700">
             <tr *ngFor="let user of users" class="hover:bg-nature-50 dark:hover:bg-nature-700 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <img [src]="getFullUrl(user.photoUrl)" class="h-10 w-10 rounded-full object-cover border-2 border-nature-200 dark:border-nature-700">
+              </td>
               <td class="px-6 py-4 whitespace-nowrap font-medium text-nature-900 dark:text-nature-100">{{ user.nickname }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-nature-600 dark:text-nature-400 text-sm">{{ user.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
@@ -86,7 +90,18 @@ export class AdminUsersComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   
   users: any[] = [];
-  currentUserId: string = '';
+  currentUserId: string = ‘’;
+
+  getFullUrl(url: string | undefined): string {
+    if (!url || url === 'null' || url === 'undefined') {
+      return 'assets/no_picture.jpg';
+    }
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    const path = url.startsWith('/') ? url : `/${url}`;
+    return `http://localhost:3000${path}`;
+  }
 
   ngOnInit() {
     console.log('AdminUsersComponent: Initializing...');

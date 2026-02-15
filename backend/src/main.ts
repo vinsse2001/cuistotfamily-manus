@@ -27,6 +27,6 @@ async function bootstrap() {
   // Les routes sont visibles dans les contrôleurs respectifs
   
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`✅ Application démarrée sur http://localhost:${process.env.PORT ?? 3000}`);
+
 }
 bootstrap();
