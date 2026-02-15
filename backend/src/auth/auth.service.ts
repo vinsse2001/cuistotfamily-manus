@@ -69,7 +69,7 @@ export class AuthService {
       throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role, nickname: user.nickname };
+    const payload = { sub: user.id, email: user.email, role: user.role, nickname: user.nickname, photoUrl: user.photoUrl };
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {

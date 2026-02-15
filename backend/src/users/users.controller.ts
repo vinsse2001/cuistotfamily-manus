@@ -46,7 +46,7 @@ export class UsersController {
       },
     }),
     fileFilter: (req, file, cb) => {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {{
         return cb(new BadRequestException('Seules les images sont autorisées'), false);
       }
       cb(null, true);

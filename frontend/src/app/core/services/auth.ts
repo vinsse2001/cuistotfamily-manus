@@ -75,7 +75,14 @@ export class AuthService {
   uploadPhoto(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post("http://localhost:3000/users/profile/photo", formData);
+    return this.http.post<any>("http://localhost:3000/users/profile/photo", formData).pipe(
+      tap(response => {
+        const currentUser = this.currentUserSubject.getValue();
+        if (currentUser) {
+          this.currentUserSubject.next({ ...currentUser, photoUrl: response.photoUrl });
+        }
+      })
+    );
   }
 
   getUserProfile(id: string): Observable<any> {
