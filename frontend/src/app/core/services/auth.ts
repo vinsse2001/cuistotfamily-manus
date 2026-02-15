@@ -10,19 +10,19 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private apiUrl = 'http://localhost:3000/auth';
-  
+
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+
+  constructor() {
+    this.loadUserFromToken();
+  }
 
   updateCurrentUser(partialUser: Partial<any>) {
     const current = this.currentUserSubject.getValue();
     if (current) {
       this.currentUserSubject.next({ ...current, ...partialUser });
     }
-  }
-
-  constructor() {
-    this.loadUserFromToken();
   }
 
   private loadUserFromToken() {
@@ -63,7 +63,6 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     this.currentUserSubject.next(null);
-    // Redirection vers l'accueil après déconnexion
     this.router.navigate(['/']);
   }
 
@@ -76,7 +75,6 @@ export class AuthService {
   }
 
   resetPassword(token: string, newPass: string): Observable<any> {
-    console.log("AuthService: Calling resetPassword API with token and newPass");
     return this.http.post("http://localhost:3000/users/reset-password", { token, newPass });
   }
 
@@ -85,12 +83,10 @@ export class AuthService {
     formData.append('file', file);
     return this.http.post<any>("http://localhost:3000/users/profile/photo", formData).pipe(
       tap(response => {
-        // Le backend doit renvoyer un nouveau token avec la photoUrl mise à jour
         if (response && response.access_token) {
           localStorage.setItem('token', response.access_token);
-          this.loadUserFromToken(); // Recharger l'utilisateur avec le nouveau token
+          this.loadUserFromToken();
         } else {
-          // Fallback si le backend ne renvoie pas de token (ancienne méthode)
           const currentUser = this.currentUserSubject.getValue();
           if (currentUser) {
             this.currentUserSubject.next({ ...currentUser, photoUrl: response.photoUrl });
@@ -111,12 +107,11 @@ export class AuthService {
     }
     return this.http.patch(`http://localhost:3000/users/profile`, updateData).pipe(
       tap(() => {
-        // Après une mise à jour de profil (email/nickname), le token JWT ne change pas.
-        // Il n'est donc pas nécessaire de recharger le token.
-        // On met à jour directement le currentUserSubject avec les nouvelles données.
         const currentUser = this.currentUserSubject.getValue();
         if (currentUser) {
           this.currentUserSubject.next({ ...currentUser, nickname: updateData.nickname || currentUser.nickname, email: updateData.email || currentUser.email });
         }
       })
     );
+  }
+}
