@@ -21,13 +21,18 @@ import { NotificationService } from '../../core/services/notification';
                 <img [src]="getFullUrl(user?.photoUrl)" 
                      class="h-full w-full object-cover">
               </div>
-              <label class="absolute bottom-0 right-0 bg-saumon-600 hover:bg-saumon-700 text-white p-2 rounded-full cursor-pointer shadow-lg transition-all transform hover:scale-110">
+              <label class="absolute bottom-0 right-0 bg-saumon-600 hover:bg-saumon-700 text-white p-2 rounded-full cursor-pointer shadow-lg transition-all transform hover:scale-110 z-10">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <input type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+                <input type="file" class="hidden" (change)="onFileSelected($event)" accept="image/jpeg, image/png, image/gif, image/webp">
               </label>
+              <button *ngIf="user?.photoUrl && user.photoUrl !== 'assets/no_picture.jpg'" (click)="deletePhoto()" class="absolute bottom-0 left-0 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full cursor-pointer shadow-lg transition-all transform hover:scale-110 z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
             </div>
 
             <!-- Formulaire -->
@@ -117,10 +122,12 @@ export class ProfileComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        this.notificationService.show('L\'image est trop lourde (max 2Mo)', 'error');
-        return;
-      }
+      // La taille max est maintenant gérée par le backend (10Mo) et le redimensionnement
+      // On peut ajouter une validation frontend pour une meilleure UX, mais le backend est la source de vérité
+      // if (file.size > 10 * 1024 * 1024) {
+      //   this.notificationService.show("L\"image est trop lourde (max 10Mo)", "error");
+      //   return;
+      // }
       
       this.authService.uploadPhoto(file).subscribe({
         next: (res) => {
@@ -128,8 +135,9 @@ export class ProfileComponent implements OnInit {
           this.notificationService.show('Photo de profil mise à jour', 'success');
           // Plus besoin de recharger la page car le BehaviorSubject est mis à jour dans le service
         },
-        error: () => {
-          this.notificationService.show('Erreur lors de l\'upload', 'error');
+        error: (err) => {
+          const errorMessage = err.error?.message || "Erreur lors de l\"upload de la photo.";
+          this.notificationService.show(errorMessage, "error");
         }
       });
     }
@@ -153,13 +161,28 @@ export class ProfileComponent implements OnInit {
       email: this.user.email
     };
 
+    let hasChanges = false;
+    if (this.user.nickname !== this.authService.currentUserSubject.getValue().nickname) {
+      hasChanges = true;
+    }
+    if (this.user.email !== this.authService.currentUserSubject.getValue().email) {
+      hasChanges = true;
+    }
+
     if (this.newPassword) {
       if (!this.validatePassword(this.newPassword)) {
-        this.notificationService.show('Mot de passe trop faible', 'error');
+        this.notificationService.show("Mot de passe trop faible", "error");
         this.loading = false;
         return;
       }
       updateData.password = this.newPassword;
+      hasChanges = true;
+    }
+
+    if (!hasChanges) {
+      this.notificationService.show("Aucune modification à enregistrer.", "info");
+      this.loading = false;
+      return;
     }
 
     this.authService.updateProfile(updateData).subscribe({
@@ -167,12 +190,6 @@ export class ProfileComponent implements OnInit {
         this.notificationService.show("Profil mis à jour avec succès", "success");
         this.loading = false;
         this.newPassword = "";
-        // Mettre à jour l'objet user localement avec les données du formulaire
-        // Les changements de photoUrl sont déjà gérés par le BehaviorSubject dans authService
-        // Mettre à jour l'utilisateur localement pour refléter les changements immédiatement
-        this.user.nickname = updateData.nickname;
-        this.user.email = updateData.email;
-        // Mettre à jour le currentUserSubject dans AuthService pour propager les changements à la navbar
         this.authService.updateCurrentUser({ nickname: updateData.nickname, email: updateData.email });
       },
       error: (err) => {
@@ -180,6 +197,22 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  deletePhoto(): void {
+    if (confirm("Voulez-vous vraiment supprimer votre photo de profil ?")) {
+      this.authService.deletePhoto().subscribe({
+        next: (res) => {
+          this.user.photoUrl = res.photoUrl;
+          this.notificationService.show("Photo de profil supprimée avec succès", "success");
+          this.authService.updateCurrentUser({ photoUrl: res.photoUrl });
+        },
+        error: (err) => {
+          const errorMessage = err.error?.message || "Erreur lors de la suppression de la photo.";
+          this.notificationService.show(errorMessage, "error");
+        }
+      });
+    }
   }
 
   getFullUrl(url: string | undefined): string {
