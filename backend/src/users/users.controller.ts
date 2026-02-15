@@ -59,7 +59,7 @@ export class UsersController {
     }
   }))
   async uploadPhoto(@Request() req, @UploadedFile() file: Express.Multer.File) {
-    console.log("Upload Photo: Received file", file);
+
     if (!file) {
       throw new BadRequestException("Aucun fichier téléchargé");
     }
@@ -108,7 +108,7 @@ export class UsersController {
   @Get(":id")
   async findOne(@Request() req, @Param("id") id: string) {
     // L'utilisateur ne peut voir que son propre profil ou si c'est un admin
-    console.log(`[UsersController] findOne: req.user.id=${req.user.id}, param.id=${id}, req.user.role=${req.user.role}`);
+
     if (req.user.id !== id && req.user.role !== "admin") {
       throw new ForbiddenException("Vous n'êtes pas autorisé à voir ce profil");
     }
