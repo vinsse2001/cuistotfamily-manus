@@ -94,8 +94,21 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.authService.currentUser$.subscribe(u => {
       if (u) {
-        this.authService.getUserProfile(u.id).subscribe(profile => {
-          this.user = profile;
+        // Charger immédiatement les données de base du token pour éviter le vide
+        this.user = { ...this.user, ...u };
+        
+        // Charger le profil complet
+        this.authService.getUserProfile(u.id).subscribe({
+          next: (profile) => {
+            this.user = profile;
+          },
+          error: (err) => {
+            console.error('Erreur lors du chargement du profil:', err);
+            // Si 403, on garde au moins les infos du token
+            if (err.status === 403) {
+              this.notificationService.show('Accès restreint au profil complet', 'info');
+            }
+          }
         });
       }
     });
@@ -169,9 +182,12 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  getFullUrl(url: string): string {
-    if (!url) return 'assets/no_picture.jpg';
+  getFullUrl(url: string | undefined): string {
+    if (!url || url === 'null' || url === 'undefined') {
+      return 'assets/no_picture.jpg';
+    }
     if (url.startsWith('http')) return url;
-    return `http://localhost:3000${url}`;
+    const path = url.startsWith('/') ? url : `/${url}`;
+    return `http://localhost:3000${path}`;
   }
 }
