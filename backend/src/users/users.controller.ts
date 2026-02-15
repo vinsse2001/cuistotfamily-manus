@@ -63,6 +63,9 @@ export class UsersController {
     const photoUrl = `/uploads/profiles/${file.filename}`;
     await this.usersService.update(req.user.id, { photoUrl });
     const updatedUser = await this.usersService.findOneById(req.user.id);
+    if (!updatedUser) {
+      throw new NotFoundException("Utilisateur non trouvé après la mise à jour de la photo.");
+    }
     const payload = { sub: updatedUser.id, email: updatedUser.email, role: updatedUser.role, nickname: updatedUser.nickname, photoUrl: updatedUser.photoUrl };
     const access_token = await this.usersService.generateJwtToken(payload);
     return { photoUrl, access_token };
