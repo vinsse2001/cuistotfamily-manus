@@ -76,6 +76,15 @@ export class UsersController {
       await fs.unlink(file.path);
 
       const photoUrl = `/uploads/profiles/${filename}`;
+      const user = await this.usersService.findOneById(req.user.id);
+      if (user && user.photoUrl) {
+        const oldFilePath = path.join(__dirname, '../../..', user.photoUrl);
+        try {
+          await fs.unlink(oldFilePath);
+        } catch (error) {
+          console.warn(`Impossible de supprimer l'ancien fichier ${oldFilePath}:`, error);
+        }
+      }
       await this.usersService.update(req.user.id, { photoUrl });
       const updatedUser = await this.usersService.findOneById(req.user.id);
       if (!updatedUser) {
