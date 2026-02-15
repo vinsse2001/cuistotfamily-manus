@@ -26,7 +26,7 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   photoUrl: string | null;
 
   @Column({ nullable: true })
