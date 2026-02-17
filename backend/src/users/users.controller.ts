@@ -165,6 +165,7 @@ export class UsersController {
     return this.usersService.remove(id, req.user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(":id")
   async findOne(@Request() req, @Param("id") id: string) {
     // L'utilisateur ne peut voir que son propre profil ou si c'est un admin

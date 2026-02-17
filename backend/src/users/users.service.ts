@@ -45,13 +45,7 @@ export class UsersService {
   }
 
   async findOneById(id: string): Promise<User | undefined> {
-    console.log(`Attempting to find user with ID: ${id}`);
     const user = await this.usersRepository.findOne({ where: { id } });
-    if (!user) {
-      console.log(`User with ID: ${id} not found.`);
-    } else {
-      console.log(`User found: ${user.email}, photoUrl: ${user.photoUrl}`);
-    }
     return user || undefined;
   }
 
