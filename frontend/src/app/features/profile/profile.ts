@@ -90,7 +90,8 @@ export class ProfileComponent implements OnInit {
   user: any = {
     nickname: '',
     email: '',
-    photoUrl: ''
+    photoUrl: '',
+    thumbnailUrl: ''
   };
   newPassword = '';
   showPassword = false;
@@ -132,6 +133,7 @@ export class ProfileComponent implements OnInit {
       this.authService.uploadPhoto(file).subscribe({
         next: (res) => {
           this.user.photoUrl = res.photoUrl || null;
+          this.user.thumbnailUrl = res.thumbnailUrl || null;
           this.notificationService.show('Photo de profil mise à jour', 'success');
           // Plus besoin de recharger la page car le BehaviorSubject est mis à jour dans le service
         },
@@ -205,8 +207,9 @@ export class ProfileComponent implements OnInit {
       this.authService.deletePhoto().subscribe({
         next: (res) => {
           this.user.photoUrl = res.photoUrl || null;
+          this.user.thumbnailUrl = res.thumbnailUrl || null;
           this.notificationService.show("Photo de profil supprimée avec succès", "success");
-          this.authService.updateCurrentUser({ photoUrl: res.photoUrl || null });
+          this.authService.updateCurrentUser({ photoUrl: res.photoUrl || null, thumbnailUrl: res.thumbnailUrl || null });
         },
         error: (err) => {
           const errorMessage = err.error?.message || "Erreur lors de la suppression de la photo.";
