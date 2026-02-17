@@ -28,7 +28,7 @@
 
         <div *ngIf="authService.currentUser$ | async as user" class="flex items-center">
           <a routerLink="/profile" class="flex items-center gap-3 mr-4 text-white hover:text-nature-200 transition-colors group">
-            <img [src]="getFullUrl(user.photoUrl)" 
+            <img [src]="getFullUrl(user.thumbnailUrl || user.photoUrl)" 
                  class="h-10 w-10 rounded-full object-cover border-2 border-white/20 group-hover:border-white/50 transition-all shadow-sm">
             <div class="flex flex-col items-end">
               <span class="hidden sm:inline text-xs opacity-90">Bonjour,</span>

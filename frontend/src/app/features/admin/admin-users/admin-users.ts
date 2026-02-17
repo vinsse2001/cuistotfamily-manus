@@ -29,7 +29,9 @@ import { AuthService } from '../../../core/services/auth';
           <tbody class="bg-white dark:bg-nature-800 divide-y divide-nature-100 dark:divide-nature-700">
             <tr *ngFor="let user of users" class="hover:bg-nature-50 dark:hover:bg-nature-700 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
-                <img [src]="getFullUrl(user.photoUrl)" class="h-10 w-10 rounded-full object-cover border-2 border-nature-200 dark:border-nature-700">
+                <div class="relative group h-10 w-10">
+                  <img [src]="getFullUrl(user.thumbnailUrl || user.photoUrl)" class="h-10 w-10 rounded-full object-cover border-2 border-nature-200 dark:border-nature-700 transition-all duration-300 group-hover:scale-[3] group-hover:z-50 group-hover:rounded-lg group-hover:shadow-2xl group-hover:relative aspect-square">
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap font-medium text-nature-900 dark:text-nature-100">{{ user.nickname }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-nature-600 dark:text-nature-400 text-sm">{{ user.email }}</td>
