@@ -159,7 +159,7 @@ export class UsersService {
     }
 
     if (user.photoUrl) {
-      const photoFilePath = path.join(__dirname, '../../..', user.photoUrl);
+      const photoFilePath = path.join(process.cwd(), '..', user.photoUrl);
       try {
         await fs.unlink(photoFilePath);
       } catch (error) {
@@ -167,7 +167,7 @@ export class UsersService {
       }
     }
     if (user.thumbnailUrl) {
-      const thumbnailFilePath = path.join(__dirname, '../../..', user.thumbnailUrl);
+      const thumbnailFilePath = path.join(process.cwd(), '..', user.thumbnailUrl);
       try {
         await fs.unlink(thumbnailFilePath);
       } catch (error) {
