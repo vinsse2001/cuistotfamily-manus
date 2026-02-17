@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 export interface UserSummary {
   photoUrl?: string;
+  thumbnailUrl?: string;
   id: string;
   nickname: string;
   friendshipStatus?: string | null;
