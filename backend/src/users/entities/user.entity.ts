@@ -38,6 +38,12 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   resetPasswordExpires: Date;
 
+  @Column({ default: true })
+  notifyFriendRequest: boolean; // Notifier pour les demandes d'amis
+
+  @Column({ default: true })
+  notifyRecipeAdded: boolean; // Notifier quand un ami ajoute une recette
+
   @CreateDateColumn()
   createdAt: Date;
 }

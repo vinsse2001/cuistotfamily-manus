@@ -51,6 +51,22 @@ import { NotificationService } from '../../core/services/notification';
               </div>
 
               <div class="pt-6 border-t border-nature-100 dark:border-nature-700">
+                <h3 class="text-lg font-bold text-nature-900 dark:text-white mb-4">Préférences de Notifications</h3>
+                <div class="space-y-3">
+                  <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" name="notifyFriendRequest" [(ngModel)]="user.notifyFriendRequest" 
+                      class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+                    <span class="text-sm text-nature-700 dark:text-nature-300">Notifier pour les demandes d'amis</span>
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" name="notifyRecipeAdded" [(ngModel)]="user.notifyRecipeAdded" 
+                      class="w-4 h-4 text-saumon-600 rounded focus:ring-saumon-500">
+                    <span class="text-sm text-nature-700 dark:text-nature-300">Notifier quand un ami ajoute une recette</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="pt-6 border-t border-nature-100 dark:border-nature-700">
                 <h3 class="text-lg font-bold text-nature-900 dark:text-white mb-4">Changer le mot de passe</h3>
                 <div class="relative">
                   <input [type]="showPassword ? 'text' : 'password'" name="newPassword" [(ngModel)]="newPassword"
@@ -91,7 +107,9 @@ export class ProfileComponent implements OnInit {
     nickname: '',
     email: '',
     photoUrl: '',
-    thumbnailUrl: ''
+    thumbnailUrl: '',
+    notifyFriendRequest: true,
+    notifyRecipeAdded: true
   };
   newPassword = '';
   showPassword = false;
@@ -166,7 +184,9 @@ export class ProfileComponent implements OnInit {
     
     const updateData: any = { 
       nickname: this.user.nickname,
-      email: this.user.email
+      email: this.user.email,
+      notifyFriendRequest: this.user.notifyFriendRequest,
+      notifyRecipeAdded: this.user.notifyRecipeAdded
     };
 
     let hasChanges = false;
@@ -175,6 +195,12 @@ export class ProfileComponent implements OnInit {
       hasChanges = true;
     }
     if (currentAuthUser && this.user.email !== currentAuthUser.email) {
+      hasChanges = true;
+    }
+    if (currentAuthUser && this.user.notifyFriendRequest !== currentAuthUser.notifyFriendRequest) {
+      hasChanges = true;
+    }
+    if (currentAuthUser && this.user.notifyRecipeAdded !== currentAuthUser.notifyRecipeAdded) {
       hasChanges = true;
     }
 

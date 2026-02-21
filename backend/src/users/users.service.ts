@@ -51,7 +51,7 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({ 
-      select: ['id', 'email', 'nickname', 'role', 'isActive', 'isEmailVerified', 'photoUrl', 'createdAt'],
+      select: ['id', 'email', 'nickname', 'role', 'isActive', 'isEmailVerified', 'photoUrl', 'thumbnailUrl', 'notifyFriendRequest', 'notifyRecipeAdded', 'createdAt'],
       order: { createdAt: 'DESC' } 
     });
   }
