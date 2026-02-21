@@ -14,6 +14,7 @@ import { AuthService } from '../../../core/services/auth';
       <h1 class="text-3xl font-bold text-saumon-700 dark:text-saumon-400 mb-8">Administration des Utilisateurs</h1>
       
       <div class="bg-white dark:bg-nature-800 shadow-md rounded-lg overflow-hidden border border-nature-200 dark:border-nature-700 transition-colors">
+        <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-nature-200 dark:divide-nature-700">
           <thead class="bg-nature-100 dark:bg-nature-700">
             <tr>
@@ -29,8 +30,8 @@ import { AuthService } from '../../../core/services/auth';
           <tbody class="bg-white dark:bg-nature-800 divide-y divide-nature-100 dark:divide-nature-700">
             <tr *ngFor="let user of users" class="hover:bg-nature-50 dark:hover:bg-nature-700 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="relative group h-10 w-10">
-                  <img [src]="getFullUrl(user.thumbnailUrl || user.photoUrl)" class="h-10 w-10 rounded-full object-cover border-2 border-nature-200 dark:border-nature-700 transition-all duration-300 group-hover:scale-[3] group-hover:z-50 group-hover:rounded-lg group-hover:shadow-2xl group-hover:relative aspect-square">
+                <div class="relative group h-10 w-10 overflow-visible">
+                  <img [src]="getFullUrl(user.thumbnailUrl || user.photoUrl)" class="h-10 w-10 rounded-full object-cover border-2 border-nature-200 dark:border-nature-700 transition-all duration-300 group-hover:scale-[3] group-hover:z-50 group-hover:rounded-lg group-hover:shadow-2xl group-hover:absolute group-hover:top-0 group-hover:left-0 aspect-square">
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap font-medium text-nature-900 dark:text-nature-100">{{ user.nickname }}</td>
@@ -81,6 +82,7 @@ import { AuthService } from '../../../core/services/auth';
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   `
