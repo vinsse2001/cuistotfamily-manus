@@ -306,7 +306,7 @@ export class RecipeDetailComponent implements OnInit {
     // Logo Cuistot Family
     try {
       // On utilise le logo réduit logo_img_seule.png
-      doc.addImage('/logo_img_seule.png', 'PNG', 10, 5, 12, 12);
+      doc.addImage('/logo_img_seule.png', 'PNG', 10, 820, 12, 12); // Positionné en bas à gauche
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.setFont('helvetica', 'normal');
