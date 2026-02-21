@@ -284,9 +284,11 @@
             <button *ngFor="let p of [].constructor(totalPages); let i = index" 
               (click)="changePage(i + 1)"
               [class.bg-saumon-600]="currentPage === i + 1"
+              [class.dark:bg-saumon-600]="currentPage === i + 1"
               [class.text-white]="currentPage === i + 1"
               [class.border-saumon-600]="currentPage === i + 1"
-              class="w-10 h-10 rounded-lg border border-nature-200 dark:border-nature-700 bg-white dark:bg-nature-800 text-nature-600 dark:text-nature-400 font-bold transition-all hover:border-saumon-500">
+              [class.dark:border-saumon-600]="currentPage === i + 1"
+              class="w-10 h-10 rounded-lg border border-nature-200 dark:border-nature-700 bg-white dark:bg-nature-800 text-nature-600 dark:text-nature-400 font-bold transition-all hover:border-saumon-500 dark:hover:border-saumon-500">
               {{ i + 1 }}
             </button>
           </div>
