@@ -158,6 +158,12 @@ export class ProfileComponent implements OnInit {
     event.preventDefault();
     this.loading = true;
     
+    if (this.user.nickname.trim().length < 3) {
+      this.notificationService.show("Le pseudo doit contenir au moins 3 caractères", "error");
+      this.loading = false;
+      return;
+    }
+    
     const updateData: any = { 
       nickname: this.user.nickname,
       email: this.user.email

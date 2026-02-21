@@ -79,6 +79,13 @@ export class FriendsListComponent implements OnInit {
       return;
     }
 
+    if (query.length < 3) {
+      this.searchResults = [];
+      this.isSearching = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.isSearching = true;
     this.socialService.searchUsers(query).subscribe({
       next: (results) => {

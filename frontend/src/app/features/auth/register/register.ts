@@ -45,6 +45,11 @@ export class RegisterComponent {
       return;
     }
 
+    if (this.user.nickname.trim().length < 3) {
+      this.notificationService.show('Le pseudo doit contenir au moins 3 caractères', 'error');
+      return;
+    }
+
     if (!this.validatePassword(this.user.password)) {
       this.notificationService.show('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.', 'error');
       return;
