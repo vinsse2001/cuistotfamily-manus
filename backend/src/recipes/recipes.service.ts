@@ -26,7 +26,16 @@ export class RecipesService {
       ...recipeData,
       ownerId: userId,
     });
-    return this.recipesRepository.save(recipe);
+    const savedRecipe = await this.recipesRepository.save(recipe);
+    
+    if (savedRecipe.visibility === 'friends') {
+      const friends = await this.socialService.getFriends(userId);
+      friends.forEach(friend => {
+        console.log(`[NOTIFICATION] Nouvelle recette pour ${friend.nickname}`);
+      });
+    }
+    
+    return savedRecipe;
   }
 
   async findAll(userId: string): Promise<any[]> {

@@ -55,7 +55,14 @@ export class SocialService {
       message: message || undefined
     });
 
-    return this.friendshipRepository.save(friendship);
+    const savedFriendship = await this.friendshipRepository.save(friendship);
+    
+    // Vérifier si l'utilisateur a activé les notifications pour les demandes d'amis
+    if (addressee.notifyFriendRequest) {
+      console.log(`[NOTIFICATION] Demande d'ami reçue pour ${addressee.nickname}`);
+    }
+    
+    return savedFriendship;
   }
 
   async cancelFriendRequest(requesterId: string, addresseeId: string) {
