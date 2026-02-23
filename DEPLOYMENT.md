@@ -18,8 +18,8 @@ Assurez-vous d'avoir les outils suivants installés sur votre système Linux Min
     ```bash
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
     source ~/.bashrc # ou ~/.zshrc
-    nvm install 20 # Installe la dernière version LTS de Node.js 20
-    nvm use 20
+    nvm install 22 # Installe la dernière version LTS de Node.js 22
+    nvm use 22
     npm install -g pnpm # Installe pnpm globalement
     ```
 *   **PostgreSQL** : La base de données utilisée par l'application.
@@ -32,10 +32,6 @@ Assurez-vous d'avoir les outils suivants installés sur votre système Linux Min
     ALTER USER cuistot_user WITH PASSWORD 'votre_mot_de_passe';
     \q
     exit
-    ```
-*   **Python (optionnel)** : Si vous avez des scripts Python ou des dépendances spécifiques.
-    ```bash
-    sudo apt install python3 python3-pip
     ```
 
 ### Étapes de Déploiement
