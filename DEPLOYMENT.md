@@ -20,7 +20,7 @@ Assurez-vous d'avoir les outils suivants installés sur votre système Linux Min
     source ~/.bashrc # ou ~/.zshrc
     nvm install 22 # Installe la dernière version LTS de Node.js 22
     nvm use 22
-    npm install -g pnpm # Installe pnpm globalement
+    curl -fsSL https://get.pnpm.io/install.sh | bash - # Installe pnpm à partir du script officiel
     ```
 *   **PostgreSQL** : La base de données utilisée par l'application.
     ```bash
