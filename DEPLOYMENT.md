@@ -9,12 +9,16 @@ Ce document fournit des instructions détaillées pour déployer l'application C
 Assurez-vous d'avoir les outils suivants installés sur votre système Linux Mint :
 
 *   **Git** : Pour cloner le dépôt.
+
 ```bash
 sudo apt update
 sudo apt install git
 ```
+
 *   **Node.js et npm/pnpm** : Pour le frontend (Angular) et le backend (NestJS).
+
     Il est recommandé d'utiliser `nvm` (Node Version Manager) pour gérer les versions de Node.js.
+    
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 source ~/.bashrc # ou ~/.zshrc
@@ -23,6 +27,7 @@ nvm use 22
 curl -fsSL https://get.pnpm.io/install.sh | bash - # Installe pnpm à partir du script officiel
 ```
 *   **PostgreSQL** : La base de données utilisée par l'application.
+*   
 ```bash
 sudo apt install postgresql postgresql-contrib
 sudo -i -u postgres
@@ -37,6 +42,7 @@ exit
 ### Étapes de Déploiement
 
 1.  **Cloner le dépôt**
+   
 ```bash
 git clone https://github.com/vinsse2001/cuistotfamily-manus.git
 cd cuistotfamily-manus
@@ -44,15 +50,17 @@ cd cuistotfamily-manus
 
 2.  **Configuration du Backend (NestJS)**
 
-    a.  **Installer les dépendances**
+a. **Installer les dépendances**
+
 ```bash
 cd backend
 pnpm install
 ```
 
-    b.  **Fichier d'environnement (.env)**
-        Créez un fichier `.env` à la racine du dossier `backend` avec les informations de votre base de données et autres configurations.
-        
+b. **Fichier d'environnement (.env)**
+
+Créez un fichier `.env` à la racine du dossier `backend` avec les informations de votre base de données et autres configurations.
+
 ```env
 DB_HOST=127.0.0.1
 DB_PORT=5432
@@ -64,27 +72,32 @@ JWT_SECRET=super-secret-key-change-me-in-production
 OPENAI_API_KEY=sk-proj-dglkdfjgdgkljetoizutzeotiuz
 ```
 
-    c.  **Exécuter les migrations de base de données**
+c.  **Exécuter les migrations de base de données**
+
 ```bash
 pnpm run typeorm migration:run
 ```
 
-    d.  **Démarrer le serveur backend**
+d.  **Démarrer le serveur backend**
+
 ```bash
 pnpm run start:dev
 ```
-        Le backend devrait être accessible sur `http://localhost:3000`.
+Le backend devrait être accessible sur `http://localhost:3000`.
 
 3.  **Configuration du Frontend (Angular)**
 
-    a.  **Installer les dépendances**
+a.  **Installer les dépendances**
+
 ```bash
 cd ../frontend
 pnpm install
 ```
 
-    b.  **Fichier d'environnement**
-        Angular utilise des fichiers d'environnement TypeScript. Modifiez `src/environments/environment.ts` et `src/environments/environment.development.ts` pour pointer vers votre backend local.
+b.  **Fichier d'environnement**
+
+Angular utilise des fichiers d'environnement TypeScript. Modifiez `src/environments/environment.ts` et `src/environments/environment.development.ts` pour pointer vers votre backend local.
+
 ```typescript
 // src/environments/environment.development.ts
 export const environment = {
@@ -94,11 +107,13 @@ export const environment = {
 };
 ```
 
-    c.  **Démarrer le serveur de développement frontend**
+c.  **Démarrer le serveur de développement frontend**
+
 ```bash
 pnpm run start
 ```
-        Le frontend devrait être accessible sur `http://localhost:4200`.
+
+Le frontend devrait être accessible sur `http://localhost:4200`.
 
 ## 2. Déploiement sur o2switch
 
