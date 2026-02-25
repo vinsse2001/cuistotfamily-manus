@@ -12,7 +12,7 @@ Assurez-vous d'avoir les outils suivants installés sur votre système Linux Min
 ```bash
 sudo apt update
 sudo apt install git
-    ```
+```
 *   **Node.js et npm/pnpm** : Pour le frontend (Angular) et le backend (NestJS).
     Il est recommandé d'utiliser `nvm` (Node Version Manager) pour gérer les versions de Node.js.
 ```bash
@@ -50,7 +50,7 @@ cd backend
 pnpm install
 ```
 
-    b.  **Fichier d'environnement (`.env`)**
+    b.  **Fichier d'environnement (.env)**
         Créez un fichier `.env` à la racine du dossier `backend` avec les informations de votre base de données et autres configurations.
 ```env
 DB_HOST=127.0.0.1
