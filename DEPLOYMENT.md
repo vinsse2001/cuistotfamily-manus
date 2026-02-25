@@ -72,17 +72,12 @@ JWT_SECRET=super-secret-key-change-me-in-production
 OPENAI_API_KEY=sk-proj-dglkdfjgdgkljetoizutzeotiuz
 ```
 
-c.  **Exécuter les migrations de base de données**
-
-```bash
-pnpm run typeorm migration:run
-```
-
-d.  **Démarrer le serveur backend**
+c. **Démarrer le serveur backend**
 
 ```bash
 pnpm run start:dev
 ```
+(à noter, cela va initialiser automatiquement la base de données)
 Le backend devrait être accessible sur `http://localhost:3000`.
 
 3.  **Configuration du Frontend (Angular)**
