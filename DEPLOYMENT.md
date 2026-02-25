@@ -52,6 +52,7 @@ pnpm install
 
     b.  **Fichier d'environnement (.env)**
         Créez un fichier `.env` à la racine du dossier `backend` avec les informations de votre base de données et autres configurations.
+        
 ```env
 DB_HOST=127.0.0.1
 DB_PORT=5432
