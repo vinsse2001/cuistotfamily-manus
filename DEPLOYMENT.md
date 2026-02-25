@@ -27,7 +27,7 @@ Assurez-vous d'avoir les outils suivants installés sur votre système Linux Min
     sudo apt install postgresql postgresql-contrib
     sudo -i -u postgres
     createuser --interactive # Suivez les instructions pour créer un utilisateur (ex: cuistot_user)
-    createdb cuistot_family # Crée la base de données
+    createdb cuistotfamilymanus # Crée la base de données
     psql
     ALTER USER cuistot_user WITH PASSWORD 'votre_mot_de_passe';
     \q
@@ -53,9 +53,14 @@ Assurez-vous d'avoir les outils suivants installés sur votre système Linux Min
     b.  **Fichier d'environnement (`.env`)**
         Créez un fichier `.env` à la racine du dossier `backend` avec les informations de votre base de données et autres configurations.
         ```env
-        DATABASE_URL="postgresql://cuistot_user:votre_mot_de_passe@localhost:5432/cuistot_family"
-        JWT_SECRET="votre_secret_jwt_tres_long_et_complexe"
-        # Ajoutez d'autres variables d'environnement nécessaires (ex: pour les services de stockage de fichiers, etc.)
+        DB_HOST=127.0.0.1
+        DB_PORT=5432
+        DB_USERNAME=cuistot
+        DB_PASSWORD=cuistot_password
+        DB_DATABASE=cuistotfamilymanus
+        DB_SYNCHRONIZE=true
+        JWT_SECRET=super-secret-key-change-me-in-production
+        OPENAI_API_KEY=sk-proj-dglkdfjgdgkljetoizutzeotiuz
         ```
 
     c.  **Exécuter les migrations de base de données**
