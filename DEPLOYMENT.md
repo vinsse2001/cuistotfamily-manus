@@ -90,26 +90,13 @@ cd frontend
 pnpm install
 ```
 
-b.  **Fichier d'environnement**
-
-Angular utilise des fichiers d'environnement TypeScript. Modifiez `src/environments/environment.ts` et `src/environments/environment.development.ts` pour pointer vers votre backend local.
-
-```typescript
-// src/environments/environment.development.ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000',
-  // ... autres variables
-};
-```
-
-c.  **Démarrer le serveur de développement frontend**
+b.  **Démarrer le serveur de développement frontend**
 
 ```bash
 pnpm run start
 ```
 
-Le frontend devrait être accessible sur `http://localhost:4200`.
+Le frontend devrait être accessible sur `http://localhost:4200`, le compte admin par défaut est .
 
 ## 2. Déploiement sur o2switch
 
