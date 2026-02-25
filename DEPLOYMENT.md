@@ -27,7 +27,7 @@ nvm use 22
 curl -fsSL https://get.pnpm.io/install.sh | bash - # Installe pnpm à partir du script officiel
 ```
 *   **PostgreSQL** : La base de données utilisée par l'application.
-*   
+
 ```bash
 sudo apt install postgresql postgresql-contrib
 sudo -i -u postgres
@@ -84,8 +84,9 @@ Le backend devrait être accessible sur `http://localhost:3000`.
 
 a.  **Installer les dépendances**
 
+Dans un nouveau terminal :
 ```bash
-cd ../frontend
+cd frontend
 pnpm install
 ```
 
