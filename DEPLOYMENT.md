@@ -72,7 +72,14 @@ JWT_SECRET=super-secret-key-change-me-in-production
 OPENAI_API_KEY=sk-proj-dglkdfjgdgkljetoizutzeotiuz
 ```
 
-c. **Démarrer le serveur backend**
+c. **Initialiser le compte administrateur**
+
+Exécuter la commande :
+```bash
+npx ts-node src/seed.ts
+```
+
+d. **Démarrer le serveur backend**
 
 ```bash
 pnpm run start:dev
